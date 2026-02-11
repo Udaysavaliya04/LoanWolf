@@ -31,10 +31,6 @@ npm run dev        # starts API on http://localhost:5000
 
 APIs (base: `/api/loans`):
 
--'the post request is used in the main calculation of home loan interest'
--'get request enables to get the loan events and the amortization shedule and the main delivery of the post data uses and the main part of the post analysis is to make changes into the proper amount'
-
--'the calculated amount includes the prepayement methods and the main '
 - `POST /api/loans` – create a loan.
 - `GET /api/loans` – list loans.
 - `GET /api/loans/:id` – get loan + events.
