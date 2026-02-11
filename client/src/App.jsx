@@ -78,9 +78,12 @@ function App() {
   const [runningAdvice, setRunningAdvice] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  async function fetchLoans() {
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+const withBase = (path) => `${API_BASE}${path}`;
+
+async function fetchLoans() {
     try {
-      const res = await fetch('/api/loans');
+      const res = await fetch(withBase('/api/loans'), { credentials: 'include' });
       const data = await res.json();
       setLoans(data);
       if (!selectedLoanId && data.length > 0) {
@@ -95,7 +98,7 @@ function App() {
   async function fetchLoanDetails(loanId) {
     if (!loanId) return;
     try {
-      const res = await fetch(`/api/loans/${loanId}`);
+      const res = await fetch(withBase(`/api/loans/${loanId}`), { credentials: 'include' });
       const data = await res.json();
       if (data.loan) {
         setEvents(data.events || []);
@@ -109,7 +112,7 @@ function App() {
   useEffect(() => {
     async function initAuth() {
       try {
-        const res = await fetch('/api/auth/me');
+        const res = await fetch(withBase('/api/auth/me'), { credentials: 'include' });
         const data = await res.json();
         if (data && data.user) {
           setCurrentUser(data.user);
@@ -180,10 +183,11 @@ function App() {
           ? { name: authForm.name, email: authForm.email, password: authForm.password }
           : { email: authForm.email, password: authForm.password };
       const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
-      const res = await fetch(endpoint, {
+      const res = await fetch(withBase(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
+        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -218,7 +222,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch(withBase('/api/auth/logout'), { method: 'POST', credentials: 'include' });
     } catch {
       // ignore
     }
@@ -240,10 +244,11 @@ function App() {
         termMonths: Number(loanForm.termMonths),
         startDate: loanForm.startDate,
       };
-      const res = await fetch('/api/loans', {
+      const res = await fetch(withBase('/api/loans'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json();
@@ -276,10 +281,11 @@ function App() {
           : undefined,
         note: eventForm.note || undefined,
       };
-      const res = await fetch(`/api/loans/${selectedLoanId}/events`, {
+      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/events`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json();
@@ -301,7 +307,9 @@ function App() {
     setError('');
     setLoadingSchedule(true);
     try {
-      const res = await fetch(`/api/loans/${selectedLoanId}/schedule`);
+      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/schedule`), {
+        credentials: 'include',
+      });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.message || 'Failed to build schedule');
@@ -538,10 +546,11 @@ function App() {
     setError('');
     setRunningScenarios(true);
     try {
-      const res = await fetch(`/api/loans/${selectedLoanId}/simulate`, {
+      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/simulate`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scenarios: payloadScenarios }),
+        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -582,10 +591,11 @@ function App() {
     setError('');
     setRunningAdvice(true);
     try {
-      const res = await fetch(`/api/loans/${selectedLoanId}/advice`, {
+      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/advice`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
+        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
