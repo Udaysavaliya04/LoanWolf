@@ -2,6 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import './App.css';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import AuthLayout from './components/AuthLayout';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
+import HomePage from './components/HomePage';
 
 const EMPTY_LOAN_FORM = {
   name: '',
@@ -44,6 +48,11 @@ const INITIAL_SCENARIOS = [
 ];
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+  const [shellView, setShellView] = useState('home'); // 'home' | 'auth'
   const [loanForm, setLoanForm] = useState(EMPTY_LOAN_FORM);
   const [loans, setLoans] = useState([]);
   const [selectedLoanId, setSelectedLoanId] = useState('');
@@ -98,7 +107,24 @@ function App() {
   }
 
   useEffect(() => {
-    fetchLoans();
+    async function initAuth() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data && data.user) {
+          setCurrentUser(data.user);
+          await fetchLoans();
+        } else {
+          setCurrentUser(null);
+        }
+      } catch (e) {
+        console.error(e);
+        setCurrentUser(null);
+      } finally {
+        setAuthChecking(false);
+      }
+    }
+    initAuth();
   }, []);
 
   useEffect(() => {
@@ -138,6 +164,69 @@ function App() {
   const handleEventInputChange = (e) => {
     const { name, value } = e.target;
     setEventForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAuthInputChange = (e) => {
+    const { name, value } = e.target;
+    setAuthForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitAuth = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const body =
+        authMode === 'register'
+          ? { name: authForm.name, email: authForm.email, password: authForm.password }
+          : { email: authForm.email, password: authForm.password };
+      const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Authentication failed');
+      }
+      const data = await res.json();
+      setCurrentUser(data);
+      setAuthForm({ name: '', email: '', password: '' });
+      await fetchLoans();
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
+  };
+
+  const goToLogin = () => {
+    setError('');
+    setAuthMode('login');
+    setShellView('auth');
+  };
+
+  const goToSignup = () => {
+    setError('');
+    setAuthMode('register');
+    setShellView('auth');
+  };
+
+  const goToHome = () => {
+    setError('');
+    setShellView('home');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+    setCurrentUser(null);
+    setLoans([]);
+    setSelectedLoanId('');
+    setEvents([]);
+    setScheduleData(null);
   };
 
   const submitLoan = async (e) => {
@@ -512,37 +601,73 @@ function App() {
     }
   };
 
+  if (authChecking) {
+    return (
+      <div className="auth-shell">
+        <div className="auth-card">
+          <p className="muted">Checking session…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    if (shellView === 'home') {
+      return <HomePage onLoginClick={goToLogin} onSignupClick={goToSignup} />;
+    }
+    return (
+      <AuthLayout
+        mode={authMode}
+        onModeChange={setAuthMode}
+        error={error}
+        onBackHome={goToHome}
+      >
+        {authMode === 'login' ? (
+          <LoginForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
+        ) : (
+          <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
+        )}
+      </AuthLayout>
+    );
+  }
+
   return (
     <div className="app">
-      <header className="app-header">
-        <h1 style={{
-          fontFamily: 'Audioware',
-          fontSize: '2.2rem',
-          textTransform: 'uppercase',
-          fontWeight: '300',
-          letterSpacing: '-0.05em',
-          position: 'relative',
-          background: 'linear-gradient( rgba(109, 0, 0, 0.8), red )', 
-          WebkitBackgroundClip: 'text',
-          BackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          TextFillColor: 'transparent',
-        }}>LOANWOLF</h1>
-        <p style={{
-          fontFamily: 'Bricolage Grotesque',
-          fontSize: '1rem',
-          letterSpacing: '-0.02em',
-          background: 'linear-gradient(0deg, rgb(239, 239, 239) 0%, rgb(111, 111, 111) 100%)',
-          WebkitBackgroundClip: 'text',
-          BackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          TextFillColor: 'transparent',
-        }}>Track shifting rates, simulate extra payments, and escape early.</p>
+      <header className="site-header">
+        <div className="site-header-inner">
+          <div className="site-brand">
+            <div className="site-logo-mark">LW</div>
+            <div className="site-brand-text">
+              <span className="site-brand-title">LOANWOLF</span>
+              <span className="site-brand-sub">Loan payoff cockpit</span>
+            </div>
+          </div>
+          <nav className="site-nav">
+            <a href="#dashboard" className="site-nav-link">
+              Dashboard
+            </a>
+            <a href="#schedule" className="site-nav-link">
+              Schedule
+            </a>
+            <a href="#scenarios" className="site-nav-link">
+              Scenarios
+            </a>
+            <a href="#advisor" className="site-nav-link">
+              Advisor
+            </a>
+          </nav>
+          <div className="site-header-user">
+            <span className="site-header-user-name">{currentUser.name}</span>
+            <button type="button" className="secondary-btn site-header-logout" onClick={handleLogout}>
+              Log out
+            </button>
+          </div>
+        </div>
       </header>
 
       {error && <div className="error-banner">{error}</div>}
 
-      <main className="layout">
+      <main className="layout" id="dashboard">
         <section className="panel">
           <h2>Create Loan</h2>
           <form className="form" onSubmit={submitLoan}>
@@ -818,7 +943,7 @@ function App() {
         </section>
       </main>
 
-      <section className="panel panel-full" ref={scheduleRef}>
+      <section className="panel panel-full" id="schedule" ref={scheduleRef}>
         <div className="panel-header">
           <h2>Amortization schedule</h2>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1057,7 +1182,7 @@ function App() {
         )}
       </section>
 
-      <section className="panel panel-full scenarios-panel">
+      <section className="panel panel-full scenarios-panel" id="scenarios">
         <div className="scenarios-header">
           <div>
             <div className="scenarios-title">What-if scenarios</div>
@@ -1187,7 +1312,7 @@ function App() {
         )}
       </section>
 
-      <section className="panel panel-full advisor-panel">
+      <section className="panel panel-full advisor-panel" id="advisor">
         <div className="scenarios-header">
           <div>
             <div className="scenarios-title">Advisor</div>

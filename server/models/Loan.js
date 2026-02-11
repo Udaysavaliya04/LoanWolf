@@ -7,6 +7,7 @@ const LoanSchema = new mongoose.Schema(
     annualInterestRate: { type: Number, required: true }, // percentage, e.g. 10.5
     termMonths: { type: Number, required: true },
     startDate: { type: Date, required: true },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

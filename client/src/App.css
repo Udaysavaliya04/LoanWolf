@@ -1,5 +1,5 @@
 :root {
-  font-family:'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   color-scheme: dark;
   --radius: 0.65rem;
   --background: hsl(0 0% 3.9%);
@@ -31,7 +31,7 @@
 }
 
 body {
-  font-family:'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   margin: 0;
   background-color: var(--bg);
   color: var(--text-primary);
@@ -43,21 +43,330 @@ body {
   padding: 2rem 1.75rem 3.5rem;
 }
 
+.site-header {
+  position: sticky;
+  top: 5px;
+  z-index: 30;
+  margin-bottom: 1.75rem;
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  
+  -webkit-backdrop-filter: blur(26px);
+  backdrop-filter: blur(26px);
+}
+
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: linear-gradient(0deg, #ff8e8e, #ef4444, #c58122);
+  display: flex;
+  font-family: a;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #020617;
+}
+
+.site-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  
+}
+
+.site-brand-title {
+  font-size: 0.86rem;
+  font-weight: 500;
+    font-family: 'Audioware';
+    text-transform: uppercase;
+    font-weight: 300;
+    letter-spacing: -0.05em;
+    background: linear-gradient(rgba(173, 173, 173, 0.8), red);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.site-brand-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: Bricolage Grotesque;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.78rem;
+}
+
+.site-nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius);
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.site-nav-link:hover {
+  color: var(--text-primary);
+  background-color: rgba(148, 163, 184, 0.12);
+}
+
+.site-header-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.site-header-user-name {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.site-header-logout {
+  padding-inline: 0.75rem;
+  height: 30px;
+}
+
+.site-header-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.site-header-get-started {
+  height: 30px;
+}
+
 .app-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.8rem;
 }
 
-.app-header h1 {
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.hero-main {
+  padding: 1.2rem 1.3rem 1.35rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background:
+    radial-gradient(circle at top left, rgba(55, 65, 81, 0.5), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));
+  -webkit-backdrop-filter: blur(26px);
+  backdrop-filter: blur(26px);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.16rem 0.55rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(148, 163, 184, 0.9);
+  margin-bottom: 0.4rem;
+}
+
+.hero-title {
+  margin: 0 0 0.4rem;
+  font-family: 'Audioware';
+  font-size: 2.3rem;
+  text-transform: uppercase;
+  font-weight: 300;
+  letter-spacing: -0.07em;
+  background: linear-gradient(rgba(109, 0, 0, 0.8), red);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  margin: 0 0 0.7rem;
+  font-family: 'Bricolage Grotesque';
+  font-size: 0.98rem;
+  letter-spacing: -0.02em;
+  color: rgba(226, 232, 240, 0.92);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.hero-primary-cta {
+  text-decoration: none;
+}
+
+.hero-secondary-cta {
+  text-decoration: none;
+}
+
+.hero-side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+.hero-card {
+  padding: 0.8rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(30, 64, 175, 0.7);
+  background:
+    radial-gradient(circle at top left, rgba(30, 64, 175, 0.65), rgba(15, 23, 42, 0.96)),
+    rgba(15, 23, 42, 0.98);
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+}
+
+.hero-card-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(191, 219, 254, 0.85);
+  margin-bottom: 0.15rem;
+}
+
+.hero-card-value {
+  font-size: 0.86rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.hero-card-copy {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(148, 163, 184, 0.92);
+}
+
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header-inner {
+    flex-wrap: wrap;
+    padding: 0.45rem 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .site-brand {
+    flex: 1 0 100%;
+    justify-content: space-between;
+  }
+
+  .site-nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.1rem;
+  }
+
+  .site-header-user,
+  .site-header-auth {
+    margin-left: auto;
+  }
+}
+
+.home-shell {
+  min-height: 100vh;
+}
+
+.home-main {
+  padding-top: 1.25rem;
+}
+
+.home-hero {
+  margin-bottom: 2.3rem;
+}
+
+.home-section {
+  margin-bottom: 2.2rem;
+}
+
+.home-section-header h2 {
   margin: 0 0 0.35rem;
-  font-size: 2rem;
-  letter-spacing: -0.04em;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
 }
 
-.app-header p {
+.home-section-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.home-features-grid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.home-feature-card {
+  padding: 0.75rem 0.8rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-elevated);
+  font-size: 0.85rem;
+}
+
+.home-feature-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+}
+
+.home-feature-card p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+}
+
+.home-section-muted {
+  opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  .home-features-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .layout {
@@ -79,8 +388,8 @@ body {
   padding: 1.35rem 1.3rem 1.4rem;
   border: 1px solid var(--border-subtle);
   box-shadow:
-    8px 8px 20px rgba(28, 28, 28, 0.3) ,
-    0 0 0 1px rgba(0, 0, 0, 0.5) ;
+    8px 8px 20px rgba(28, 28, 28, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 
 .panel-full {
@@ -468,7 +777,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
 }
 
 .chart-legend-swatch {
@@ -714,4 +1023,126 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 16px 35px rgba(0, 0, 0, 0.8);
   background: rgba(30, 64, 175, 0.95);
+}
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.25rem;
+  position: relative;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 1.8rem 1.6rem 2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-elevated);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+.auth-back-home {
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  padding: 0.45rem 1.1rem;
+  cursor: pointer;
+  color: black;
+    border-color: var(--border-subtle);
+  background-color: rgb(236, 236, 236);
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+  position: absolute;
+  top: 1.2rem;
+  right: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+
+.auth-card-gradient {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card-gradient::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0.12;
+  z-index: -1;
+}
+
+.auth-logo {
+  margin: 0;
+  font-family: 'Audioware';
+  font-size: 1.9rem;
+  text-transform: uppercase;
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  background: linear-gradient(rgba(109, 0, 0, 0.8), red);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.auth-subtitle {
+  margin: 0.3rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.auth-toggle {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  padding: 0.12rem;
+  background-color: var(--background);
+  margin: 0 auto 1rem;
+}
+
+.auth-toggle-capsule {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-toggle-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.32rem 1.2rem;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex: 1 1 0;
+}
+
+.auth-toggle-button-active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.auth-form {
+  margin-top: 0.4rem;
+}
+
+.auth-primary-btn {
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.auth-error-banner {
+  margin-bottom: 0.75rem;
 }

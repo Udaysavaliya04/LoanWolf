@@ -2,8 +2,11 @@ const express = require('express');
 const Loan = require('../models/Loan');
 const LoanEvent = require('../models/LoanEvent');
 const { buildSchedule } = require('../services/amortizationService');
+const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
+
+router.use(requireAuth);
 
 router.post('/', async (req, res) => {
   try {
@@ -14,6 +17,7 @@ router.post('/', async (req, res) => {
       annualInterestRate,
       termMonths,
       startDate,
+      ownerId: req.user.id,
     });
     res.status(201).json(loan);
   } catch (err) {
@@ -24,7 +28,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const loans = await Loan.find().sort({ createdAt: -1 });
+    const loans = await Loan.find({ ownerId: req.user.id }).sort({ createdAt: -1 });
     res.json(loans);
   } catch (err) {
     console.error(err);
@@ -34,7 +38,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const loan = await Loan.findById(req.params.id);
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
     const events = await LoanEvent.find({ loanId: loan._id }).sort({ date: 1 });
     res.json({ loan, events });
@@ -48,7 +52,7 @@ router.post('/:id/events', async (req, res) => {
   try {
     const { type, date, amount, newAnnualInterestRate, note } = req.body;
     const loanId = req.params.id;
-    const loan = await Loan.findById(loanId);
+    const loan = await Loan.findOne({ _id: loanId, ownerId: req.user.id });
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
     const event = await LoanEvent.create({
