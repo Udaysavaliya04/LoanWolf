@@ -585,6 +585,80 @@ body {
   font-weight: 500;
 }
 
+.advisor-panel {
+  margin-top: 2rem;
+}
+
+.advisor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .advisor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.advisor-mode-toggle {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  padding: 0.12rem;
+  background-color: var(--background);
+}
+
+.advisor-mode-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.advisor-mode-button-active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.advisor-summary {
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--card);
+  padding: 0.8rem 0.9rem 0.9rem;
+  font-size: 0.82rem;
+}
+
+.advisor-summary h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+}
+
+.advisor-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .advisor-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.advisor-tip-list {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.advisor-tip-list li {
+  margin-bottom: 0.15rem;
+}
+
 @media (max-width: 900px) {
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -614,4 +688,30 @@ body {
 
 .footer-icon svg {
   display: none;
+}
+
+.scroll-top-btn {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(15, 23, 42, 0.95);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  z-index: 40;
+}
+
+.scroll-top-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.8);
+  background: rgba(30, 64, 175, 0.95);
 }

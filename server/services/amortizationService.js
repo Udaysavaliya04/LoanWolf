@@ -126,6 +126,9 @@ async function buildSchedule(loanId, options = {}) {
   const maxMonths = termMonths * 2 || 600; // safety cap so we don't loop forever
 
   const today = new Date();
+  const recurringExtra = options.extraPerMonth
+    ? new Decimal(options.extraPerMonth)
+    : new Decimal(0);
 
   for (let i = 1; i <= maxMonths && balance.gt(0.01); i++) {
     const periodStartBalance = balance;
@@ -154,7 +157,7 @@ async function buildSchedule(loanId, options = {}) {
       principalComponent = new Decimal(0);
     }
 
-    let extraPayment = new Decimal(0);
+    let extraPayment = recurringExtra;
     for (const ev of eventsThisPeriod.filter((e) => e.type === 'EXTRA_PAYMENT')) {
       if (typeof ev.amount === 'number') {
         extraPayment = extraPayment.plus(ev.amount);

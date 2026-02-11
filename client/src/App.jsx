@@ -62,6 +62,12 @@ function App() {
   const [scenarios, setScenarios] = useState(INITIAL_SCENARIOS);
   const [scenarioResults, setScenarioResults] = useState([]);
   const [runningScenarios, setRunningScenarios] = useState(false);
+  const [advisorMode, setAdvisorMode] = useState('extra'); // 'extra' | 'target'
+  const [advisorExtra, setAdvisorExtra] = useState('');
+  const [advisorTargetDate, setAdvisorTargetDate] = useState('');
+  const [advisorResult, setAdvisorResult] = useState(null);
+  const [runningAdvice, setRunningAdvice] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   async function fetchLoans() {
     try {
@@ -113,6 +119,15 @@ function App() {
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 200);
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLoanInputChange = (e) => {
@@ -450,6 +465,50 @@ function App() {
       setError(e.message);
     } finally {
       setRunningScenarios(false);
+    }
+  };
+
+  const runAdvisor = async () => {
+    if (!selectedLoanId) {
+      setError('Select a loan first to get advice');
+      return;
+    }
+
+    const body = {};
+    if (advisorMode === 'extra') {
+      const val = Number(advisorExtra);
+      if (!Number.isFinite(val) || val <= 0) {
+        setError('Enter a positive monthly extra amount.');
+        return;
+      }
+      body.extraPerMonth = val;
+    } else {
+      if (!advisorTargetDate) {
+        setError('Pick a target payoff date.');
+        return;
+      }
+      body.targetPayoffDate = advisorTargetDate;
+    }
+
+    setError('');
+    setRunningAdvice(true);
+    try {
+      const res = await fetch(`/api/loans/${selectedLoanId}/advice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to generate advice');
+      }
+      const data = await res.json();
+      setAdvisorResult(data);
+    } catch (e) {
+      console.error(e);
+      setError(e.message);
+    } finally {
+      setRunningAdvice(false);
     }
   };
 
@@ -1026,7 +1085,7 @@ function App() {
               {scenarios.map((sc) => (
                 <div key={sc.id} className="scenario-card">
                   <h4>{sc.name}</h4>
-                  <div className="form-row">
+                  <div className="form-row" style={{marginBottom: '0.9rem'}}>
                     <label>Scenario name</label>
                     <input
                       value={sc.name}
@@ -1034,7 +1093,7 @@ function App() {
                       placeholder={`Scenario ${sc.id}`}
                     />
                   </div>
-                  <div className="form-row">
+                  <div className="form-row" style={{ marginBottom: '0.9rem' }}>
                     <label>Hypothetical lump sum (₹)</label>
                     <input
                       type="number"
@@ -1045,7 +1104,7 @@ function App() {
                       placeholder="e.g. 2,00,000"
                     />
                   </div>
-                  <div className="form-row">
+                  <div className="form-row" style={{ marginBottom: '0.9rem' }}>
                     <label>Lump sum date</label>
                     <input
                       type="date"
@@ -1053,7 +1112,7 @@ function App() {
                       onChange={(e) => updateScenarioField(sc.id, 'lumpSumDate', e.target.value)}
                     />
                   </div>
-                  <div className="form-row">
+                  <div className="form-row" style={{ marginBottom: '0.9rem' }}>
                     <label>Future rate (%)</label>
                     <input
                       type="number"
@@ -1128,9 +1187,166 @@ function App() {
         )}
       </section>
 
+      <section className="panel panel-full advisor-panel">
+        <div className="scenarios-header">
+          <div>
+            <div className="scenarios-title">Advisor</div>
+            <div className="scenarios-subtitle">
+              Get a recommended extra EMI plan to either use a fixed surplus or hit a target payoff date.
+            </div>
+          </div>
+          <div className="advisor-mode-toggle">
+            <button
+              type="button"
+              className={
+                'advisor-mode-button' + (advisorMode === 'extra' ? ' advisor-mode-button-active' : '')
+              }
+              onClick={() => setAdvisorMode('extra')}
+            >
+              Monthly surplus
+            </button>
+            <button
+              type="button"
+              className={
+                'advisor-mode-button' + (advisorMode === 'target' ? ' advisor-mode-button-active' : '')
+              }
+              onClick={() => setAdvisorMode('target')}
+            >
+              Target payoff date
+            </button>
+          </div>
+        </div>
+
+        {!selectedLoanId ? (
+          <p className="muted">Select a loan above to get personalized advice.</p>
+        ) : (
+          <div className="advisor-grid">
+            <div>
+              {advisorMode === 'extra' ? (
+                <div className="form">
+                  <div className="form-row">
+                    <label>I can spare (₹ per month)</label>
+                    <input
+                      type="number"
+                      value={advisorExtra}
+                      onChange={(e) => setAdvisorExtra(e.target.value)}
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g. 5,000"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="form">
+                  <div className="form-row">
+                    <label>Target payoff date</label>
+                    <input
+                      type="date"
+                      value={advisorTargetDate}
+                      onChange={(e) => setAdvisorTargetDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div style={{ marginTop: '0.6rem' }}>
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={runAdvisor}
+                  disabled={runningAdvice}
+                >
+                  {runningAdvice ? 'Calculating…' : 'Get advice'}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              {advisorResult ? (
+                <div className="advisor-summary">
+                  <h4>Suggested plan</h4>
+                  {advisorResult.mode === 'extraPerMonth' && (
+                    <p style={{ margin: 0, marginBottom: '0.4rem' }}>
+                      Add roughly{' '}
+                      <strong>
+                        ₹{formatINR(advisorResult.input.extraPerMonth || 0)} per month
+                      </strong>{' '}
+                      as extra principal.
+                    </p>
+                  )}
+                  {advisorResult.mode === 'targetPayoffDate' &&
+                    advisorResult.recommendedExtraPerMonth != null && (
+                      <p style={{ margin: 0, marginBottom: '0.4rem' }}>
+                        To approach your target date, add about{' '}
+                        <strong>
+                          ₹{formatINR(advisorResult.recommendedExtraPerMonth || 0)} per month
+                        </strong>{' '}
+                        as extra principal.
+                      </p>
+                    )}
+
+                  {advisorResult.summaryWithExtra && advisorResult.comparisonWithExtra && (
+                    <div className="advisor-summary-grid">
+                      <div>
+                        <div className="chart-card-subtitle">Interest saved</div>
+                        <div>
+                          ₹
+                          {formatINR(
+                            Math.max(0, advisorResult.comparisonWithExtra.interestSaved || 0)
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="chart-card-subtitle">EMIs saved</div>
+                        <div>
+                          {Math.max(
+                            0,
+                            advisorResult.comparisonWithExtra.monthsSaved || 0
+                          ).toLocaleString()}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="chart-card-subtitle">New payoff date</div>
+                        <div>
+                          {advisorResult.summaryWithExtra.payoffDate
+                            ? formatDate(advisorResult.summaryWithExtra.payoffDate)
+                            : 'Not fully repaid'}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {Array.isArray(advisorResult.tips) && advisorResult.tips.length > 0 && (
+                    <ul className="advisor-tip-list">
+                      {advisorResult.tips.map((tip, idx) => (
+                        <li key={idx}>{tip}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <p className="muted">
+                  Run the advisor to see recommended extra EMI and how much faster you can close this loan.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
+
       <footer className="footer">
         <span className="footer-text">Made with ❤️ by Uday Savaliya</span>
       </footer>
+
+      {showScrollTop && (
+        <button
+          type="button"
+          className="scroll-top-btn"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          ↑
+        </button>
+      )}
     </div>
   );
 }
