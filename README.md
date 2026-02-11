@@ -1,5 +1,7 @@
 ## Loanwolf – Track shifting rates, simulate extra payments, and escape debt faster.
 
+Try now - https://loanwolf-platform.onrender.com
+
 Loanwolf is a full‑stack app for **loans**.  
 It gives you a clean cockpit to see your entire amortization, run what‑if scenarios and get payoff strategies.
 
