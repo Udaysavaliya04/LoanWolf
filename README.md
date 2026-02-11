@@ -12,12 +12,6 @@ It lets you:
   - Extra payments
   - Totals and payoff date.
 
-### Prerequisites
-
-- Node.js (LTS recommended)
-- A running MongoDB instance (default URI: `mongodb://127.0.0.1:27017/loan_tracker`)
-
-You can override the MongoDB connection string by setting `MONGO_URI` in your environment for the backend.
 
 ### Backend (Express + Mongo)
 
@@ -37,8 +31,6 @@ APIs (base: `/api/loans`):
 - `POST /api/loans/:id/events` – add extra payment or rate change.
 - `GET /api/loans/:id/schedule` – build amortization schedule with events applied.
 
-Calculations are done with monthly compounding and use `decimal.js` to avoid floating-point rounding issues.
-
 ### Frontend (React + Vite)
 
 From the `client` folder:
@@ -48,13 +40,3 @@ cd client
 npm install        # already run once
 npm run dev        # starts app (usually on http://localhost:5173)
 ```
-
-The Vite dev server is configured to **proxy** `/api` to `http://localhost:5000`, so as long as the backend is running you can use the app without extra config.
-
-### Usage
-
-1. Start MongoDB.
-2. In `server`, run `npm run dev`.
-3. In `client`, run `npm run dev` and open the shown URL in your browser.
-4. Create a loan, select it, add events (extra payments or rate changes), and click **Generate schedule** to view the detailed table and totals.
-
