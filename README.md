@@ -1,42 +1,32 @@
-## Loan amortization tracker (MERN)
+## Loanwolf – Track shifting rates, simulate extra payments, and escape debt faster.
 
-This project is a full-stack loan amortization tracker built with the **MERN stack** (MongoDB, Express, React, Node).
+Loanwolf is a full‑stack app for **loans**.  
+It gives you a clean cockpit to see your entire amortization, run what‑if scenarios and get payoff strategies.
 
-It lets you:
+### Features
 
-- Create loans with principal, interest rate, term, and start date.
-- Add **extra principal payments** and **interest rate change** events.
-- Generate a **detailed amortization schedule** with:
-  - Period-by-period opening/closing balance
-  - Interest and principal split
-  - Extra payments
-  - Totals and payoff date.
+- **Loan tracking**
+  - Create loans with principal, annual interest rate, term (months) and start date.
 
+- **Events & schedule**
+  - Add **extra principal payments**.
+  - Add **interest rate change** events.
+  - Generate a detailed amortization schedule (HDFC‑style):
+    - Period‑by‑period opening/closing balance.
+    - Interest and principal split.
+    - Prepayments and adjusted EMIs.
+    - Totals and payoff date.
 
-### Backend (Express + Mongo)
+- **Insights**
+  - Interest saved vs original schedule.
+  - Remaining principal vs time chart (original vs with prepayments).
+  - Interest vs principal per year chart.
 
-From the `server` folder:
+- **What‑if & Advisor**
+  - Scenario studio: compare multiple hypothetical lump sums / future rate changes.
+  - Advisor: enter either `I can spare ₹X/month` or a **target payoff date** and get:
+    - Suggested extra EMI per month.
+    - Interest and EMIs saved.
+    - Plain‑English tips.
 
-```bash
-cd server
-npm install        # already run once
-npm run dev        # starts API on http://localhost:5000
-```
-
-APIs (base: `/api/loans`):
-
-- `POST /api/loans` – create a loan.
-- `GET /api/loans` – list loans.
-- `GET /api/loans/:id` – get loan + events.
-- `POST /api/loans/:id/events` – add extra payment or rate change.
-- `GET /api/loans/:id/schedule` – build amortization schedule with events applied.
-
-### Frontend (React + Vite)
-
-From the `client` folder:
-
-```bash
-cd client
-npm install        # already run once
-npm run dev        # starts app (usually on http://localhost:5173)
-```
+---
