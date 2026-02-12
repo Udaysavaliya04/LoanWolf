@@ -48,24 +48,15 @@ const INITIAL_SCENARIOS = [
 ];
 
 
-// --- Luxury Crystal Spinner ---
+// --- Luxury Modern Spinner ---
 const LoadingSpinner = () => (
   <div className="spinner-wrapper">
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="48" 
-      height="48" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className="animate-spin"
-      style={{ color: '#ffffff', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.3))' }}
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
+    <div className="luxury-spinner">
+      <svg className="spinner-svg" viewBox="25 25 50 50">
+        <circle className="spinner-track" cx="50" cy="50" r="20" fill="none" />
+        <circle className="spinner-head" cx="50" cy="50" r="20" fill="none" />
+      </svg>
+    </div>
     <div className="spinner-text">LOANWOLF</div>
   </div>
 );
@@ -100,6 +91,7 @@ function App() {
   const [advisorResult, setAdvisorResult] = useState(null);
   const [runningAdvice, setRunningAdvice] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const withBase = (path) => `${API_BASE}${path}`;
@@ -665,23 +657,67 @@ async function fetchLoans() {
           <div className="site-brand">
             <span className="site-brand-title">LOANWOLF</span>
           </div>
+          <div className="desktop-nav">
+            <nav className="site-nav">
+              <a href="#dashboard" className="site-nav-link">
+                Dashboard
+              </a>
+              <a href="#schedule" className="site-nav-link">
+                Schedule
+              </a>
+              <a href="#scenarios" className="site-nav-link">
+                Scenarios
+              </a>
+              <a href="#advisor" className="site-nav-link">
+                Advisor
+              </a>
+            </nav>
+            <div className="site-header-user">
+              <span className="site-header-user-name">{currentUser.name}</span>
+              <button type="button" className="secondary-btn site-header-logout" onClick={handleLogout}>
+                Log out
+              </button>
+            </div>
+          </div>
+
+          <div
+            className="mobile-nav-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            )}
+          </div>
+        </div>
+
+        <div className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}>
           <nav className="site-nav">
-            <a href="#dashboard" className="site-nav-link">
+            <a href="#dashboard" className="site-nav-link" onClick={() => setMobileMenuOpen(false)}>
               Dashboard
             </a>
-            <a href="#schedule" className="site-nav-link">
+            <a href="#schedule" className="site-nav-link" onClick={() => setMobileMenuOpen(false)}>
               Schedule
             </a>
-            <a href="#scenarios" className="site-nav-link">
+            <a href="#scenarios" className="site-nav-link" onClick={() => setMobileMenuOpen(false)}>
               Scenarios
             </a>
-            <a href="#advisor" className="site-nav-link">
+            <a href="#advisor" className="site-nav-link" onClick={() => setMobileMenuOpen(false)}>
               Advisor
             </a>
           </nav>
           <div className="site-header-user">
             <span className="site-header-user-name">{currentUser.name}</span>
-            <button type="button" className="secondary-btn site-header-logout" onClick={handleLogout}>
+            <button
+              type="button"
+              className="secondary-btn site-header-logout"
+              onClick={() => {
+                handleLogout();
+                setMobileMenuOpen(false);
+              }}
+            >
               Log out
             </button>
           </div>
@@ -741,6 +777,16 @@ async function fetchLoans() {
                 step="1"
                 placeholder='e.g. 180'
                 required
+              />
+              <input 
+                type="range" 
+                name="termMonths"
+                min="0" 
+                max="360" 
+                value={loanForm.termMonths || 0} 
+                onChange={handleLoanInputChange}
+                className="slider-range"
+                style={{ '--range-progress': `${((loanForm.termMonths || 0) / 360) * 100}%` }}
               />
             </div>
             <div className="form-row">
@@ -934,32 +980,34 @@ async function fetchLoans() {
               {events.length === 0 ? (
                 <p className="muted">No events for this loan yet.</p>
               ) : (
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Type</th>
-                      <th>Amount / Rate</th>
-                      <th>Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {events.map((ev) => (
-                      <tr key={ev._id}>
-                        <td>{formatDate(ev.date)}</td>
-                        <td>{ev.type === 'EXTRA_PAYMENT' ? 'Extra payment' : 'Rate change'}</td>
-                        <td>
-                          {ev.type === 'EXTRA_PAYMENT' && ev.amount != null
-                            ? `₹${formatINR(ev.amount)}`
-                            : ev.newAnnualInterestRate != null
-                              ? `${ev.newAnnualInterestRate}%`
-                              : '-'}
-                        </td>
-                        <td>{ev.note || '-'}</td>
+                <div className="table-wrapper">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount / Rate</th>
+                        <th>Note</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {events.map((ev) => (
+                        <tr key={ev._id}>
+                          <td>{formatDate(ev.date)}</td>
+                          <td>{ev.type === 'EXTRA_PAYMENT' ? 'Extra payment' : 'Rate change'}</td>
+                          <td>
+                            {ev.type === 'EXTRA_PAYMENT' && ev.amount != null
+                              ? `₹${formatINR(ev.amount)}`
+                              : ev.newAnnualInterestRate != null
+                                ? `${ev.newAnnualInterestRate}%`
+                                : '-'}
+                          </td>
+                          <td>{ev.note || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </>
           )}

@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 
 function HomePage({ onLoginClick, onSignupClick }) {
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  const handleFaqClick = (index) => {
+    setOpenFaqIndex(prevIndex => (prevIndex === index ? null : index));
+  };
+
   return (
     <div className="home-shell">
       <header className="site-header">
@@ -31,12 +37,9 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </h1>
         </div>
         
-
-        {/* --- LUXURY BENTO GRID SECTION --- */}
         <section className="bento-section">
           <div className="features-grid">
             
-            {/* 1. Amortization (Wide Card) */}
             <div className="f-card glass-panel wide">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3v18h18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
@@ -53,7 +56,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            {/* 2. Charts (Square Card) */}
             <div className="f-card glass-panel">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
@@ -64,7 +66,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            {/* 3. Scenarios (Square Card) */}
             <div className="f-card glass-panel">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><circle cx="12" cy="12" r="10"/></svg>
@@ -75,7 +76,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            {/* 4. Advisor (Wide Card) */}
             <div className="f-card glass-panel wide">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
@@ -86,7 +86,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            {/* 5. Workflow (Full Width Strip) */}
             <div className="f-card glass-panel full-width workflow-strip">
               <div className="workflow-header">
                 <h3>How Loanwolf fits into your month</h3>
@@ -117,7 +116,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </div>
         </section>
 
-{/* --- LUXURY FAQ SECTION --- */}
         <section className="faq-section">
           <div className="faq-header">
             <h2>Common <span className="text-gradient-silver">Questions</span></h2>
@@ -127,18 +125,26 @@ function HomePage({ onLoginClick, onSignupClick }) {
             <FaqItem 
               question="Is my financial data safe?" 
               answer="Absolutely. We don't ask for your bank login credentials. You only input the loan numbers (principal, interest rate, tenure) manually. Your data remains private and secure."
+              isOpen={openFaqIndex === 0}
+              onClick={() => handleFaqClick(0)}
             />
             <FaqItem 
               question="Does this work for HDFC, SBI, or ICICI loans?" 
               answer="Yes. Loanwolf works with the standard reducing balance method used by 99% of Indian banks (SBI, HDFC, ICICI, Axis, Kotak). If your bank adjusts interest monthly, this calculator is accurate for you."
+              isOpen={openFaqIndex === 1}
+              onClick={() => handleFaqClick(1)}
             />
             <FaqItem 
               question="How exactly does prepayment save money?" 
               answer="When you prepay, the entire amount goes towards reducing your Principal. Since interest is calculated on the remaining Principal, a smaller Principal means significantly lower interest for the rest of the loan tenure."
+              isOpen={openFaqIndex === 2}
+              onClick={() => handleFaqClick(2)}
             />
             <FaqItem 
               question="Can I simulate a rate hike by RBI?" 
               answer="Yes. Use the 'What-if Lab' to increase your current interest rate by 0.25% or 0.50% and see how much your tenure increases immediately."
+              isOpen={openFaqIndex === 3}
+              onClick={() => handleFaqClick(3)}
             />
           </div>
         </section>
@@ -166,14 +172,11 @@ function HomePage({ onLoginClick, onSignupClick }) {
   );
 }
 
-// Helper Component for the Accordion
-const FaqItem = ({ question, answer }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const FaqItem = ({ question, answer, isOpen, onClick }) => {
   return (
     <div 
       className={`faq-item glass-panel ${isOpen ? 'open' : ''}`} 
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={onClick}
     >
       <div className="faq-question">
         <span>{question}</span>
