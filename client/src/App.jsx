@@ -1457,7 +1457,6 @@ async function fetchLoans() {
                 </div>
               ) : (
                 <p className="muted">
-                  Run the advisor to see recommended extra EMI and how much faster you can close this loan.
                 </p>
               )}
             </div>
