@@ -24,7 +24,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
       </header>
 
       <main className="home-main">
-        {/* --- NEW: TRENDY BIG HERO TEXT --- */}
         <div className="titan-text-container">
           <h1 className="titan-text">
             Master your <br />

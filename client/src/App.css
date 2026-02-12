@@ -1,7 +1,7 @@
 :root {
   font-family: 'Inter', sans-serif;
   color-scheme: dark;
-  --radius: 0.65rem;
+  --radius: 0.75rem;
   --background: hsl(0 0% 3.9%);
   --foreground: hsl(0 0% 98%);
   --card: hsl(0 0% 3.9%);
@@ -915,7 +915,7 @@ body {
 
 .advisor-mode-button {
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 0.25rem 0.7rem;
   font-size: 0.78rem;
   background: transparent;
@@ -1217,7 +1217,7 @@ body {
   height: 48px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1731,4 +1731,65 @@ body {
 /* Hide the OLD hero title if you want to keep the hero cards but remove duplicate text */
 .hero-main .hero-title {
   display: none;
+}
+
+/* =========================================
+   GLOBAL ANIMATIONS (Luxury Feel)
+   ========================================= */
+
+/* 1. Base Fade In (for page loads) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 2. Staggered Animation Delay (for lists/cards) */
+.stagger-1 {
+  animation-delay: 100ms;
+}
+
+.stagger-2 {
+  animation-delay: 200ms;
+}
+
+.stagger-3 {
+  animation-delay: 300ms;
+}
+
+/* 3. Scroll Reveal Class (Use this on sections) */
+/* You can trigger this with a simple IntersectionObserver script if needed, 
+   but for now, we'll use a simple CSS loading animation */
+.reveal-on-load {
+  opacity: 0;
+  animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 4. Pulse Animation (for important buttons) */
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.animate-pulse {
+  animation: softPulse 3s infinite;
 }
