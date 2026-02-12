@@ -79,58 +79,115 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </div>
         </section>
 
-        <section id="features" className="home-section">
-          <div className="home-section-header">
-            <h2>Everything tuned for Indian home loans</h2>
+        {/* --- LUXURY BENTO GRID SECTION --- */}
+        <section className="bento-section">
+          <div className="bento-header">
+            <h2>Everything tuned for <span className="text-highlight">Indian home loans</span></h2>
             <p>
-              Indian currency, floating rates, and output aligned with real bank
-              statements.
+              Indian currency, floating rates, and output aligned with real bank statements.
             </p>
           </div>
-          <div className="home-features-grid">
-            <div className="home-feature-card">
-              <h3>Live amortization table</h3>
-              <p>
-                Full EMI breakdown without pagination. Every month shows opening balance, interest,
-                principal and prepayments.
-              </p>
+
+          <div className="features-grid">
+            
+            {/* 1. Amortization (Wide Card) */}
+            <div className="f-card glass-panel wide">
+              <div className="f-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3v18h18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+              </div>
+              <div className="f-content">
+                <h3>Live Amortization Table</h3>
+                <p>Full EMI breakdown without pagination. Every month shows opening balance, interest, principal, and prepayments in a single view.</p>
+              </div>
+              <div className="f-visual-table">
+                <div className="row head"><span>Month</span><span>Interest</span><span>Principal</span></div>
+                <div className="row"><span>Apr</span><span>₹24,103</span><span>₹8,342</span></div>
+                <div className="row"><span>May</span><span>₹23,980</span><span>₹8,465</span></div>
+                <div className="row active"><span>Jun</span><span>₹23,810</span><span>₹58,635</span></div>
+              </div>
             </div>
-            <div className="home-feature-card">
-              <h3>Minimal charts</h3>
-              <p>
-                Track remaining principal vs time and yearly interest vs principal with clean, hoverable
-                charts.
-              </p>
+
+            {/* 2. Charts (Square Card) */}
+            <div className="f-card glass-panel">
+              <div className="f-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+              </div>
+              <div className="f-content">
+                <h3>Minimal Charts</h3>
+                <p>Track remaining principal vs time and yearly interest vs principal with clean, hoverable charts.</p>
+              </div>
             </div>
-            <div className="home-feature-card">
-              <h3>Scenario studio</h3>
-              <p>
-                Compare multiple what‑if plans to see months and interest saved versus your original bank
-                schedule.
-              </p>
+
+            {/* 3. Scenarios (Square Card) */}
+            <div className="f-card glass-panel">
+              <div className="f-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <div className="f-content">
+                <h3>Scenario Studio</h3>
+                <p>Compare multiple what‑if plans to see months and interest saved versus your original bank schedule.</p>
+              </div>
             </div>
-            <div className="home-feature-card">
-              <h3>Advisor guidance</h3>
-              <p>
-                Plain‑English suggestions on how much to overpay and when, so you are never guessing your
-                strategy.
-              </p>
+
+            {/* 4. Advisor (Wide Card) */}
+            <div className="f-card glass-panel wide">
+              <div className="f-icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              </div>
+              <div className="f-content">
+                <h3>Advisor Guidance</h3>
+                <p>Plain‑English suggestions on how much to overpay and when, so you are never guessing your strategy.</p>
+              </div>
             </div>
+
+            {/* 5. Workflow (Full Width Strip) */}
+            <div className="f-card glass-panel full-width workflow-strip">
+              <div className="workflow-header">
+                <h3>How Loanwolf fits into your month</h3>
+              </div>
+              <div className="workflow-steps">
+                <div className="step">
+                  <div className="step-num">1</div>
+                  <span>Check Statement</span>
+                </div>
+                <div className="step-arrow">→</div>
+                <div className="step">
+                  <div className="step-num">2</div>
+                  <span>Update Events</span>
+                </div>
+                <div className="step-arrow">→</div>
+                <div className="step">
+                  <div className="step-num">3</div>
+                  <span>Run Advisor</span>
+                </div>
+                <div className="step-arrow">→</div>
+                <div className="step">
+                  <div className="step-num highlight">4</div>
+                  <span className="text-highlight">Execute Plan</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
-        <section id="how-it-works" className="home-section home-section-muted">
-          <div className="home-section-header">
-            <h2>How Loanwolf fits into your month</h2>
-            <p>
-              Check bank statement → update events → run advisor → follow the extra EMI plan for the next
-              few months.
-            </p>
+       <footer className="luxury-footer">
+          <div className="footer-glass glass-panel">
+            <div className="footer-left">
+              <div className="footer-logo-box">LW</div>
+              <span className="footer-copy">
+                &copy; 2026 Loanwolf. Crafted with ❤️ by <span className="text-white">Uday Savaliya</span>.
+              </span>
+            </div>
+            
+            <div className="footer-right">
+              <a href="#" className="footer-link">Twitter</a>
+              <span className="footer-sep">•</span>
+              <a href="#" className="footer-link">GitHub</a>
+              <span className="footer-sep">•</span>
+              <a href="#" className="footer-link">LinkedIn</a>
+            </div>
           </div>
-        </section>
-
-        <footer className="footer">
-          <span className="footer-text">Made with ❤️ by Uday Savaliya</span>
         </footer>
       </main>
     </div>
