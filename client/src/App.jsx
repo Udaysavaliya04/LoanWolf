@@ -8,6 +8,7 @@ import RegisterForm from './components/RegisterForm';
 import HomePage from './components/HomePage';
 import ProfileSettings from './components/ProfileSettings';
 
+
 const EMPTY_LOAN_FORM = {
   name: '',
   principal: '',
@@ -94,6 +95,9 @@ function App() {
   const [advisorResult, setAdvisorResult] = useState(null);
   const [runningAdvice, setRunningAdvice] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Edit States
+  const [editingLoanId, setEditingLoanId] = useState(null); // ID of loan being edited (null = create mode)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -252,6 +256,27 @@ async function fetchLoans() {
     setSelectedLoanId('');
     setEvents([]);
     setScheduleData(null);
+    setScheduleData(null);
+    setEditingLoanId(null);
+    setLoanForm(EMPTY_LOAN_FORM);
+  };
+
+  const startEditLoan = (loan) => {
+    setEditingLoanId(loan._id);
+    setLoanForm({
+      name: loan.name,
+      principal: loan.principal,
+      annualInterestRate: loan.annualInterestRate,
+      termMonths: loan.termMonths,
+      startDate: loan.startDate ? loan.startDate.split('T')[0] : '',
+    });
+    // Scroll to form (top/left)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEditLoan = () => {
+    setEditingLoanId(null);
+    setLoanForm(EMPTY_LOAN_FORM);
   };
 
   const submitLoan = async (e) => {
@@ -278,10 +303,46 @@ async function fetchLoans() {
       const loan = await res.json();
       setLoanForm(EMPTY_LOAN_FORM);
       await fetchLoans();
+      setLoanForm(EMPTY_LOAN_FORM);
+      await fetchLoans();
       setSelectedLoanId(loan._id);
     } catch (e) {
       console.error(e);
       setError(e.message);
+    }
+  };
+
+  const submitUpdateLoan = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const payload = {
+        name: loanForm.name,
+        principal: Number(loanForm.principal),
+        annualInterestRate: Number(loanForm.annualInterestRate),
+        termMonths: Number(loanForm.termMonths),
+        startDate: loanForm.startDate,
+      };
+      
+      const res = await fetch(withBase(`/api/loans/${editingLoanId}`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to update loan');
+      
+      const data = await res.json();
+      setLoans((prev) => prev.map((l) => (l._id === data._id ? data : l)));
+      if (selectedLoanId === data._id) {
+        fetchLoanDetails(data._id);
+      }
+      // Reset to create mode
+      setEditingLoanId(null);
+      setLoanForm(EMPTY_LOAN_FORM);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
     }
   };
 
@@ -607,6 +668,45 @@ async function fetchLoans() {
     }
   };
 
+  const handleDeleteLoan = async (loanId) => {
+    if (!window.confirm('Are you sure you want to delete this loan? This action cannot be undone.')) return;
+    try {
+      const res = await fetch(withBase(`/api/loans/${loanId}`), {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete loan');
+
+      setLoans((prev) => prev.filter((l) => l._id !== loanId));
+      if (selectedLoanId === loanId) {
+        setSelectedLoanId(null);
+        setCurrentLoan(null);
+        setEvents([]);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
+  };
+
+
+
+  const handleDeleteEvent = async (eventId) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+    try {
+      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/events/${eventId}`), {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete event');
+      
+      fetchLoanDetails(selectedLoanId); // Refresh data
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
+  };
+
   const runAdvisor = async () => {
     if (!selectedLoanId) {
       setError('Select a loan first to get advice');
@@ -794,8 +894,8 @@ async function fetchLoans() {
 
       <main className="layout" id="dashboard">
         <section className="panel">
-          <h2>Create Loan</h2>
-          <form className="form" onSubmit={submitLoan}>
+          <h2>{editingLoanId ? 'Edit Loan' : 'Create Loan'}</h2>
+          <form className="form" onSubmit={editingLoanId ? submitUpdateLoan : submitLoan}>
             <div className="form-row">
               <label>Loan name</label>
               <input
@@ -865,9 +965,16 @@ async function fetchLoans() {
                 required
               />
             </div>
-            <button type="submit" className="primary-btn">
-              Save loan
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button type="submit" className="primary-btn">
+                {editingLoanId ? 'Update loan' : 'Save loan'}
+              </button>
+              {editingLoanId && (
+                <button type="button" className="secondary-btn" onClick={cancelEditLoan}>
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         </section>
 
@@ -936,6 +1043,16 @@ async function fetchLoans() {
                     <strong>Start:</strong>{' '}
                     {formatDate(currentLoan.startDate)}
                   </p>
+                  <div className="loan-actions" style={{ gridColumn: 'span 2', justifyContent: 'flex-start' }}>
+                     <button className="action-btn" onClick={() => startEditLoan(currentLoan)} title="Edit Loan">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                       Edit Loan
+                     </button>
+                     <button className="action-btn delete" onClick={() => handleDeleteLoan(currentLoan._id)} title="Delete Loan">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                       Delete Loan
+                     </button>
+                  </div>
                 </div>
               )}
 
@@ -1054,6 +1171,7 @@ async function fetchLoans() {
                         <th>Type</th>
                         <th>Amount / Rate</th>
                         <th>Note</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1069,6 +1187,13 @@ async function fetchLoans() {
                                 : '-'}
                           </td>
                           <td>{ev.note || '-'}</td>
+                          <td>
+                            <div className="action-btn-group">
+                              <button className="action-btn delete" onClick={() => handleDeleteEvent(ev._id)} title="Delete Event">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>

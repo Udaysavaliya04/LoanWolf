@@ -70,6 +70,85 @@ router.post('/:id/events', async (req, res) => {
   }
 });
 
+// Update a loan
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, principal, annualInterestRate, termMonths, startDate } = req.body;
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    loan.name = name || loan.name;
+    loan.principal = principal || loan.principal;
+    loan.annualInterestRate = annualInterestRate || loan.annualInterestRate;
+    loan.termMonths = termMonths || loan.termMonths;
+    loan.startDate = startDate || loan.startDate;
+
+    await loan.save();
+    res.json(loan);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Failed to update loan', error: err.message });
+  }
+});
+
+// Delete a loan
+router.delete('/:id', async (req, res) => {
+  try {
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    await LoanEvent.deleteMany({ loanId: loan._id });
+    await Loan.deleteOne({ _id: loan._id });
+
+    res.json({ message: 'Loan deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete loan', error: err.message });
+  }
+});
+
+// Update an event
+router.put('/:id/events/:eventId', async (req, res) => {
+  try {
+    const { type, date, amount, newAnnualInterestRate, note } = req.body;
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    const event = await LoanEvent.findOne({ _id: req.params.eventId, loanId: loan._id });
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    event.type = type || event.type;
+    event.date = date || event.date;
+    // Allow setting to null/undefined if explicitly passed? For now just simple update
+    if (amount !== undefined) event.amount = amount;
+    if (newAnnualInterestRate !== undefined) event.newAnnualInterestRate = newAnnualInterestRate;
+    event.note = note !== undefined ? note : event.note;
+
+    await event.save();
+    res.json(event);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Failed to update event', error: err.message });
+  }
+});
+
+// Delete an event
+router.delete('/:id/events/:eventId', async (req, res) => {
+  try {
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    const result = await LoanEvent.deleteOne({ _id: req.params.eventId, loanId: loan._id });
+    if (result.deletedCount === 0) return res.status(404).json({ message: 'Event not found' });
+
+    res.json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete event', error: err.message });
+  }
+});
+
 router.get('/:id/schedule', async (req, res) => {
   try {
     const data = await buildSchedule(req.params.id);
