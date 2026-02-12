@@ -68,19 +68,7 @@ body {
   gap: 0.5rem;
 }
 
-.site-logo-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: linear-gradient(0deg, #ff8e8e, #ef4444, #c58122);
-  display: flex;
-  font-family: audioware;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #020617;
-}
+
 
 .site-brand-text {
   display: flex;
@@ -103,11 +91,7 @@ body {
     font-size: 1.5rem;
 }
 
-.site-brand-sub {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  font-family: Bricolage Grotesque;
-}
+
 
 .site-nav {
   display: flex;
@@ -156,136 +140,9 @@ body {
   gap: 0.45rem;
 }
 
-.app-header {
-  margin-bottom: 1.8rem;
-}
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 1.5rem;
-  align-items: stretch;
-}
 
-.hero-main {
-  padding: 1.2rem 1.3rem 1.35rem;
-  border-radius: var(--radius);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background:
-    radial-gradient(circle at top left, rgba(55, 65, 81, 0.5), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));
-  -webkit-backdrop-filter: blur(30px);
-  backdrop-filter: blur(30px);
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(15, 23, 42, 0.9);
-    transition: all 0.3s ease;
-}
 
-.hero-main:hover{
-  border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-}
-
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.16rem 0.55rem;
-  border-radius: var(--radius);
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: rgba(15, 23, 42, 0.9);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: rgba(148, 163, 184, 0.9);
-  margin-bottom: 0.4rem;
-}
-
-.hero-title {
-  margin: 0 0 0.4rem;
-  font-family: 'Audioware';
-  font-size: 2.3rem;
-  text-transform: uppercase;
-  font-weight: 300;
-  letter-spacing: -0.07em;
-  background: linear-gradient(rgba(109, 0, 0, 0.8), red);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero-subtitle {
-  margin: 0 0 0.7rem;
-  font-family: 'Bricolage Grotesque';
-  font-size: 0.98rem;
-  letter-spacing: -0.02em;
-  color: rgba(226, 232, 240, 0.92);
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 0.4rem;
-}
-
-.hero-primary-cta {
-  text-decoration: none;
-}
-
-.hero-secondary-cta {
-  text-decoration: none;
-}
-
-.hero-side {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.6rem;
-}
-
-.hero-card {
-  padding: 0.8rem 0.85rem;
-  border-radius: var(--radius);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background:
-      radial-gradient(circle at top left, rgba(55, 65, 81, 0.5), transparent 55%),
-      radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));  box-shadow:
-    0 16px 40px rgba(15, 23, 42, 0.9),
-    0 0 0 1px rgba(15, 23, 42, 0.9);
-    -webkit-backdrop-filter: blur(30px);
-    backdrop-filter: blur(30px);
-    box-shadow:
-          0 24px 60px rgba(0, 0, 0, 0.7),
-          0 0 0 1px rgba(15, 23, 42, 0.9);
-}
-
-.hero-card-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: rgba(191, 219, 254, 0.85);
-  margin-bottom: 0.15rem;
-}
-
-.hero-card-value {
-  font-size: 0.86rem;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-}
-
-.hero-card-copy {
-  margin: 0;
-  font-size: 0.78rem;
-  color: rgba(148, 163, 184, 0.92);
-}
-
-@media (max-width: 900px) {
-  .hero-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 
 @media (max-width: 640px) {
   .site-header-inner {
@@ -320,49 +177,7 @@ body {
   padding-top: 1.25rem;
 }
 
-.home-hero {
-  margin-bottom: 2.3rem;
-}
 
-.home-section {
-  margin-bottom: 2.2rem;
-}
-
-.home-features-grid {
-  margin-top: 0.9rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.home-feature-card {
-  padding: 0.75rem 0.8rem 0.85rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-subtle);
-  background-color: var(--bg-elevated);
-  font-size: 0.85rem;
-}
-
-.home-feature-card h3 {
-  margin: 0 0 0.25rem;
-  font-size: 0.9rem;
-}
-
-.home-feature-card p {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.home-section-muted {
-  opacity: 0.9;
-}
-
-@media (max-width: 900px) {
-  .home-features-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 
 .layout {
   display: grid;
@@ -1430,10 +1245,8 @@ body {
   }
 }
 
-.hero-section,
 .bento-section,
 .luxury-footer,
-.home-hero,
 .footer-glass {
   max-width: 100% !important;
   width: 100% !important;
@@ -1442,12 +1255,7 @@ body {
   box-sizing: border-box;
 }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 1.5rem;
-  width: 100%;
-}
+
 
 .footer-glass {
   max-width: 100% !important;
@@ -1463,7 +1271,6 @@ body {
 
 @media (max-width: 900px) {
 
-  .hero-grid,
   .features-grid {
     grid-template-columns: 1fr;
   }
@@ -1578,7 +1385,6 @@ body {
   --section-gap-mobile: 4rem;
 }
 
-.home-hero,
 .bento-section,
 .faq-section {
   margin-bottom: var(--section-gap) !important;

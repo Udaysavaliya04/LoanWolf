@@ -46,4 +46,3 @@ function RegisterForm({ values, onChange, onSubmit }) {
 }
 
 export default RegisterForm;
-
