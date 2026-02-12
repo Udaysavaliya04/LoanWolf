@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function HomePage({ onLoginClick, onSignupClick }) {
   return (
@@ -171,6 +171,32 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </div>
         </section>
 
+{/* --- LUXURY FAQ SECTION --- */}
+        <section className="faq-section">
+          <div className="faq-header">
+            <h2>Common <span className="text-gradient-silver">Questions</span></h2>
+          </div>
+
+          <div className="faq-grid">
+            <FaqItem 
+              question="Is my financial data safe?" 
+              answer="Absolutely. We don't ask for your bank login credentials. You only input the loan numbers (principal, interest rate, tenure) manually. Your data remains private and secure."
+            />
+            <FaqItem 
+              question="Does this work for HDFC, SBI, or ICICI loans?" 
+              answer="Yes. Loanwolf works with the standard reducing balance method used by 99% of Indian banks (SBI, HDFC, ICICI, Axis, Kotak). If your bank adjusts interest monthly, this calculator is accurate for you."
+            />
+            <FaqItem 
+              question="How exactly does prepayment save money?" 
+              answer="When you prepay, the entire amount goes towards reducing your Principal. Since interest is calculated on the remaining Principal, a smaller Principal means significantly lower interest for the rest of the loan tenure."
+            />
+            <FaqItem 
+              question="Can I simulate a rate hike by RBI?" 
+              answer="Yes. Use the 'What-if Lab' to increase your current interest rate by 0.25% or 0.50% and see how much your tenure increases immediately."
+            />
+          </div>
+        </section>
+
        <footer className="luxury-footer">
           <div className="footer-glass glass-panel">
             <div className="footer-left">
@@ -193,6 +219,31 @@ function HomePage({ onLoginClick, onSignupClick }) {
     </div>
   );
 }
+
+// Helper Component for the Accordion
+const FaqItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div 
+      className={`faq-item glass-panel ${isOpen ? 'open' : ''}`} 
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      <div className="faq-question">
+        <span>{question}</span>
+        <div className="faq-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 5v14" className="vertical-line" />
+            <path d="M5 12h14" />
+          </svg>
+        </div>
+      </div>
+      <div className="faq-answer">
+        <p>{answer}</p>
+      </div>
+    </div>
+  );
+};
 
 export default HomePage;
 

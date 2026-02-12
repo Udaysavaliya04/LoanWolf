@@ -1444,3 +1444,169 @@ body {
     padding-top: 1rem;
   }
 }
+
+/* =========================================
+   WIDTH UNIFIER (Standardize Layout)
+   ========================================= */
+
+/* 1. Force all sections to fill the container (1250px) */
+.hero-section,
+.bento-section,
+.luxury-footer,
+.home-hero,
+/* Targeting your existing class */
+.footer-glass {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box;
+}
+
+/* 2. Fix the Hero Grid to stretch properly */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  /* Ensure grid takes full width */
+}
+
+/* 3. Make the footer glass pill full width but keep content centered */
+.footer-glass {
+  max-width: 100% !important;
+  /* Override the 900px */
+  border-radius: 1.5rem;
+  /* Slightly less rounded since it's wider */
+  justify-content: space-between;
+}
+
+/* 4. Ensure the Bento Grid fills the space */
+.features-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* 5. Mobile Responsive Adjustments */
+@media (max-width: 900px) {
+
+  .hero-grid,
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .f-card.wide,
+  .f-card.full-width {
+    grid-column: span 1;
+  }
+}
+
+/* =========================================
+   FAQ GLASS ACCORDION
+   ========================================= */
+
+.faq-section {
+  padding: 4rem 1rem;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding-top: -15rem;
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.faq-header h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+.faq-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faq-item {
+  padding: 0;
+  /* Reset padding for internal control */
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+  /* Vital for accordion animation */
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.faq-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.faq-question {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.faq-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a1a1aa;
+  transition: transform 0.3s ease;
+}
+
+.vertical-line {
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+/* Open State Styles */
+.faq-item.open {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.faq-item.open .vertical-line {
+  transform: scaleY(1);
+}
+
+.faq-item.open .faq-icon {
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0 1.5rem;
+  opacity: 0;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 200px;
+  /* Arbitrary large height */
+  padding-bottom: 1.5rem;
+  opacity: 1;
+  transition: max-height 0.4s ease, opacity 0.3s ease 0.1s;
+}
+
+.faq-answer p {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
