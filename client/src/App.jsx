@@ -47,6 +47,29 @@ const INITIAL_SCENARIOS = [
   { id: 'C', name: 'Scenario C', lumpSumAmount: '', lumpSumDate: '', newRatePct: '', newRateDate: '' },
 ];
 
+
+// --- Luxury Crystal Spinner ---
+const LoadingSpinner = () => (
+  <div className="spinner-wrapper">
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="48" 
+      height="48" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className="animate-spin"
+      style={{ color: '#ffffff', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.3))' }}
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+    <div className="spinner-text">LOANWOLF</div>
+  </div>
+);
+
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
@@ -612,13 +635,7 @@ async function fetchLoans() {
   };
 
   if (authChecking) {
-    return (
-      <div className="auth-shell">
-        <div className="auth-card">
-          <p className="muted">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!currentUser) {
