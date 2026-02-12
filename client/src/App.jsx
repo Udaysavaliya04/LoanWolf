@@ -646,11 +646,7 @@ async function fetchLoans() {
       <header className="site-header">
         <div className="site-header-inner">
           <div className="site-brand">
-            <div className="site-logo-mark">LW</div>
-            <div className="site-brand-text">
-              <span className="site-brand-title">LOANWOLF</span>
-              <span className="site-brand-sub">Loan payoff cockpit</span>
-            </div>
+            <span className="site-brand-title">LOANWOLF</span>
           </div>
           <nav className="site-nav">
             <a href="#dashboard" className="site-nav-link">

@@ -55,14 +55,11 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  background:
-      radial-gradient(circle at top left, rgba(55, 65, 81, 0.5), transparent 55%),
-      radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));
   padding: 0.55rem 0.85rem;
   border-radius: var(--radius);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  -webkit-backdrop-filter: blur(26px);
-  backdrop-filter: blur(26px);
+  border: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
 }
 
 .site-brand {
@@ -77,7 +74,7 @@ body {
   border-radius: 999px;
   background: linear-gradient(0deg, #ff8e8e, #ef4444, #c58122);
   display: flex;
-  font-family: a;
+  font-family: audioware;
   align-items: center;
   justify-content: center;
   font-size: 0.7rem;
@@ -99,10 +96,11 @@ body {
     text-transform: uppercase;
     font-weight: 300;
     letter-spacing: -0.05em;
-    background: linear-gradient(rgba(173, 173, 173, 0.8), red);
+    background: linear-gradient(rgba(109, 0, 0, 0.8), red);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    font-size: 1.5rem;
 }
 
 .site-brand-sub {
@@ -176,11 +174,18 @@ body {
   background:
     radial-gradient(circle at top left, rgba(55, 65, 81, 0.5), transparent 55%),
     radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));
-  -webkit-backdrop-filter: blur(26px);
-  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.7),
     0 0 0 1px rgba(15, 23, 42, 0.9);
+    transition: all 0.3s ease;
+}
+
+.hero-main:hover{
+  border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
 }
 
 .hero-pill {
@@ -249,8 +254,8 @@ body {
       radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.98));  box-shadow:
     0 16px 40px rgba(15, 23, 42, 0.9),
     0 0 0 1px rgba(15, 23, 42, 0.9);
-    -webkit-backdrop-filter: blur(26px);
-    backdrop-filter: blur(26px);
+    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(30px);
     box-shadow:
           0 24px 60px rgba(0, 0, 0, 0.7),
           0 0 0 1px rgba(15, 23, 42, 0.9);
@@ -997,7 +1002,7 @@ body {
   height: 2.25rem;
   border-radius: 999px;
   border: 1px solid var(--border-subtle);
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba(0, 0, 0, 0.95);
   color: var(--foreground);
   display: flex;
   align-items: center;
@@ -1012,7 +1017,7 @@ body {
 .scroll-top-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 35px rgba(0, 0, 0, 0.8);
-  background: rgba(30, 64, 175, 0.95);
+  background: rgba(21, 21, 21, 0.95);
 }
 
 .auth-shell {
@@ -1371,8 +1376,8 @@ body {
   border-radius: 99px;
   /* Full pill shape */
   background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
 }
@@ -1389,7 +1394,7 @@ body {
   background: linear-gradient(0deg, #ff1111 0%, #ff9393 100%);
   color: #000;
   border-radius: 50%;
-  font-family: 'Bricolage Grotesque', sans-serif;
+  font-family: audioware;
   font-weight: 700;
   font-size: 0.7rem;
   display: flex;
@@ -1511,7 +1516,6 @@ body {
   padding: 4rem 1rem;
   max-width: 800px !important;
   margin: 0 auto !important;
-  padding-top: -15rem;
 }
 
 .faq-header {
@@ -1520,7 +1524,7 @@ body {
 }
 
 .faq-header h2 {
-  font-family: 'Bricolage Grotesque', sans-serif;
+  letter-spacing: -0.05em;
   font-size: 2.5rem;
   color: #fff;
 }
@@ -1609,4 +1613,122 @@ body {
   color: #a1a1aa;
   font-size: 0.95rem;
   line-height: 1.6;
+}
+
+/* =========================================
+   MASTER SPACING FIX (Consistent Gaps)
+   ========================================= */
+
+/* 1. Define the standard luxury gap */
+:root {
+  --section-gap: 8rem;
+  /* Large, breathable space */
+  --section-gap-mobile: 4rem;
+}
+
+/* 2. Apply uniform spacing to all main sections */
+.home-hero,
+.bento-section,
+.faq-section {
+  margin-bottom: var(--section-gap) !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  /* Ensure they stay centered */
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 3. Fix the Bento Section specifically */
+.bento-section {
+  /* Remove the old large padding that was doubling the gap */
+  display: block;
+  width: 100%;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 4. Fix the FAQ Section (Remove the negative padding hack) */
+.faq-section {
+  /* Remove 'padding-top: -15rem' which was breaking layout */
+  display: block;
+  width: 100%;
+  max-width: 800px !important;
+  /* Keep FAQs narrow for readability */
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 5. Footer Positioning */
+.luxury-footer {
+  margin-top: 0 !important;
+  /* Spacing is handled by FAQ's bottom margin */
+  padding-top: 0 !important;
+  padding-bottom: 4rem !important;
+  /* Bottom breathing room */
+}
+
+/* 6. Mobile Responsiveness */
+@media (max-width: 900px) {
+
+  .home-hero,
+  .bento-section,
+  .faq-section {
+    margin-bottom: var(--section-gap-mobile) !important;
+  }
+}
+
+/* =========================================
+   TITAN HERO TEXT (Trendy "Big Type")
+   ========================================= */
+
+.titan-text-container {
+  text-align: center;
+  margin-bottom: 5rem;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.titan-text {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  /* Adjusted for sentence length */
+  font-size: clamp(3rem, 8vw, 15rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin: 0 0 1rem 0;
+
+  /* The "Liquid Chrome" Text Effect */
+  background: linear-gradient(180deg,
+      #ffffff 0%,
+      #adadad 40%,
+      #555555 60%,
+      #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.titan-sub-text {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.titan-highlight {
+  /* Make the second half slightly darker/metallic for contrast */
+  background: linear-gradient(180deg,
+      #e2e2e2 0%,
+      #71717a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hide the OLD hero title if you want to keep the hero cards but remove duplicate text */
+.hero-main .hero-title {
+  display: none;
 }
