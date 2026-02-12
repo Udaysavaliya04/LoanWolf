@@ -88,5 +88,35 @@ router.get('/me', async (req, res) => {
   }
 });
 
+router.put('/profile', async (req, res) => {
+  try {
+    const token = req.cookies && req.cookies.token;
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const payload = jwt.verify(token, JWT_SECRET);
+    const userId = payload.userId;
+
+    const { name, currency, password } = req.body || {};
+    const updates = {};
+
+    if (name && name.trim()) updates.name = name.trim();
+    if (currency && currency.trim()) updates.currency = currency.trim().toUpperCase();
+    if (password && password.trim()) {
+      updates.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    const user = await User.findByIdAndUpdate(userId, updates, { new: true }).select(
+      '_id email name currency'
+    );
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ id: user._id, email: user.email, name: user.name, currency: user.currency });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Failed to update profile', error: err.message });
+  }
+});
+
 module.exports = router;
 

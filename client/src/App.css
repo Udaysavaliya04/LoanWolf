@@ -66,7 +66,7 @@ body {
   max-width: 1250px;
   margin: 0 auto;
   padding: 0 1.75rem;
-  height: 60px; /* Explicit height for centering */
+  height: 60px; 
   border-radius: 0;
   border: none;
   background: transparent;
@@ -1663,6 +1663,14 @@ body {
   display: none;
 }
 
+.mobile-actions {
+  display: none;
+}
+
+.mobile-actions {
+  display: none;
+}
+
 .mobile-menu-overlay {
   display: none;
 }
@@ -1704,6 +1712,12 @@ body {
     cursor: pointer;
     z-index: 60;
     margin-right: -0.5rem; 
+  }
+
+  .mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
   }
 
   /* Mobile Menu Overlay */
