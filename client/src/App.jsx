@@ -615,7 +615,7 @@ async function fetchLoans() {
     return (
       <div className="auth-shell">
         <div className="auth-card">
-          <p className="muted">Checking session…</p>
+          <p className="muted">Loading...</p>
         </div>
       </div>
     );
