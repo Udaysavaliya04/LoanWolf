@@ -22,7 +22,7 @@
   --input: hsl(0 0% 14.9%);
   --ring: hsl(0 0% 83.1%);
 
-  /* aliases used throughout the app */
+
   --bg: var(--background);
   --bg-elevated: var(--card);
   --border-subtle: var(--border);
@@ -1059,7 +1059,6 @@ body {
   gap: 0.25rem;
 }
 
-
 .auth-card-gradient {
   position: relative;
   overflow: hidden;
@@ -1142,10 +1141,6 @@ body {
   margin-bottom: 0.75rem;
 }
 
-/* =========================================
-   BENTO FEATURES GRID
-   ========================================= */
-
 .bento-section {
   padding: 4rem 1rem 6rem;
   margin: 0 auto;
@@ -1175,15 +1170,12 @@ body {
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
-/* --- The Grid Layout --- */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  /* 3 Columns */
   gap: 1.5rem;
 }
 
-/* Base Card Style */
 .f-card {
   border-radius: var(--radius);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1202,7 +1194,6 @@ body {
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
 }
 
-/* Grid Spans */
 .f-card.wide {
   grid-column: span 2;
 }
@@ -1211,7 +1202,6 @@ body {
   grid-column: span 3;
 }
 
-/* Icons */
 .f-icon-box {
   width: 48px;
   height: 48px;
@@ -1225,7 +1215,6 @@ body {
   color: #fff;
 }
 
-/* Content */
 .f-content h3 {
   font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 1.25rem;
@@ -1240,7 +1229,6 @@ body {
   margin: 0;
 }
 
-/* Visual Decoration: Mini Table inside Card 1 */
 .f-visual-table {
   margin-top: 1.5rem;
   border-radius: 8px;
@@ -1272,7 +1260,6 @@ body {
   color: #fff;
 }
 
-/* Workflow Strip Styles */
 .workflow-strip {
   display: flex;
   align-items: center;
@@ -1325,7 +1312,6 @@ body {
   font-size: 1.2rem;
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 900px) {
   .features-grid {
     grid-template-columns: 1fr;
@@ -1354,10 +1340,6 @@ body {
   }
 }
 
-/* =========================================
-   LUXURY FOOTER
-   ========================================= */
-
 .luxury-footer {
   padding-bottom: 2rem;
   display: flex;
@@ -1374,7 +1356,6 @@ body {
   max-width: 1400px;
   padding: 1rem 1.5rem;
   border-radius: 99px;
-  /* Full pill shape */
   background: rgba(10, 10, 10, 0.6);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
@@ -1433,7 +1414,6 @@ body {
   font-size: 0.8rem;
 }
 
-/* Mobile Adjustments */
 @media (max-width: 640px) {
   .footer-glass {
     flex-direction: column;
@@ -1450,16 +1430,10 @@ body {
   }
 }
 
-/* =========================================
-   WIDTH UNIFIER (Standardize Layout)
-   ========================================= */
-
-/* 1. Force all sections to fill the container (1250px) */
 .hero-section,
 .bento-section,
 .luxury-footer,
 .home-hero,
-/* Targeting your existing class */
 .footer-glass {
   max-width: 100% !important;
   width: 100% !important;
@@ -1468,25 +1442,18 @@ body {
   box-sizing: border-box;
 }
 
-/* 2. Fix the Hero Grid to stretch properly */
 .hero-grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 1.5rem;
   width: 100%;
-  /* Ensure grid takes full width */
 }
 
-/* 3. Make the footer glass pill full width but keep content centered */
 .footer-glass {
   max-width: 100% !important;
-  /* Override the 900px */
-  border-radius: 1.5rem;
-  /* Slightly less rounded since it's wider */
   justify-content: space-between;
 }
 
-/* 4. Ensure the Bento Grid fills the space */
 .features-grid {
   width: 100%;
   display: grid;
@@ -1494,7 +1461,6 @@ body {
   gap: 1.5rem;
 }
 
-/* 5. Mobile Responsive Adjustments */
 @media (max-width: 900px) {
 
   .hero-grid,
@@ -1507,10 +1473,6 @@ body {
     grid-column: span 1;
   }
 }
-
-/* =========================================
-   FAQ GLASS ACCORDION
-   ========================================= */
 
 .faq-section {
   padding: 4rem 1rem;
@@ -1537,12 +1499,10 @@ body {
 
 .faq-item {
   padding: 0;
-  /* Reset padding for internal control */
   border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
-  /* Vital for accordion animation */
   background: rgba(255, 255, 255, 0.02);
 }
 
@@ -1577,7 +1537,6 @@ body {
   transform-origin: center;
 }
 
-/* Open State Styles */
 .faq-item.open {
   background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.2);
@@ -1602,7 +1561,6 @@ body {
 
 .faq-item.open .faq-answer {
   max-height: 200px;
-  /* Arbitrary large height */
   padding-bottom: 1.5rem;
   opacity: 1;
   transition: max-height 0.4s ease, opacity 0.3s ease 0.1s;
@@ -1615,18 +1573,11 @@ body {
   line-height: 1.6;
 }
 
-/* =========================================
-   MASTER SPACING FIX (Consistent Gaps)
-   ========================================= */
-
-/* 1. Define the standard luxury gap */
 :root {
   --section-gap: 8rem;
-  /* Large, breathable space */
   --section-gap-mobile: 4rem;
 }
 
-/* 2. Apply uniform spacing to all main sections */
 .home-hero,
 .bento-section,
 .faq-section {
@@ -1634,42 +1585,31 @@ body {
   margin-top: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-
-  /* Ensure they stay centered */
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
-/* 3. Fix the Bento Section specifically */
 .bento-section {
-  /* Remove the old large padding that was doubling the gap */
   display: block;
   width: 100%;
   padding-left: 1rem !important;
   padding-right: 1rem !important;
 }
 
-/* 4. Fix the FAQ Section (Remove the negative padding hack) */
 .faq-section {
-  /* Remove 'padding-top: -15rem' which was breaking layout */
   display: block;
   width: 100%;
   max-width: 800px !important;
-  /* Keep FAQs narrow for readability */
   padding-left: 1rem !important;
   padding-right: 1rem !important;
 }
 
-/* 5. Footer Positioning */
 .luxury-footer {
   margin-top: 0 !important;
-  /* Spacing is handled by FAQ's bottom margin */
   padding-top: 0 !important;
   padding-bottom: 4rem !important;
-  /* Bottom breathing room */
 }
 
-/* 6. Mobile Responsiveness */
 @media (max-width: 900px) {
 
   .home-hero,
@@ -1678,10 +1618,6 @@ body {
     margin-bottom: var(--section-gap-mobile) !important;
   }
 }
-
-/* =========================================
-   TITAN HERO TEXT (Trendy "Big Type")
-   ========================================= */
 
 .titan-text-container {
   text-align: center;
@@ -1692,14 +1628,12 @@ body {
 
 .titan-text {
   font-family: 'Bricolage Grotesque', sans-serif;
-  /* Adjusted for sentence length */
   font-size: clamp(3rem, 8vw, 15rem);
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.04em;
   margin: 0 0 1rem 0;
 
-  /* The "Liquid Chrome" Text Effect */
   background: linear-gradient(180deg,
       #ffffff 0%,
       #adadad 40%,
@@ -1719,7 +1653,6 @@ body {
 }
 
 .titan-highlight {
-  /* Make the second half slightly darker/metallic for contrast */
   background: linear-gradient(180deg,
       #e2e2e2 0%,
       #71717a 100%);
@@ -1728,16 +1661,10 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-/* Hide the OLD hero title if you want to keep the hero cards but remove duplicate text */
 .hero-main .hero-title {
   display: none;
 }
 
-/* =========================================
-   GLOBAL ANIMATIONS (Luxury Feel)
-   ========================================= */
-
-/* 1. Base Fade In (for page loads) */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1754,7 +1681,6 @@ body {
   animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-/* 2. Staggered Animation Delay (for lists/cards) */
 .stagger-1 {
   animation-delay: 100ms;
 }
@@ -1767,15 +1693,11 @@ body {
   animation-delay: 300ms;
 }
 
-/* 3. Scroll Reveal Class (Use this on sections) */
-/* You can trigger this with a simple IntersectionObserver script if needed, 
-   but for now, we'll use a simple CSS loading animation */
 .reveal-on-load {
   opacity: 0;
   animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-/* 4. Pulse Animation (for important buttons) */
 @keyframes softPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
@@ -1794,16 +1716,11 @@ body {
   animation: softPulse 3s infinite;
 }
 
-/* =========================================
-   LUXURY SPINNER STYLES
-   ========================================= */
 .spinner-wrapper {
   position: fixed;
   inset: 0;
-  /* shorthand for top:0; right:0; bottom:0; left:0; */
   z-index: 9999;
   background-color: #050505;
-  /* Deep luxury black */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1827,7 +1744,7 @@ body {
 .spinner-text {
   margin-top: 1.2rem;
   font-family: 'Bricolage Grotesque', sans-serif;
-  /* Using your brand font */
+
   font-size: 0.85rem;
   letter-spacing: 0.25em;
   color: rgba(255, 255, 255, 0.5);
