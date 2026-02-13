@@ -1689,7 +1689,7 @@ body {
   }
   
   .titan-text {
-    font-size: clamp(2.5rem, 12vw, 4rem);
+    font-size: clamp(3rem, 14vw, 5rem);
   }
   
   .site-brand-title {
@@ -1884,4 +1884,27 @@ body {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+/* Product Hunt Badge */
+.ph-badge-wrapper {
+  display: inline-block;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.ph-badge-wrapper:hover {
+  transform: translateY(-2px);
+}
+
+.ph-badge {
+  width: 250px;
+  height: 54px;
+}
+
+@media (max-width: 640px) {
+  .ph-badge {
+    width: 180px;
+    height: auto;
+  }
 }

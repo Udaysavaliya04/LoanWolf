@@ -31,6 +31,9 @@ function HomePage({ onLoginClick, onSignupClick }) {
 
       <main className="home-main">
         <div className="titan-text-container">
+          <a href="https://www.producthunt.com/products/loanwolf?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-loanwolf" target="_blank" rel="noopener noreferrer" className="ph-badge-wrapper">
+            <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1077962&theme=dark" alt="LOANWOLF - Track shifting rates, extra payments, and escape debt faster | Product Hunt" className="ph-badge" width="250" height="54" />
+          </a>
           <h1 className="titan-text">
             Master your <br />
             <span className="titan-highlight">financial destiny.</span>
