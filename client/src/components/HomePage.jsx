@@ -155,7 +155,6 @@ function HomePage({ onLoginClick, onSignupClick }) {
        <footer className="luxury-footer">
           <div className="footer-glass glass-panel">
             <div className="footer-left">
-              <div className="footer-logo-box">LW</div>
               <span className="footer-copy">
                 &copy; 2026 Loanwolf. Crafted with ❤️ by <span className="text-white">Uday Savaliya</span>.
               </span>
