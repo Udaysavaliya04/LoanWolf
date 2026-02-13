@@ -10,27 +10,24 @@ function AuthLayout({ mode, onModeChange, children, error, onBackHome }) {
       )}
       <div className="auth-card auth-card-gradient">
         <div className="auth-header">
-          <h1 className="auth-logo">LOANWOLF</h1>
-          <p className="auth-subtitle">
+          <img src="/logo main.png" alt="LOANWOLF" className="auth-logo-img animate-blur-in" />
+          <p className="auth-subtitle animate-blur-in delay-100">
             Track shifting rates, simulate extra payments, and escape debt faster.
           </p>
         </div>
 
-        <div className="auth-toggle auth-toggle-capsule">
+        <div className={`auth-toggle auth-toggle-capsule animate-blur-in delay-200 ${mode}`}>
+          <div className="auth-pill" />
           <button
             type="button"
-            className={
-              'auth-toggle-button' + (mode === 'login' ? ' auth-toggle-button-active' : '')
-            }
+            className={`auth-toggle-button ${mode === 'login' ? 'active' : ''}`}
             onClick={() => onModeChange('login')}
           >
             Log in
           </button>
           <button
             type="button"
-            className={
-              'auth-toggle-button' + (mode === 'register' ? ' auth-toggle-button-active' : '')
-            }
+            className={`auth-toggle-button ${mode === 'register' ? 'active' : ''}`}
             onClick={() => onModeChange('register')}
           >
             Sign up

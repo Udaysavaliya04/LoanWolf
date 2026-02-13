@@ -61,7 +61,9 @@ const LoadingSpinner = () => (
         <circle className="spinner-head" cx="50" cy="50" r="20" fill="none" />
       </svg>
     </div>
-    <div className="spinner-text">LOANWOLF</div>
+    <div className="spinner-text">
+       <img src="/logo main.png" alt="LOANWOLF" style={{ height: '40px' }} />
+    </div>
   </div>
 );
 
@@ -135,6 +137,10 @@ async function fetchLoans() {
   }
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     async function initAuth() {
       try {
         const res = await fetch(withBase('/api/auth/me'), { credentials: 'include' });
@@ -161,6 +167,21 @@ async function fetchLoans() {
       setScheduleData(null);
     }
   }, [selectedLoanId]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const hiddenElements = document.querySelectorAll('.scroll-reveal');
+    hiddenElements.forEach((el) => observer.observe(el));
+
+    return () => hiddenElements.forEach((el) => observer.unobserve(el));
+  }, [shellView, currentUser]); // Re-run when view or user changes (mounting dashboard)
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -222,6 +243,7 @@ async function fetchLoans() {
       setCurrentUser(data);
       setAuthForm({ name: '', email: '', password: '' });
       await fetchLoans();
+      window.scrollTo(0, 0);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -232,17 +254,20 @@ async function fetchLoans() {
     setError('');
     setAuthMode('login');
     setShellView('auth');
+    window.scrollTo(0, 0);
   };
 
   const goToSignup = () => {
     setError('');
     setAuthMode('register');
     setShellView('auth');
+    window.scrollTo(0, 0);
   };
 
   const goToHome = () => {
     setError('');
     setShellView('home');
+    window.scrollTo(0, 0);
   };
 
   const handleLogout = async () => {
@@ -256,9 +281,9 @@ async function fetchLoans() {
     setSelectedLoanId('');
     setEvents([]);
     setScheduleData(null);
-    setScheduleData(null);
     setEditingLoanId(null);
     setLoanForm(EMPTY_LOAN_FORM);
+    window.scrollTo(0, 0);
   };
 
   const startEditLoan = (loan) => {
@@ -788,10 +813,10 @@ async function fetchLoans() {
 
   return (
     <div className="app">
-      <header className="site-header">
+      <header className="site-header animate-blur-in">
         <div className="site-header-inner">
           <div className="site-brand">
-            <span className="site-brand-title">LOANWOLF</span>
+            <img src="/logo main.png" alt="LOANWOLF" className="site-brand-logo" />
           </div>
           <div className="desktop-nav">
             <nav className="site-nav">
@@ -892,7 +917,7 @@ async function fetchLoans() {
 
       {error && <div className="error-banner">{error}</div>}
 
-      <main className="layout" id="dashboard">
+      <main className="layout animate-blur-in delay-100" id="dashboard">
         <section className="panel">
           <h2>{editingLoanId ? 'Edit Loan' : 'Create Loan'}</h2>
           <form className="form" onSubmit={editingLoanId ? submitUpdateLoan : submitLoan}>
@@ -1205,7 +1230,7 @@ async function fetchLoans() {
         </section>
       </main>
 
-      <section className="panel panel-full" id="schedule" ref={scheduleRef}>
+      <section className="panel panel-full scroll-reveal" id="schedule" ref={scheduleRef}>
         <div className="panel-header">
           <h2>Amortization schedule</h2>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1444,7 +1469,7 @@ async function fetchLoans() {
         )}
       </section>
 
-      <section className="panel panel-full scenarios-panel" id="scenarios">
+      <section className="panel panel-full scenarios-panel scroll-reveal" id="scenarios">
         <div className="scenarios-header">
           <div>
             <div className="scenarios-title">What-if scenarios</div>
@@ -1574,7 +1599,7 @@ async function fetchLoans() {
         )}
       </section>
 
-      <section className="panel panel-full advisor-panel" id="advisor">
+      <section className="panel panel-full advisor-panel scroll-reveal" id="advisor">
         <div className="scenarios-header">
           <div>
             <div className="scenarios-title">Advisor</div>
@@ -1719,7 +1744,7 @@ async function fetchLoans() {
         )}
       </section>
 
-      <footer className="footer">
+      <footer className="footer scroll-reveal">
         <span className="footer-text">Made with ❤️ by Uday Savaliya</span>
       </footer>
 

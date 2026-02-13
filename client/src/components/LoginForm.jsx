@@ -2,7 +2,7 @@ import React from 'react';
 
 function LoginForm({ values, onChange, onSubmit }) {
   return (
-    <form className="form auth-form" onSubmit={onSubmit}>
+    <form className="form auth-form animate-blur-in delay-300" onSubmit={onSubmit}>
       <div className="form-row">
         <label>Email</label>
         <input

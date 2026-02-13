@@ -1,7 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function HomePage({ onLoginClick, onSignupClick }) {
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const hiddenElements = document.querySelectorAll('.scroll-reveal');
+    hiddenElements.forEach((el) => observer.observe(el));
+
+    return () => hiddenElements.forEach((el) => observer.unobserve(el));
+  }, []);
 
   const handleFaqClick = (index) => {
     setOpenFaqIndex(prevIndex => (prevIndex === index ? null : index));
@@ -13,7 +28,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
         <div className="site-header-inner">
             <div className="site-brand">
             <div className="site-brand-text">
-              <span className="site-brand-title">Loanwolf</span>
+              <img src="/logo main.png" alt="Loanwolf" className="site-brand-logo" />
             </div>
           </div>
           <nav className="site-nav">
@@ -31,10 +46,10 @@ function HomePage({ onLoginClick, onSignupClick }) {
 
       <main className="home-main">
         <div className="titan-text-container">
-          <a href="https://www.producthunt.com/products/loanwolf?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-loanwolf" target="_blank" rel="noopener noreferrer" className="ph-badge-wrapper">
+          <a href="https://www.producthunt.com/products/loanwolf?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-loanwolf" target="_blank" rel="noopener noreferrer" className="ph-badge-wrapper animate-blur-in">
             <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1077962&theme=dark" alt="LOANWOLF - Track shifting rates, extra payments, and escape debt faster | Product Hunt" className="ph-badge" width="250" height="54" />
           </a>
-          <h1 className="titan-text">
+          <h1 className="titan-text animate-blur-in delay-100">
             Master your <br />
             <span className="titan-highlight">financial destiny.</span>
           </h1>
@@ -43,7 +58,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
         <section className="bento-section">
           <div className="features-grid">
             
-            <div className="f-card glass-panel wide">
+            <div className="f-card glass-panel wide scroll-reveal">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3v18h18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
               </div>
@@ -59,7 +74,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            <div className="f-card glass-panel">
+            <div className="f-card glass-panel scroll-reveal delay-100">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
               </div>
@@ -69,7 +84,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            <div className="f-card glass-panel">
+            <div className="f-card glass-panel scroll-reveal delay-200">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><circle cx="12" cy="12" r="10"/></svg>
               </div>
@@ -79,7 +94,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            <div className="f-card glass-panel wide">
+            <div className="f-card glass-panel wide scroll-reveal">
               <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
               </div>
@@ -89,7 +104,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
             </div>
 
-            <div className="f-card glass-panel full-width workflow-strip">
+            <div className="f-card glass-panel full-width workflow-strip scroll-reveal">
               <div className="workflow-header">
                 <h3>How Loanwolf fits into your month</h3>
               </div>
@@ -119,7 +134,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </div>
         </section>
 
-        <section className="faq-section">
+        <section className="faq-section scroll-reveal">
           <div className="faq-header">
             <h2>Common <span className="text-gradient-silver">Questions</span></h2>
           </div>
@@ -152,7 +167,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </div>
         </section>
 
-       <footer className="luxury-footer">
+       <footer className="luxury-footer scroll-reveal">
           <div className="footer-glass glass-panel">
             <div className="footer-left">
               <span className="footer-copy">
