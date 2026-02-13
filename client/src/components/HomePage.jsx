@@ -35,10 +35,10 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </nav>
           <div className="site-header-auth">
             <button type="button" className="secondary-btn site-header-logout" onClick={onLoginClick}>
-              Log in
+              Log In
             </button>
             <button type="button" className="primary-btn site-header-get-started" onClick={onSignupClick}>
-              Get started
+              Sign Up
             </button>
           </div>
         </div>
@@ -50,9 +50,20 @@ function HomePage({ onLoginClick, onSignupClick }) {
             <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1077962&theme=dark" alt="LOANWOLF - Track shifting rates, extra payments, and escape debt faster | Product Hunt" className="ph-badge" width="250" height="54" />
           </a>
           <h1 className="titan-text animate-blur-in delay-100">
-            Master your <br />
-            <span className="titan-highlight">financial destiny.</span>
+            Architect your <br />
+            <span className="titan-highlight">financial freedom.</span>
           </h1>
+          <p className="titan-subtitle animate-blur-in delay-200">
+            Precision analytics for floating-rate mortgages. <br></br>Simulate strategic prepayments, monitor interest drift, and accelerate your path to zero debt.
+          </p>
+          <div className="hero-cta-group animate-blur-in delay-300">
+            <button type="button" className="secondary-btn hero-login-btn" onClick={onLoginClick}>
+              Log In
+            </button>
+            <button type="button" className="primary-btn hero-get-started-btn" onClick={onSignupClick}>
+              Sign Up
+            </button>
+          </div>
         </div>
         
         <section className="bento-section">
@@ -89,7 +100,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><circle cx="12" cy="12" r="10"/></svg>
               </div>
               <div className="f-content">
-                <h3>Scenario Studio</h3>
+                <h3>Strategy Sandbox</h3>
                 <p>Compare multiple what‑if plans to see months and interest saved versus your original bank schedule.</p>
               </div>
             </div>
@@ -100,13 +111,13 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </div>
               <div className="f-content">
                 <h3>Advisor Guidance</h3>
-                <p>Plain‑English suggestions on how much to overpay and when, so you are never guessing your strategy.</p>
+                <p>Algorithmic recommendations on optimal prepayment timing to maximize interest savings.</p>
               </div>
             </div>
 
             <div className="f-card glass-panel full-width workflow-strip scroll-reveal">
               <div className="workflow-header">
-                <h3>How Loanwolf fits into your month</h3>
+                <h3>The Monthly Optimization Cycle</h3>
               </div>
               <div className="workflow-steps">
                 <div className="step">
@@ -147,8 +158,8 @@ function HomePage({ onLoginClick, onSignupClick }) {
               onClick={() => handleFaqClick(0)}
             />
             <FaqItem 
-              question="Does this work for HDFC, SBI, or ICICI loans?" 
-              answer="Yes. Loanwolf works with the standard reducing balance method used by 99% of Indian banks (SBI, HDFC, ICICI, Axis, Kotak). If your bank adjusts interest monthly, this calculator is accurate for you."
+              question="Does this work for my bank loans?" 
+              answer="Yes. Loanwolf works with the standard reducing balance method used by 99% of world banks. If your bank adjusts interest monthly, this calculator is very accurate for you."
               isOpen={openFaqIndex === 1}
               onClick={() => handleFaqClick(1)}
             />
@@ -159,7 +170,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
               onClick={() => handleFaqClick(2)}
             />
             <FaqItem 
-              question="Can I simulate a rate hike by RBI?" 
+              question="Can I simulate a rate hike by Reserve Bank?" 
               answer="Yes. Use the 'What-if Lab' to increase your current interest rate by 0.25% or 0.50% and see how much your tenure increases immediately."
               isOpen={openFaqIndex === 3}
               onClick={() => handleFaqClick(3)}

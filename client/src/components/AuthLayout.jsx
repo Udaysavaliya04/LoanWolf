@@ -5,14 +5,14 @@ function AuthLayout({ mode, onModeChange, children, error, onBackHome }) {
     <div className="auth-shell">
       {onBackHome && (
         <button type="button" className="auth-back-home" onClick={onBackHome}>
-          Back to home
+          ← Return to home
         </button>
       )}
       <div className="auth-card auth-card-gradient">
         <div className="auth-header">
           <img src="/logo main.png" alt="LOANWOLF" className="auth-logo-img animate-blur-in" />
           <p className="auth-subtitle animate-blur-in delay-100">
-            Track shifting rates, simulate extra payments, and escape debt faster.
+            Track shifting rates, simulate extra payments, and <br></br>escape loan debt faster.
           </p>
         </div>
 

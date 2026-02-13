@@ -291,16 +291,13 @@ body {
 }
 
 .primary-btn {
-  margin-top: 0.4rem;
   background-color: #16a34a;
   color: #000000;
 }
 
 .secondary-btn {
-  margin-top: 0.25rem;
-  background-color: rgb(236, 236, 236);
+  background-color: rgb(255, 255, 255);
   color: black;
-  border-color: var(--border-subtle);
 }
 
 .primary-btn:active,
@@ -1163,6 +1160,50 @@ body {
   }
 }
 
+/* Hero Subtitle */
+.titan-subtitle {
+  font-size: 1rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  color: #898989;
+  max-width: 700px;
+  margin: 1.5rem auto 0;
+  line-height: 1.6;
+  font-weight: 400;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .titan-subtitle {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+  .hidden-mobile {
+    display: none;
+  }
+}
+
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.hero-login-btn,
+.hero-get-started-btn {
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .hero-login-btn,
+  .hero-get-started-btn {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
 .luxury-footer {
   display: flex;
   justify-content: center;
@@ -1531,6 +1572,7 @@ body {
 }
 
 .animate-fade-in {
+  opacity: 0;
   animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
@@ -1967,6 +2009,7 @@ body {
 }
 
 .animate-blur-in {
+  opacity: 0;
   animation: blurInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
