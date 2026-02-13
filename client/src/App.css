@@ -1164,11 +1164,41 @@ body {
 }
 
 .luxury-footer {
-  padding-bottom: 2rem;
   display: flex;
   justify-content: center;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  width: 100%;
+  font-family: Bricolage Grotesque, sans-serif;
+  
+  /* Full width decoration */
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 5rem;
+  position: relative;
+  z-index: 10;
+  padding: 0;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.footer-big-text {
+  font-size: 15vw;
+  font-weight: 300;
+  line-height: 0.8;
+  background: linear-gradient(0deg, #0000008f 0%, #e3e3e376 50%, rgb(255, 255, 255) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+  pointer-events: none;
+  user-select: none;
+  margin-top: 1rem;
+  margin-bottom: -4vw;
+  letter-spacing: -0.06em;
+  font-family: 'Times New Roman', serif;
 }
 
 .footer-glass {
@@ -1176,14 +1206,8 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1400px;
-  padding: 1rem 1.5rem;
-  border-radius: 99px;
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  max-width: 1250px;
+  padding: 1.5rem 1.75rem 0.5rem;
 }
 
 .footer-left {
@@ -1191,6 +1215,7 @@ body {
   align-items: center;
   gap: 1rem;
 }
+
 
 .footer-logo-box {
   width: 28px;
@@ -1209,6 +1234,14 @@ body {
 .footer-copy {
   font-size: 0.85rem;
   color: #71717a;
+}
+
+.footer-heart {
+  height: 0.9em;
+  width: auto;
+  vertical-align: -0.1em;
+  display: inline-block;
+  margin: 0 0.15rem;
 }
 
 .text-white {
