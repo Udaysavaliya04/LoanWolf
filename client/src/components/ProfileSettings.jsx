@@ -59,7 +59,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack }) => {
   const currentCurrency = currencies.find(c => c.code === formData.currency) || currencies[0];
 
   return (
-    <div className="panel profile-panel">
+    <div className="panel profile-panel animate-blur-in">
       <div className="panel-header">
         <h2>Profile & Settings</h2>
         <button type="button" className="secondary-btn" onClick={onBack}>

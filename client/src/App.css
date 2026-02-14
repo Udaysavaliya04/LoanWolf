@@ -1,3 +1,9 @@
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 :root {
   font-family: 'Inter', sans-serif;
   color-scheme: dark;
@@ -21,8 +27,6 @@
   --border: hsl(0 0% 14.9%);
   --input: hsl(0 0% 14.9%);
   --ring: hsl(0 0% 83.1%);
-
-
   --bg: var(--background);
   --bg-elevated: var(--card);
   --border-subtle: var(--border);
@@ -89,9 +93,6 @@ body {
   gap: 0.1rem;
   
 }
-
-
-
 
 .site-brand-logo {
   height: 32px;
@@ -291,14 +292,42 @@ body {
 }
 
 .primary-btn {
-  background-color: #16a34a;
-  color: #000000;
+  background: 
+    linear-gradient(180deg, #1A1A1A 0%, #050505 100%) padding-box,
+    linear-gradient(135deg, rgba(255, 215, 0, 0.8) 0%, rgba(255, 165, 0, 0.6) 50%, rgba(169, 169, 169, 0.3) 100%) border-box;
+  color: #FFFFFF;
+  border: 1px solid transparent;
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.1);
+}
+
+.primary-btn:hover {
+  background: 
+    linear-gradient(180deg, #1A1A1A 0%, #050505 100%) padding-box,
+    linear-gradient(135deg, #FFD700 0%, #FFA500 50%, rgba(255, 255, 255, 0.4) 100%) border-box;
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.25);
+  transform: translateY(-1px);
 }
 
 .secondary-btn {
-  background-color: rgb(255, 255, 255);
-  color: black;
+  background: linear-gradient(180deg, #ffffff 0%, #848484 100%) padding-box,
+    linear-gradient(135deg, rgba(255, 215, 0, 0.8) 0%, rgba(255, 165, 0, 0.6) 50%, rgba(255, 255, 255, 0.1) 100%) border-box;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #1a1a1a;
+  box-shadow: 
+    1px 1px 6px rgba(0, 0, 0, 0.642) inset,
+    0 4px 8px rgba(0, 0, 0, 0.02) inset,
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
+
+.secondary-btn:hover {
+  box-shadow: 
+    0 6px 16px rgba(213, 213, 213, 0.244) ;
+  transform: translateY(-1px);
+}
+
 
 .primary-btn:active,
 .secondary-btn:active {
@@ -844,21 +873,36 @@ body {
 }
 
 .auth-back-home {
+  /* Layout & Position - Kept */
   border-radius: var(--radius);
-  border: 1px solid transparent;
   font-size: 0.85rem;
   padding: 0.45rem 1.1rem;
   cursor: pointer;
-  color: black;
-    border-color: var(--border-subtle);
-  background-color: rgb(236, 236, 236);
-  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
   position: absolute;
   top: 1rem;
   right: 1rem;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+
+  /* Visual Style - Matched to .secondary-btn */
+  background: linear-gradient(180deg, #ffffff 0%, #848484 100%) padding-box,
+    linear-gradient(135deg, rgba(255, 215, 0, 0.8) 0%, rgba(255, 165, 0, 0.6) 50%, rgba(255, 255, 255, 0.1) 100%) border-box;
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Matches user's secondary-btn */
+  color: #1a1a1a;
+  font-weight: 600;
+  box-shadow: 
+    1px 1px 6px rgba(0, 0, 0, 0.642) inset,
+    0 4px 8px rgba(0, 0, 0, 0.02) inset,
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 10px rgba(255, 215, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.auth-back-home:hover {
+  box-shadow: 
+    0 6px 16px rgba(166, 166, 166, 0.244);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 640px) {
@@ -868,7 +912,11 @@ body {
     padding: 0.35rem 0.8rem;
     font-size: 0.8rem;
   }
-}
+  
+  .auth-shell {
+    padding: 0 1rem;
+  }
+  }
 
 .auth-card-gradient {
   position: relative;
@@ -1003,15 +1051,50 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  transition: all 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
   overflow: hidden;
+  z-index: 1;
+}
+
+.f-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: 
+    linear-gradient(180deg, #1A1A1A 0%, #050505 100%) content-box, /* Inner Background */
+    conic-gradient(from var(--border-angle), 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 215, 0, 0.8) 40%, 
+      rgba(255, 165, 0, 0.8) 50%, 
+      rgba(255, 215, 0, 0.8) 60%, 
+      rgba(255, 255, 255, 0.1) 100%
+    ) border-box; /* Gradient Border */
+  
+  /* We don't need masking if we use background-clip content-box + border-box stacking correctly above */
+  
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: rotate-border 3s linear infinite;
 }
 
 .f-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+  border-color: transparent; /* Hide static border */
+}
+
+.f-card:hover::before {
+  opacity: 1;
+}
+
+@keyframes rotate-border {
+  to {
+    --border-angle: 360deg;
+  }
 }
 
 .f-card.wide {
@@ -1174,7 +1257,7 @@ body {
 
 @media (max-width: 768px) {
   .titan-subtitle {
-    font-size: 1rem;
+    font-size: 0.85rem;
     padding: 0 1rem;
   }
   .hidden-mobile {
@@ -1390,15 +1473,44 @@ body {
   padding: 0;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   border: 1px solid var(--border);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.02);
+  position: relative;
+  z-index: 1;
+}
+
+.faq-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: 
+    linear-gradient(180deg, #0a0a0a 0%, #000000 100%) content-box,
+    conic-gradient(from var(--border-angle), 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 215, 0, 0.8) 40%, 
+      rgba(255, 165, 0, 0.8) 50%, 
+      rgba(255, 215, 0, 0.8) 60%, 
+      rgba(255, 255, 255, 0.1) 100%
+    ) border-box;
+  
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: rotate-border 3s linear infinite;
 }
 
 .faq-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  border-color: transparent;
+}
+
+.faq-item:hover::before {
+  opacity: 1;
 }
 
 .faq-question {
@@ -1428,7 +1540,6 @@ body {
 }
 
 .faq-item.open {
-  background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -2036,5 +2147,216 @@ body {
   .ph-badge {
     width: 180px;
     height: auto;
+  }
+}
+
+/* Testimonials Section */
+.testimonials-section {
+  padding: 0rem 0 4rem;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.testimonials-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+  padding: 0 1rem;
+}
+
+.testimonials-header h2 {
+  font-size: 2.5rem;
+  color: #fff;
+  letter-spacing: -0.05em;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: scroll 60s linear infinite;
+  padding: 1rem 0; 
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.testimonial-card {
+  width: 380px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+}
+
+.testimonial-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  padding: 1px;
+  background: 
+    linear-gradient(180deg, #1A1A1A 0%, #050505 100%) content-box,
+    conic-gradient(from var(--border-angle), 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 215, 0, 0.8) 40%, 
+      rgba(255, 165, 0, 0.8) 50%, 
+      rgba(255, 215, 0, 0.8) 60%, 
+      rgba(255, 255, 255, 0.1) 100%
+    ) border-box;
+  
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: rotate-border 3s linear infinite;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  border-color: transparent; 
+}
+
+.testimonial-card:hover::before {
+  opacity: 1;
+}
+
+.t-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.t-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #333 0%, #000000 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.t-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.t-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.t-tag {
+  font-size: 0.75rem;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.t-text {
+  font-size: 0.95rem;
+  color: #a1a1aa;
+  margin: 0;
+  line-height: 1.6;
+  font-style: italic;
+  font-weight: 300;
+}
+
+@media (max-width: 640px) {
+  .testimonial-card {
+    width: 300px;
+    padding: 1.25rem;
+  }
+  
+  .testimonials-header h2 {
+    font-size: 2rem;
+  }
+}
+
+/* Password Toggle */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input {
+  width: 100%;
+  padding-right: 2.5rem !important; 
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.2s ease;
+  height: 100%;
+}
+
+.password-toggle:hover {
+  color: var(--color-text-base);
+}
+
+.profile-panel {
+  max-width: 600px;
+  width: 90%; 
+  margin: 3rem auto;
+}
+
+@media (max-width: 640px) {
+  .profile-panel {
+    width: 94%;
+    margin: 1.5rem auto;
+    padding: 1.25rem;
   }
 }
