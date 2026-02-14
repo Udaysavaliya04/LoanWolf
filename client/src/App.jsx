@@ -1607,10 +1607,8 @@ async function fetchLoans() {
       <section className="panel panel-full advisor-panel" id="advisor">
         <div className="scenarios-header">
           <div>
-            <div className="scenarios-title">Advisor</div>
-            <div className="scenarios-subtitle">
-              Get a recommended extra EMI plan to either use a fixed surplus or hit a target payoff date.
-            </div>
+            <div className="scenarios-title" style={{marginRight: '0.9rem'}}>Advisor</div>
+            
           </div>
           <div className="advisor-mode-toggle">
             <button
@@ -1688,7 +1686,7 @@ async function fetchLoans() {
                   onClick={runAdvisor}
                   disabled={runningAdvice}
                 >
-                  {runningAdvice ? 'Calculating…' : 'Get advice'}
+                  {runningAdvice ? 'Calculating…' : 'Get an advice'}
                 </button>
               </div>
             </div>
