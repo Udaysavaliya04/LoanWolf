@@ -15,15 +15,19 @@ export default function WolfAIChat({ currentUser, contextData }) {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
   const hasFetchedHistory = useRef(false);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if we have messages or just loaded history
+    // Timeout ensures DOM update before scroll
+    setTimeout(scrollToBottom, 100);
   }, [messages]);
 
   // Load history on mount
@@ -90,7 +94,7 @@ export default function WolfAIChat({ currentUser, contextData }) {
 
   return (
     <div className="wolf-chat-container">
-      <div className="chat-messages">
+      <div className="chat-messages" ref={chatContainerRef}>
         {messages.map((msg, idx) => (
           <div key={idx} className={`chat-bubble ${msg.role === 'user' ? 'user' : 'ai'}`}>
             <div className="bubble-content">
@@ -105,7 +109,6 @@ export default function WolfAIChat({ currentUser, contextData }) {
             </div>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {messages.length <= 1 && (

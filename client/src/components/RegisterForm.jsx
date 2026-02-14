@@ -23,7 +23,7 @@ function RegisterForm({ values, onChange, onSubmit }) {
           name="email"
           value={values.email}
           onChange={onChange}
-          placeholder="you@example.com"
+          placeholder="you@gmail.com"
           autoComplete="email"
           required
         />
