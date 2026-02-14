@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/advisor', require('./routes/advisorRoutes'));
 app.use('/api/loans', loanRoutes);
 
 mongoose

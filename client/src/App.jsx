@@ -7,6 +7,7 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import HomePage from './components/HomePage';
 import ProfileSettings from './components/ProfileSettings';
+import WolfAIChat from './components/WolfAIChat';
 
 
 const EMPTY_LOAN_FORM = {
@@ -91,7 +92,7 @@ function App() {
   const [scenarios, setScenarios] = useState(INITIAL_SCENARIOS);
   const [scenarioResults, setScenarioResults] = useState([]);
   const [runningScenarios, setRunningScenarios] = useState(false);
-  const [advisorMode, setAdvisorMode] = useState('extra'); // 'extra' | 'target'
+  const [advisorMode, setAdvisorMode] = useState('chat'); // 'chat' | 'extra' | 'target'
   const [advisorExtra, setAdvisorExtra] = useState('');
   const [advisorTargetDate, setAdvisorTargetDate] = useState('');
   const [advisorResult, setAdvisorResult] = useState(null);
@@ -1615,6 +1616,15 @@ async function fetchLoans() {
             <button
               type="button"
               className={
+                'advisor-mode-button' + (advisorMode === 'chat' ? ' advisor-mode-button-active' : '')
+              }
+              onClick={() => setAdvisorMode('chat')}
+            >
+              WolfAI Chat
+            </button>
+            <button
+              type="button"
+              className={
                 'advisor-mode-button' + (advisorMode === 'extra' ? ' advisor-mode-button-active' : '')
               }
               onClick={() => setAdvisorMode('extra')}
@@ -1628,7 +1638,7 @@ async function fetchLoans() {
               }
               onClick={() => setAdvisorMode('target')}
             >
-              Target payoff date
+              Target Date
             </button>
           </div>
         </div>
@@ -1637,6 +1647,12 @@ async function fetchLoans() {
           <p className="muted">Select a loan above to get personalized advice.</p>
         ) : (
           <div className="advisor-grid">
+            {advisorMode === 'chat' ? (
+              <div style={{gridColumn: '1 / -1'}}>
+                 <WolfAIChat currentUser={currentUser} />
+              </div>
+            ) : (
+            <>
             <div>
               {advisorMode === 'extra' ? (
                 <div className="form">
@@ -1744,6 +1760,8 @@ async function fetchLoans() {
                 </p>
               )}
             </div>
+          </>
+          )}
           </div>
         )}
       </section>
