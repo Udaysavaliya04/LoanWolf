@@ -1642,7 +1642,7 @@ async function fetchLoans() {
         </div>
 
         {!selectedLoanId ? (
-          <p className="muted">Select a loan above to get personalized advice.</p>
+          <p className="muted">Please select a loan above to get personalized advice.</p>
         ) : (
           <div className="advisor-grid">
             {advisorMode === 'chat' ? (

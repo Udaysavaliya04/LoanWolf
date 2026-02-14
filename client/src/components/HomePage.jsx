@@ -54,7 +54,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
             <span className="titan-highlight">financial freedom.</span>
           </h1>
           <p className="titan-subtitle animate-blur-in delay-200">
-            Precision analytics for floating-rate mortgages. <br></br>Simulate strategic prepayments, monitor interest drift, and accelerate your path to zero debt.
+            Precision analytics for floating & Fixed -rate mortgages. <br></br>Simulate strategic prepayments, monitor interest drift, and accelerate your path to zero debt.
           </p>
           <div className="hero-cta-group animate-blur-in delay-300">
             <button type="button" className="secondary-btn hero-login-btn" onClick={onLoginClick}>
