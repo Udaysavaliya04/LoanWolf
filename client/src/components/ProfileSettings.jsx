@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-const ProfileSettings = ({ user, onUpdateProfile, onBack }) => {
+const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
   const [formData, setFormData] = useState({
     name: user.name || '',
     currency: user.currency || 'INR',
@@ -58,14 +58,43 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack }) => {
 
   const currentCurrency = currencies.find(c => c.code === formData.currency) || currencies[0];
 
+  const formatMoney = (val) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: formData.currency || 'INR',
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
+
   return (
     <div className="panel profile-panel animate-blur-in">
-      <div className="panel-header">
-        <h2>Profile & Settings</h2>
+      <div className="panel-header" style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ fontSize: '1.5rem' }}>Profile/Settings</h2>
         <button type="button" className="secondary-btn" onClick={onBack}>
-          Back
+          Close
         </button>
       </div>
+
+      {dashboardData && (
+        <div className="dashboard-summary glass-panel animate-fade-in-up dashboard-full-width" style={{ marginBottom: '2rem' }}>
+          <div className="dashboard-metric">
+            <div className="metric-label">Total Outstanding</div>
+            <div className="metric-value">{formatMoney(dashboardData.totalDebt)}</div>
+          </div>
+          <div className="metric-divider"></div>
+          <div className="dashboard-metric">
+            <div className="metric-label">Blended Rate</div>
+            <div className="metric-value">{dashboardData.blendedInterestRate.toFixed(2)}%</div>
+          </div>
+          <div className="metric-divider"></div>
+          <div className="dashboard-metric">
+            <div className="metric-label">Debt Free By</div>
+            <div className="metric-value ">
+              {dashboardData.debtFreeDate ? new Date(dashboardData.debtFreeDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '-'}
+            </div>
+          </div>
+        </div>
+      )}
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="form-row">
@@ -119,8 +148,9 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack }) => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="********"
+            placeholder="New Password..."
             minLength="6"
+            style={{ fontFamily: "'Inter', sans-serif" }}
           />
         </div>
 
@@ -132,7 +162,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack }) => {
         )}
 
         <div className="form-actions">
-          <button type="submit" className="primary-btn" disabled={status === 'saving'}>
+          <button type="submit" className="primary-btn" style={{ marginTop: '0.8rem', width: '100%' }} disabled={status === 'saving'}>
             {status === 'saving' ? 'Saving...' : 'Save Changes'}
           </button>
         </div>

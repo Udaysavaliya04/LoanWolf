@@ -36,6 +36,71 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/dashboard', async (req, res) => {
+  try {
+    const loans = await Loan.find({ ownerId: req.user.id });
+    let totalDebt = 0;
+    let weightedRateSum = 0;
+    let maxPayoffDate = null;
+
+    const results = await Promise.all(
+      loans.map(async (loan) => {
+        const data = await buildSchedule(loan._id);
+        
+        // Find current balance (opening balance of the first future payment)
+        // 'Proj' means projected (future), 'Amrt' means amortized (past/today)
+        const currentEntry = data.schedule.find(row => row.tranType === 'Proj');
+        
+        let currentBalance = 0;
+        if (currentEntry) {
+          currentBalance = currentEntry.openingBalance;
+        } else if (data.schedule.length > 0) {
+            // No Proj rows? Either loan is fully paid (bal=0) or fully future?
+            // If loan starts in future, all rows are Proj. If none are Proj, all are Amrt.
+            // If all Amrt, balance is closing balance of last row.
+             const last = data.schedule[data.schedule.length - 1];
+             if (last.closingBalance > 0) currentBalance = last.closingBalance;
+        }
+        
+        return { loan, summary: data.summary, currentBalance };
+      })
+    );
+
+    // DEBUG: Check what we got back
+    if (process.env.NODE_ENV !== 'production') {
+       console.log('Dashboard Debug: Found', results.length, 'loans');
+    }
+
+    results.forEach(({ loan, summary, currentBalance }) => {
+      const balance = currentBalance;
+      
+      totalDebt += balance;
+      weightedRateSum += balance * loan.annualInterestRate;
+
+      if (summary.payoffDate) {
+        const date = new Date(summary.payoffDate);
+        if (!maxPayoffDate || date > maxPayoffDate) {
+          maxPayoffDate = date;
+        }
+      }
+    });
+
+    console.log('Total Debt:', totalDebt, 'Weighted Rate Sum:', weightedRateSum);
+
+    const blendedRate = totalDebt > 0 ? weightedRateSum / totalDebt : 0;
+
+    res.json({
+      totalDebt,
+      blendedInterestRate: blendedRate,
+      debtFreeDate: maxPayoffDate,
+      loanCount: loans.length,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to build dashboard', error: err.message });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
