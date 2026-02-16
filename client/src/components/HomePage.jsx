@@ -51,7 +51,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
           </a>
           <h1 className="titan-text animate-blur-in delay-100">
             Architect your <br />
-            <span className="titan-highlight">financial freedom.</span>
+            <span className="titan-highlight">financial <span className="text-gold">freedom!</span></span>
           </h1>
           <p className="titan-subtitle animate-blur-in delay-200">
             Precision analytics for floating & Fixed -rate mortgages. <br></br>Simulate strategic prepayments, monitor interest drift, and accelerate your path to zero debt.
