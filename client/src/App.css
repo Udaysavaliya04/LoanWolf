@@ -190,7 +190,7 @@ body {
   padding: 1.35rem 1.3rem 1.4rem;
   border: 1px solid var(--border-subtle);
   box-shadow:
-    8px 8px 20px rgba(28, 28, 28, 0.3),
+    8px 8px 20px rgba(54, 54, 54, 0.2) inset,
     0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 
@@ -829,7 +829,7 @@ body {
   padding: 0.6rem 0.85rem;
   border-radius: var(--radius);
   border: 1px solid rgba(239, 68, 68, 0.6);
-  background-color: #450a0a;
+  background-color: #450a0ab4;
   color: #fee2e2;
   font-size: 0.82rem;
 }
@@ -2401,7 +2401,7 @@ body {
   align-items: center;
   padding: 1.5rem;
   margin-bottom: 0.5rem;
-  background: rgba(255, 255, 255, 0.03); /* slightly lighter than panel */
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius);
   backdrop-filter: blur(10px);
