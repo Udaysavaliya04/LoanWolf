@@ -1647,7 +1647,38 @@ async function fetchLoans() {
           <div className="advisor-grid">
             {advisorMode === 'chat' ? (
               <div style={{gridColumn: '1 / -1'}}>
-                 <WolfAIChat currentUser={currentUser} />
+                 <WolfAIChat
+                  currentUser={currentUser}
+                  contextData={{
+                    currentLoan: currentLoan
+                      ? {
+                          _id: currentLoan._id,
+                          name: currentLoan.name,
+                          principal: currentLoan.principal,
+                          annualInterestRate: currentLoan.annualInterestRate,
+                          termMonths: currentLoan.termMonths,
+                          startDate: currentLoan.startDate,
+                        }
+                      : null,
+                    scheduleSummary: scheduleData?.summary ?? null,
+                    scheduleComparison: scheduleData?.comparison ?? null,
+                    events: events.map((e) => ({
+                      date: e.date,
+                      type: e.type,
+                      amount: e.amount,
+                      newAnnualInterestRate: e.newAnnualInterestRate,
+                      note: e.note,
+                    })),
+                    dashboard: dashboardData
+                      ? {
+                          totalDebt: dashboardData.totalDebt,
+                          blendedInterestRate: dashboardData.blendedInterestRate,
+                          debtFreeDate: dashboardData.debtFreeDate,
+                          loanCount: dashboardData.loanCount,
+                        }
+                      : null,
+                  }}
+                />
               </div>
             ) : (
             <>

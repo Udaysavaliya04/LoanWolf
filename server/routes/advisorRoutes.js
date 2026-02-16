@@ -1,8 +1,7 @@
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const Loan = require('../models/Loan');
-const ChatSession = require('../models/ChatSession'); // New model
-const { buildSchedule } = require('../services/amortizationService');
+const ChatSession = require('../models/ChatSession');
+const { buildFullAdvisorContext } = require('../services/advisorContextService');
 const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
@@ -14,10 +13,8 @@ router.get('/chat', async (req, res) => {
   try {
     let session = await ChatSession.findOne({ userId: req.user.id });
     if (!session) {
-      // Return empty if no session yet
       return res.json({ messages: [] });
     }
-    // Return last 50 messages to keep payload light
     res.json({ messages: session.messages.slice(-50) });
   } catch (err) {
     console.error('Error fetching chat history:', err);
@@ -35,7 +32,7 @@ router.post('/chat', async (req, res) => {
 
     const userId = req.user.id;
 
-    // 1. Save User Message to History
+    // 1. Save user message to history
     let session = await ChatSession.findOne({ userId });
     if (!session) {
       session = new ChatSession({ userId, messages: [] });
@@ -43,125 +40,72 @@ router.post('/chat', async (req, res) => {
     session.messages.push({ role: 'user', content: userMessage });
     await session.save();
 
-    // 2. Build Advanced Context (The "Brain")
-    const loans = await Loan.find({ ownerId: userId });
-    let loanContext = "";
-    
-    // Inject Client Context if available (User is looking at a specific loan)
-    if (contextData && contextData.currentLoan) {
-       loanContext += `
-**ACTIVE VIEW CONTEXT**:
-The user is currently viewing the loan: "${contextData.currentLoan.name}".
-- **Schedule Summary from UI**: 
-  - Total Interest: ₹${contextData.scheduleSummary?.totalInterest?.toLocaleString() || 'N/A'}
-  - Payoff Date: ${contextData.scheduleSummary?.payoffDate ? new Date(contextData.scheduleSummary.payoffDate).toLocaleDateString() : 'N/A'}
-  - Interest Saved (vs Baseline): ₹${contextData.scheduleComparison?.interestSaved?.toLocaleString() || '0'}
-  - Interest Saved (vs Baseline): ₹${contextData.scheduleComparison?.interestSaved?.toLocaleString() || '0'}
-- **Recent Events from UI**:
-${contextData.events?.map(e => `  - ${new Date(e.date).toLocaleDateString()}: ${e.type === 'EXTRA_PAYMENT' ? 'Extra Payment ₹'+e.amount : 'Rate Change ' + e.newAnnualInterestRate + '%'}`).join('\n') || 'None'}
-\n`;
-    }
+    // 2. Build full AI context: all loans, full schedules, events, dashboard (the "brain")
+    const activeLoanId = contextData?.currentLoan?._id || contextData?.currentLoanId || null;
+    const { context: fullContext } = await buildFullAdvisorContext(userId, {
+      activeLoanId,
+      clientContextData: contextData || null,
+    });
 
-    loanContext += "\n**FULL PORTFOLIO ANALYSIS**:\n";
-    let totalPrincipal = 0;
-    let totalMonthlyPayment = 0;
-
-    if (loans.length === 0) {
-      loanContext += "User has no loans currently.";
-    } else {
-      for (const loan of loans) {
-        // 1. Fetch Events
-        const events = await require('../models/LoanEvent').find({ loanId: loan._id }).sort({ date: 1 });
-        const eventHistory = events.map(e => 
-          `- ${new Date(e.date).toLocaleDateString()}: ${e.type === 'EXTRA_PAYMENT' ? 'Extra Payment' : 'Rate Change'} of ${e.type === 'EXTRA_PAYMENT' ? '₹'+e.amount.toLocaleString() : e.newAnnualInterestRate+'%'}`
-        ).join('\n    ');
-
-        // 2. Run Schedule
-        const fullData = await buildSchedule(loan._id);
-        const schedule = fullData.schedule;
-        const currentItem = schedule.find(i => i.tranType === 'Proj');
-        const currentBalance = currentItem ? currentItem.openingBalance : 0;
-        const nextPaymentDate = currentItem ? new Date(currentItem.toDate).toLocaleDateString() : 'N/A';
-        
-        const nextInterest = currentItem ? currentItem.interest : 0;
-        const nextPrincipal = currentItem ? currentItem.principalComponent : 0;
-        
-        // 3. Get recent/upcoming schedule (next 3 months)
-        const upcoming = schedule
-          .filter(i => i.tranType === 'Proj')
-          .slice(0, 3)
-          .map(i => `   - ${new Date(i.toDate).toLocaleDateString()}: EMI ₹${Math.round(i.totalPayment).toLocaleString()} (Prin: ₹${Math.round(i.principalComponent)}, Int: ₹${Math.round(i.interest)})`)
-          .join('\n');
-
-        totalPrincipal += currentBalance;
-        totalMonthlyPayment += currentItem ? currentItem.totalPayment : 0;
-
-        loanContext += `
-**Loan: ${loan.name}**
-  - **Status**: Current Balance ₹${Math.round(currentBalance).toLocaleString()}
-  - **Terms**: ${loan.annualInterestRate}% Interest, EMI ~₹${Math.round(currentItem ? currentItem.totalPayment : 0).toLocaleString()}
-  - **Event History (User Actions)**:
-    ${eventHistory || 'No extra payments or rate changes recorded.'}
-  - **Upcoming Schedule**:
-${upcoming}
-  - **Projected Payoff**: ${fullData.summary.payoffDate ? new Date(fullData.summary.payoffDate).toLocaleDateString() : 'Unknown'}
-`;
-      }
-      loanContext += `\n**Portfolio Summary**:\n- Total Debt: ₹${Math.round(totalPrincipal).toLocaleString()}\n- Total Monthly Commitment: ₹${Math.round(totalMonthlyPayment).toLocaleString()}`;
-    }
-
-    // 3. Initialize Gemini
-    // Ensure API Key is present
+    // 3. Gemini setup
     if (!process.env.GEMINI_API_KEY) {
-       throw new Error("Server missing GEMINI_API_KEY");
+      throw new Error('Server missing GEMINI_API_KEY');
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+    const modelName = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+    const model = genAI.getGenerativeModel({ model: modelName });
 
-    // 4. Construct System Prompt
-    // We include last few messages for conversational continuity
-    const recentHistory = session.messages.slice(-5).map(m => `${m.role === 'user' ? 'User' : 'WolfAI'}: ${m.content}`).join('\n');
+    // 4. Conversational history (last 8 exchanges for continuity)
+    const recentHistory = session.messages
+      .slice(-8)
+      .map((m) => `${m.role === 'user' ? 'User' : 'WolfAI'}: ${m.content}`)
+      .join('\n');
 
-    const systemPrompt = `
-      You are **WolfAI**, an elite financial strategist and debt payoff expert.
-      Your goal is to help the user become debt-free as fast as possible.
-      
-      **Persona**:
-      - Professional but encouraging.
-      - Mathematically precise.
-      - You use the "Avalanche Method" (highest interest rate first) as your default strategy unless asked otherwise.
-      - You are direct. No fluff.
+    // 5. System prompt — elite financial strategist with full data
+    const systemPrompt = `You are **WolfAI**, an elite financial strategist and debt payoff expert. You have access to the user's complete portfolio: every loan, full amortization schedules (period-by-period), all extra payments and rate changes, and dashboard metrics. Use this data to give precise, actionable advice.
 
-      **Current Portfolio Context**:
-      ${loanContext}
+**Persona**
+- Professional, encouraging, and mathematically precise.
+- Default strategy: **Avalanche method** (highest interest rate first) unless the user asks otherwise.
+- Be direct. No fluff. Use exact numbers from the context when possible.
 
-      **Recent Conversation**:
-      ${recentHistory}
+**Data you have**
+The following block contains the user's full portfolio: loan inputs, events, schedule summaries, and the complete amortization table (every month) for each loan. Use it to answer questions accurately.
 
-      **User's Latest Question**: "${userMessage}"
+\`\`\`
+${fullContext}
+\`\`\`
 
-      **Instructions**:
-      - Answer the question specifically based on the portfolio data above.
-      - If they ask "What if I pay extra?", calculate the impact roughly (e.g., "Paying ₹5,000 extra on [Loan Name] would save you...")
-      - Use Markdown for formatting (bold key numbers, lists).
-      - Keep response under 200 words unless detailed analysis is requested.
-    `;
+**Recent conversation**
+${recentHistory}
 
-    // 5. Generate Response
+**User's latest message**
+"${userMessage}"
+
+**Instructions**
+- Answer using the portfolio data above. Reference specific loans by name and exact figures (₹ amounts, dates, months) when relevant.
+- For "what if I pay extra?" questions: use the schedule math. E.g. "Paying ₹X extra on [Loan Name] would reduce interest by approximately ₹Y and payoff by Z months earlier."
+- For "which loan first?": use Avalanche (highest rate first); cite current balance and rate from the data.
+- Use Markdown: **bold** key numbers, lists, and dates.
+- Keep responses under 250 words unless the user asks for a detailed breakdown.
+- If the user has no loans, encourage them to add one and explain how you can help once they do.`;
+
+    // 6. Generate response
     const result = await model.generateContent(systemPrompt);
-    const response = await result.response;
+    const response = result.response;
     const text = response.text();
 
-    // 6. Save AI Response
+    // 7. Save AI response
     session.messages.push({ role: 'assistant', content: text });
     await session.save();
 
     res.json({ reply: text });
-
   } catch (err) {
     console.error('WolfAI Chat Error:', err);
-    res.status(500).json({ message: 'Failed to generate advice. Ensure GEMINI_API_KEY is set.' });
+    res.status(500).json({
+      message: 'Failed to generate advice. Ensure GEMINI_API_KEY is set.',
+    });
   }
 });
 
