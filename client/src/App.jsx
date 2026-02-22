@@ -123,6 +123,11 @@ function App() {
     if (currentUser) fetchDashboard();
   }, [loans, events]);
 
+  // Ensure scroll resets to top on all page navigation
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [shellView, currentUser]);
+
   // Helper for dynamic currency
   const formatMoney = (val) => formatCurrency(val, currentUser?.currency);
 

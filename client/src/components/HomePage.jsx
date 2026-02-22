@@ -31,9 +31,6 @@ function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
               <img src="/logo main.png" alt="Loanwolf" className="site-brand-logo" />
             </div>
           </div>
-          <nav className="site-nav">
-            <span className="nav-link" onClick={onEduClick} style={{ cursor: 'pointer', color: '#a1a1aa' }}>Loan Education</span>
-          </nav>
           <div className="site-header-auth">
             <button type="button" className="secondary-btn site-header-logout" onClick={onLoginClick}>
               Log In
@@ -63,6 +60,11 @@ function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
             </button>
             <button type="button" className="primary-btn hero-get-started-btn" onClick={onSignupClick}>
               Sign Up
+            </button>
+          </div>
+          <div className="animate-blur-in delay-300" style={{ marginTop: '2rem', textAlign: 'center' }}>
+            <button type="button" className="rotating-hero-btn" onClick={onEduClick}>
+              Learn how banks trap you in debt →
             </button>
           </div>
         </div>

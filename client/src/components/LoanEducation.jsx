@@ -26,9 +26,6 @@ function LoanEducation({ onLoginClick, onSignupClick, onBackHome }) {
               <img src="/logo main.png" alt="Loanwolf" className="site-brand-logo" />
             </div>
           </div>
-          <nav className="site-nav">
-             <span className="nav-link" onClick={onBackHome} style={{ cursor: 'pointer', color: '#a1a1aa' }}>Back to Home</span>
-          </nav>
           <div className="site-header-auth">
             <button type="button" className="secondary-btn site-header-logout" onClick={onLoginClick}>
               Log In
@@ -112,13 +109,13 @@ function LoanEducation({ onLoginClick, onSignupClick, onBackHome }) {
                 <p style={{ color: '#a1a1aa', marginTop: '0.5rem', fontSize: '0.95rem' }}>Because interest is calculated <i>daily</i> or <i>monthly</i> on your remaining principal, an extra payment made in Year 1 destroys the principal that was generating interest for the next 19 years.</p>
               </div>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', padding: '2rem 2rem 0', textAlign: 'center' }}>
+              <div className="math-grid">
                 <div>
                    <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.5rem', fontFamily: 'Bricolage Grotesque' }}>1 Extra EMI</div>
                    <div style={{ color: '#a1a1aa', fontSize: '1rem' }}>Paid each year can shave off</div>
                    <div style={{ fontSize: '1.5rem', fontWeight: '500', color: '#fff', marginTop: '0.5rem' }}>4 Years of Debt</div>
                 </div>
-                <div style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="math-divider">
                    <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#3b82f6', marginBottom: '0.5rem', fontFamily: 'Bricolage Grotesque' }}>5% Increase</div>
                    <div style={{ color: '#a1a1aa', fontSize: '1rem' }}>In your monthly EMI knocks off</div>
                    <div style={{ fontSize: '1.5rem', fontWeight: '500', color: '#fff', marginTop: '0.5rem' }}>3 Years & ₹5L+ Interest</div>

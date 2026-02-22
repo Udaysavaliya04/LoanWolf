@@ -898,6 +898,49 @@ body {
     0 0 0 1px rgba(0, 0, 0, 0.9);
 }
 
+.rotating-hero-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+  background: transparent;
+  border-radius: 999px;
+  border: transparent;
+  cursor: pointer;
+  z-index: 1;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.rotating-hero-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: 
+    linear-gradient(180deg, #1A1A1A 0%, #050505 100%) content-box,
+    conic-gradient(from var(--border-angle), 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 215, 0, 0.8) 40%, 
+      rgba(192, 125, 0, 0.8) 50%, 
+      rgba(255, 215, 0, 0.8) 60%, 
+      rgba(43, 29, 0, 0.4) 100%
+    ) border-box;
+  z-index: -1;
+  animation: rotate-border 2s linear infinite;
+}
+
+.rotating-hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 215, 0, 0.15);
+}
+
 .auth-back-home {
   border-radius: var(--radius);
   font-size: 0.85rem;
@@ -1071,6 +1114,34 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+}
+
+.math-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 2rem 2rem 0;
+  text-align: center;
+}
+
+.math-divider {
+  border-left: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+@media (max-width: 900px) {
+  .math-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2rem 1rem 0;
+  }
+  .math-divider {
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 2.5rem 0;
+  }
 }
 
 .f-card {
@@ -1676,8 +1747,8 @@ body {
 
   background: linear-gradient(180deg,
       #ffffff 0%,
-      #adadad 40%,
-      #555555 60%,
+      #e2e2e2 40%,
+      #eaeaea 60%,
       #ffffff 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1693,9 +1764,9 @@ body {
 }
 
 .titan-highlight {
-  background: linear-gradient(0deg,
-      #e2e2e2 0%,
-      #9b9b9b 100%);
+  background: linear-gradient(180deg,
+      #efefef 0%,
+      #dedede 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
