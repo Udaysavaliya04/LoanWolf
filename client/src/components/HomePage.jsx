@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
+function HomePage() {
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -31,11 +33,13 @@ function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
               <img src="/logo main.png" alt="Loanwolf" className="site-brand-logo" />
             </div>
           </div>
+          <nav className="site-nav">
+          </nav>
           <div className="site-header-auth">
-            <button type="button" className="secondary-btn site-header-logout" onClick={onLoginClick}>
+            <button type="button" className="secondary-btn site-header-logout" onClick={() => navigate('/login')}>
               Log In
             </button>
-            <button type="button" className="primary-btn site-header-get-started" onClick={onSignupClick}>
+            <button type="button" className="primary-btn site-header-get-started" onClick={() => navigate('/register')}>
               Sign Up
             </button>
           </div>
@@ -55,15 +59,15 @@ function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
             Precision analytics for floating & Fixed -rate mortgages. <br></br>Simulate strategic prepayments, monitor interest drift, and accelerate your path to zero debt.
           </p>
           <div className="hero-cta-group animate-blur-in delay-300">
-            <button type="button" className="secondary-btn hero-login-btn" onClick={onLoginClick}>
+            <button type="button" className="secondary-btn hero-login-btn" onClick={() => navigate('/login')}>
               Log In
             </button>
-            <button type="button" className="primary-btn hero-get-started-btn" onClick={onSignupClick}>
+            <button type="button" className="primary-btn hero-get-started-btn" onClick={() => navigate('/register')}>
               Sign Up
             </button>
           </div>
           <div className="animate-blur-in delay-300" style={{ marginTop: '2rem', textAlign: 'center' }}>
-            <button type="button" className="rotating-hero-btn" onClick={onEduClick}>
+            <button type="button" className="rotating-hero-btn" onClick={() => navigate('/learnloans')}>
               Learn how banks trap you in debt →
             </button>
           </div>
@@ -227,7 +231,7 @@ function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
               </span>
             </div>
             <div className="footer-right">
-              <span className="footer-link" onClick={onEduClick} style={{ cursor: 'pointer' }}>Loan Education</span>
+              <span className="footer-link" onClick={() => navigate('/learnloans')} style={{ cursor: 'pointer' }}>Loan Education</span>
               <span className="footer-sep">•</span>
               <a href="#" className="footer-link">Twitter</a>
               <span className="footer-sep">•</span>

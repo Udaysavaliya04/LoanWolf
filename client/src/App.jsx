@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -70,11 +71,12 @@ const LoadingSpinner = () => (
 );
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
-  const [shellView, setShellView] = useState('home'); // 'home' | 'auth'
   const [loanForm, setLoanForm] = useState(EMPTY_LOAN_FORM);
   const [loans, setLoans] = useState([]);
   const [selectedLoanId, setSelectedLoanId] = useState('');
@@ -126,7 +128,7 @@ function App() {
   // Ensure scroll resets to top on all page navigation
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [shellView, currentUser]);
+  }, [location.pathname, currentUser]);
 
   // Helper for dynamic currency
   const formatMoney = (val) => formatCurrency(val, currentUser?.currency);
@@ -256,26 +258,6 @@ async function fetchLoans() {
       console.error(err);
       setError(err.message);
     }
-  };
-
-  const goToLogin = () => {
-    setError('');
-    setAuthMode('login');
-    setShellView('auth');
-    window.scrollTo(0, 0);
-  };
-
-  const goToSignup = () => {
-    setError('');
-    setAuthMode('register');
-    setShellView('auth');
-    window.scrollTo(0, 0);
-  };
-
-  const goToHome = () => {
-    setError('');
-    setShellView('home');
-    window.scrollTo(0, 0);
   };
 
   const handleLogout = async () => {
@@ -491,7 +473,7 @@ async function fetchLoans() {
       const updatedUser = await res.json();
       setCurrentUser(updatedUser);
       // Wait a moment then go back
-      setTimeout(() => setShellView('home'), 1000);
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (e) {
       throw e;
     }
@@ -795,41 +777,59 @@ async function fetchLoans() {
     return <LoadingSpinner />;
   }
 
-  if (!currentUser) {
-    if (shellView === 'home') {
-      return <HomePage onLoginClick={goToLogin} onSignupClick={goToSignup} onEduClick={() => setShellView('education')} />;
-    }
-    if (shellView === 'education') {
-      return <LoanEducation onLoginClick={goToLogin} onSignupClick={goToSignup} onBackHome={() => setShellView('home')} />;
-    }
-    return (
-      <AuthLayout
-        mode={authMode}
-        onModeChange={setAuthMode}
-        error={error}
-        onBackHome={goToHome}
-      >
-        {authMode === 'login' ? (
-          <LoginForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
-        ) : (
-          <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
-        )}
-      </AuthLayout>
-    );
-  }
-
-  if (shellView === 'profile') {
-    return (
-      <ProfileSettings
-        user={currentUser}
-        onUpdateProfile={handleUpdateProfile}
-        onBack={() => setShellView('home')}
-        dashboardData={dashboardData}
-      />
-    );
-  }
-
   return (
+    <Routes>
+      <Route path="/" element={
+        !currentUser ? <HomePage /> : <Navigate to="/dashboard" replace />
+      } />
+      
+      <Route path="/learnloans" element={
+        <LoanEducation />
+      } />
+
+      <Route path="/login" element={
+        !currentUser ? (
+          <AuthLayout mode="login" onModeChange={(mode) => {
+            setAuthMode(mode);
+            navigate('/login');
+          }} error={error}>
+            <LoginForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
+          </AuthLayout>
+        ) : <Navigate to="/dashboard" replace />
+      } />
+
+      <Route path="/register" element={
+        !currentUser ? (
+          <AuthLayout mode="register" onModeChange={(mode) => {
+            setAuthMode(mode);
+            navigate(`/${mode === 'register' ? 'register' : 'login'}`);
+          }} error={error}>
+            <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
+          </AuthLayout>
+        ) : <Navigate to="/dashboard" replace />
+      } />
+
+      <Route path="/profile" element={
+        currentUser ? (
+          <ProfileSettings
+            user={currentUser}
+            onUpdateProfile={handleUpdateProfile}
+            onBack={() => navigate('/dashboard')}
+            dashboardData={dashboardData}
+          />
+        ) : <Navigate to="/login" replace />
+      } />
+
+      <Route path="/dashboard" element={
+        currentUser ? renderDashboard() : <Navigate to="/login" replace />
+      } />
+
+      <Route path="*" element={<Navigate to={currentUser ? "/dashboard" : "/"} replace />} />
+    </Routes>
+  );
+
+  function renderDashboard() {
+    return (
     <div className="app">
       <header className="site-header animate-blur-in">
         <div className="site-header-inner">
@@ -852,13 +852,13 @@ async function fetchLoans() {
               </a>
             </nav>
             <div className="site-header-user">
-              <span className="site-header-user-name" onClick={() => setShellView('profile')} style={{ cursor: 'pointer' }}>
+              <span className="site-header-user-name" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
                 {currentUser.name}
               </span>
               <button
                 type="button"
                 className="secondary-btn site-header-settings"
-                onClick={() => setShellView('profile')}
+                onClick={() => navigate('/profile')}
                 title="Profile Settings"
                 style={{ marginRight: '0.5rem', padding: '0.4rem' }}
               >
@@ -875,8 +875,8 @@ async function fetchLoans() {
                 type="button"
                 className="secondary-btn site-header-settings mobile-settings-btn"
                 onClick={() => {
-                  setShellView('profile');
                   setMobileMenuOpen(false);
+                  navigate('/profile');
                 }}
                 title="Settings"
                 style={{ padding: '0.4rem', border: 'none', boxShadow:'none', background: 'transparent'}}
@@ -1817,6 +1817,7 @@ async function fetchLoans() {
       )}
     </div>
   );
+  }
 }
 
 export default App;

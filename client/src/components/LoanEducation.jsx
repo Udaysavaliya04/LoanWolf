@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function LoanEducation({ onLoginClick, onSignupClick, onBackHome }) {
+function LoanEducation() {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     // Scroll reveal logic matching HomePage
     const observer = new IntersectionObserver((entries) => {
@@ -21,16 +24,16 @@ function LoanEducation({ onLoginClick, onSignupClick, onBackHome }) {
     <div className="home-shell">
       <header className="site-header">
         <div className="site-header-inner">
-          <div className="site-brand" onClick={onBackHome} style={{ cursor: 'pointer' }}>
+          <div className="site-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <div className="site-brand-text">
               <img src="/logo main.png" alt="Loanwolf" className="site-brand-logo" />
             </div>
           </div>
           <div className="site-header-auth">
-            <button type="button" className="secondary-btn site-header-logout" onClick={onLoginClick}>
+            <button type="button" className="secondary-btn site-header-logout" onClick={() => navigate('/login')}>
               Log In
             </button>
-            <button type="button" className="primary-btn site-header-get-started" onClick={onSignupClick}>
+            <button type="button" className="primary-btn site-header-get-started" onClick={() => navigate('/register')}>
               Sign Up
             </button>
           </div>
@@ -140,7 +143,7 @@ function LoanEducation({ onLoginClick, onSignupClick, onBackHome }) {
             
             <div className="f-card glass-panel scroll-reveal delay-200" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
                <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem', fontFamily: 'Bricolage Grotesque' }}>Take Back Control</h3>
-               <button onClick={onSignupClick} className="primary-btn" style={{ width: '100%', maxWidth: '200px' }}>Start Simulating</button>
+               <button onClick={() => navigate('/register')} className="primary-btn" style={{ width: '100%', maxWidth: '200px' }}>Start Simulating</button>
             </div>
 
           </div>
