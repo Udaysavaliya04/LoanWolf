@@ -9,7 +9,43 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
   const [status, setStatus] = useState(''); // 'saving', 'success', 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [milestonesData, setMilestonesData] = useState([]);
+  const [loadingMilestones, setLoadingMilestones] = useState(true);
   const currencyRef = useRef(null);
+  
+  // Custom fetch to get the schedule for each loan to extract milestones
+  useEffect(() => {
+    let isMounted = true;
+    const fetchMilestones = async () => {
+      try {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+        const res = await fetch(`${API_BASE}/api/loans`, { credentials: 'include' });
+        const loans = await res.json();
+        
+        const allMilestones = [];
+        for (const loan of loans) {
+            const scheduleRes = await fetch(`${API_BASE}/api/loans/${loan._id}/schedule`, { credentials: 'include' });
+            if (scheduleRes.ok) {
+               const scheduleData = await scheduleRes.json();
+               if (scheduleData.milestones && scheduleData.milestones.length > 0) {
+                 allMilestones.push({ loanName: loan.name, milestones: scheduleData.milestones });
+               }
+            }
+        }
+        
+        if (isMounted) {
+            setMilestonesData(allMilestones);
+            setLoadingMilestones(false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch milestones:", err);
+        if (isMounted) setLoadingMilestones(false);
+      }
+    };
+    
+    fetchMilestones();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -95,6 +131,42 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
           </div>
         </div>
       )}
+
+      {/* Gamification Section */}
+      <div className="milestone-section" style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
+          <span>Your Achievements</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#ff8800ff" style={{ opacity: 1 }}><path  d="M12 11q.825 0 1.413-.587T14 9t-.587-1.412T12 7t-1.412.588T10 9t.588 1.413T12 11m-5-.2V7H5v1q0 .95.55 1.713T7 10.8m10 0q.9-.325 1.45-1.088T19 8V7h-2zM11 19v-3.1q-1.225-.275-2.187-1.037T7.4 12.95q-1.875-.225-3.137-1.637T3 8V7q0-.825.588-1.412T5 5h2q0-.825.588-1.412T9 3h6q.825 0 1.413.588T17 5h2q.825 0 1.413.588T21 7v1q0 1.9-1.263 3.313T16.6 12.95q-.45 1.15-1.412 1.913T13 15.9V19h3q.425 0 .713.288T17 20t-.288.713T16 21H8q-.425 0-.712-.288T7 20t.288-.712T8 19z"/></svg>
+        </h3>
+        
+        {loadingMilestones ? (
+          <p className="muted" style={{ fontSize: '0.9rem' }}>Loading your trophies...</p>
+        ) : milestonesData.length === 0 ? (
+          <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
+            <p className="muted" style={{ margin: 0 }}>Start making extra prepayments to unlock milestone badges!</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {milestonesData.map((loanData, idx) => (
+              <div key={idx}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                  {loanData.milestones.map((m, mIdx) => (
+                    <div key={m.id} className="f-card animate-blur-in" style={{ padding: '1.5rem', animationDelay: `${mIdx * 0.1}s` }}>
+                      <div className="f-icon-box" style={{ marginBottom: '1rem', fontSize: '1.5rem', width: '40px', height: '40px' }}>
+                        {m.icon}
+                      </div>
+                      <div className="f-content">
+                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{m.title}</h3>
+                        <p style={{ fontSize: '0.85rem' }}>{m.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="form-row">

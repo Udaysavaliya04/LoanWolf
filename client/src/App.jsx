@@ -8,6 +8,7 @@ import RegisterForm from './components/RegisterForm';
 import HomePage from './components/HomePage';
 import ProfileSettings from './components/ProfileSettings';
 import WolfAIChat from './components/WolfAIChat';
+import LoanEducation from './components/LoanEducation';
 
 
 const EMPTY_LOAN_FORM = {
@@ -791,7 +792,10 @@ async function fetchLoans() {
 
   if (!currentUser) {
     if (shellView === 'home') {
-      return <HomePage onLoginClick={goToLogin} onSignupClick={goToSignup} />;
+      return <HomePage onLoginClick={goToLogin} onSignupClick={goToSignup} onEduClick={() => setShellView('education')} />;
+    }
+    if (shellView === 'education') {
+      return <LoanEducation onLoginClick={goToLogin} onSignupClick={goToSignup} onBackHome={() => setShellView('home')} />;
     }
     return (
       <AuthLayout
@@ -1439,7 +1443,6 @@ async function fetchLoans() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Tran Type</th>
                     <th>From Date</th>
                     <th>To Date</th>
                     <th>Opening Prin. Bal.</th>
@@ -1455,7 +1458,6 @@ async function fetchLoans() {
                   {scheduleData.schedule.map((row) => (
                     <tr key={row.period}>
                       <td>{row.period}</td>
-                      <td>{row.tranType}</td>
                       <td>{formatDate(row.fromDate)}</td>
                       <td>{formatDate(row.toDate)}</td>
                       <td>{formatMoney(row.openingBalance)}</td>

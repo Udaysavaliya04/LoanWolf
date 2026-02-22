@@ -234,6 +234,68 @@ async function buildSchedule(loanId, options = {}) {
     };
   })();
 
+  const calculateMilestones = () => {
+    const achieved = [];
+    const p100 = loan.principal;
+
+    const currentEntry = schedule.find(row => row.tranType === 'Proj');
+    let currentBalance = 0;
+    if (currentEntry) {
+      currentBalance = currentEntry.openingBalance;
+    } else if (schedule.length > 0) {
+         const last = schedule[schedule.length - 1];
+         currentBalance = last.closingBalance;
+    }
+    
+    const currentPrincipalPaid = p100 - currentBalance;
+    
+    // 1. Halfway mark
+    if (currentPrincipalPaid >= p100 / 2 && p100 > 0) {
+      achieved.push({ 
+        id: 'halfway', 
+        title: 'Halfway There!', 
+        description: 'You have paid off 50% of your principal.',
+        icon: '🎯' 
+      });
+    }
+
+    // 2. Absolute Principal Milestones
+    if (currentBalance <= 1000000 && p100 > 1000000) {
+      achieved.push({ id: 'under10l', title: 'Under ₹10L', description: 'Principal is now under ₹10 Lakhs.', icon: '📉' });
+    }
+    if (currentBalance <= 500000 && p100 > 500000) {
+      achieved.push({ id: 'under5l', title: 'Under ₹5L', description: 'Principal is now under ₹5 Lakhs.', icon: '📉' });
+    }
+    if (currentBalance <= 100000 && p100 > 100000) {
+      achieved.push({ id: 'under1l', title: 'Home Run Stretch', description: 'Principal is under ₹1 Lakh!', icon: '🔥' });
+    }
+
+    // 3. Years Saved Milestones
+    const yearsSaved = Math.floor(comparison.monthsSaved / 12);
+    if (yearsSaved >= 1) {
+      achieved.push({ 
+        id: `years_saved_${yearsSaved}`, 
+        title: `${yearsSaved} ${yearsSaved === 1 ? 'Year' : 'Years'} Saved!`, 
+        description: `You knocked ${yearsSaved} ${yearsSaved === 1 ? 'year' : 'years'} off your loan!`,
+        icon: '🐺'
+      });
+    }
+    
+    // 4. Fully Paid
+    if (currentBalance <= 0.01 && schedule.length > 0) {
+       achieved.push({
+         id: 'debt_free',
+         title: 'Debt Free!',
+         description: 'You have completely paid off this loan.',
+         icon: '👑'
+       });
+    }
+
+    return achieved;
+  };
+
+  const milestones = calculateMilestones();
+
   return {
     loan: {
       id: loan._id,
@@ -248,6 +310,7 @@ async function buildSchedule(loanId, options = {}) {
     baselineSummary: baseline.summary,
     baselineSchedule: baseline.schedule,
     comparison,
+    milestones,
   };
 }
 

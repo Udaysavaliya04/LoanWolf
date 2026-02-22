@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function HomePage({ onLoginClick, onSignupClick }) {
+function HomePage({ onLoginClick, onSignupClick, onEduClick }) {
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
   useEffect(() => {
@@ -32,6 +32,7 @@ function HomePage({ onLoginClick, onSignupClick }) {
             </div>
           </div>
           <nav className="site-nav">
+            <span className="nav-link" onClick={onEduClick} style={{ cursor: 'pointer', color: '#a1a1aa' }}>Loan Education</span>
           </nav>
           <div className="site-header-auth">
             <button type="button" className="secondary-btn site-header-logout" onClick={onLoginClick}>
@@ -224,6 +225,8 @@ function HomePage({ onLoginClick, onSignupClick }) {
               </span>
             </div>
             <div className="footer-right">
+              <span className="footer-link" onClick={onEduClick} style={{ cursor: 'pointer' }}>Loan Education</span>
+              <span className="footer-sep">•</span>
               <a href="#" className="footer-link">Twitter</a>
               <span className="footer-sep">•</span>
               <a href="#" className="footer-link">GitHub</a>
