@@ -220,6 +220,19 @@ function HomePage() {
               isOpen={openFaqIndex === 3}
               onClick={() => handleFaqClick(3)}
             />
+            <FaqItem 
+              question="How does the system handle floating interest rates?" 
+              answer="Seamlessly. You can log historical and projected rate changes exactly when they occur. The engine instantaneously recalibrates the interest accrual from that specific month forward, ensuring your digital ledger matches reality."
+              isOpen={openFaqIndex === 4}
+              onClick={() => handleFaqClick(4)}
+            />
+            <FaqItem 
+              question="Is LoanWolf free to use?" 
+              answer="The core Amortization Engine and Strategy Sandbox are completely free. We built this platform to democratize the financial mathematics that banks use to maximize profits, putting the power of debt-reduction back in your hands."
+              isOpen={openFaqIndex === 5}
+              onClick={() => handleFaqClick(5)}
+            />
+
           </div>
         </section>
 
@@ -236,11 +249,11 @@ function HomePage() {
               </span>
             </div>
             <div className="footer-right">
-              <span className="footer-link" onClick={() => navigate('/learnloans')} style={{ cursor: 'pointer' }}>Loan Education</span>
+              <a href="https://x.com/Uday_Code" className="footer-link">Twitter</a>
               <span className="footer-sep">•</span>
-              <a href="#" className="footer-link">Twitter</a>
+              <a href="https://github.com/Udaysavaliya04" className="footer-link">GitHub</a>
               <span className="footer-sep">•</span>
-              <a href="#" className="footer-link">GitHub</a>
+              <a href="https://www.linkedin.com/in/uday-savaliya-b30bb7286" className="footer-link">LinkedIn</a>
             </div>
           </div>
           <div className="footer-big-text">LOANWOLF</div>
