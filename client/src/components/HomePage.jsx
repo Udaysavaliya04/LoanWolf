@@ -56,7 +56,8 @@ function HomePage() {
             <button type="button" className="rotating-hero-btn" onClick={() => navigate('/learnloans')} style={{ padding: '0.4rem 1.2rem', fontSize: '0.9rem', maxWidth: '100%' }}>
               <span className="text-gold hide-on-mobile" style={{ fontWeight: 'bold' }}>Guide</span> 
               <span className="hide-on-mobile" style={{ margin: '0 8px', color: 'rgba(255,255,255,0.3)' }}>|</span> 
-              Learn how banks trap you in debt →
+              Learn how banks trap you in debt 
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{opacity:1, marginLeft: '4px'}}><path fill="none" d="M5 12h14m-7-7l7 7l-7 7"/></svg>
             </button>
           </div>
 
