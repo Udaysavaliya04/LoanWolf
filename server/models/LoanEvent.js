@@ -9,8 +9,8 @@ const LoanEventSchema = new mongoose.Schema(
       enum: ['EXTRA_PAYMENT', 'RATE_CHANGE'],
       required: true,
     },
-    amount: { type: Number }, // for EXTRA_PAYMENT
-    newAnnualInterestRate: { type: Number }, // for RATE_CHANGE
+    amount: { type: Number }, 
+    newAnnualInterestRate: { type: Number }, 
     note: { type: String },
   },
   { timestamps: true }

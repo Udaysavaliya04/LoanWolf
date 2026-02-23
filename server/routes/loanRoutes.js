@@ -47,8 +47,6 @@ router.get('/dashboard', async (req, res) => {
       loans.map(async (loan) => {
         const data = await buildSchedule(loan._id);
         
-        // Find current balance (opening balance of the first future payment)
-        // 'Proj' means projected (future), 'Amrt' means amortized (past/today)
         const currentEntry = data.schedule.find(row => row.tranType === 'Proj');
         
         let currentBalance = 0;

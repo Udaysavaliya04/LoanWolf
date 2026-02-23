@@ -8,7 +8,6 @@ const router = express.Router();
 
 router.use(requireAuth);
 
-// GET /chat - Retrieve conversation history
 router.get('/chat', async (req, res) => {
   try {
     let session = await ChatSession.findOne({ userId: req.user.id });
@@ -22,7 +21,6 @@ router.get('/chat', async (req, res) => {
   }
 });
 
-// POST /chat - Send a message
 router.post('/chat', async (req, res) => {
   try {
     const { message: userMessage, contextData } = req.body;
@@ -32,7 +30,6 @@ router.post('/chat', async (req, res) => {
 
     const userId = req.user.id;
 
-    // 1. Save user message to history
     let session = await ChatSession.findOne({ userId });
     if (!session) {
       session = new ChatSession({ userId, messages: [] });
@@ -40,14 +37,12 @@ router.post('/chat', async (req, res) => {
     session.messages.push({ role: 'user', content: userMessage });
     await session.save();
 
-    // 2. Build full AI context: all loans, full schedules, events, dashboard (the "brain")
     const activeLoanId = contextData?.currentLoan?._id || contextData?.currentLoanId || null;
     const { context: fullContext } = await buildFullAdvisorContext(userId, {
       activeLoanId,
       clientContextData: contextData || null,
     });
 
-    // 3. Gemini setup
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('Server missing GEMINI_API_KEY');
     }
@@ -56,13 +51,11 @@ router.post('/chat', async (req, res) => {
     const modelName = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
     const model = genAI.getGenerativeModel({ model: modelName });
 
-    // 4. Conversational history (last 8 exchanges for continuity)
     const recentHistory = session.messages
       .slice(-8)
       .map((m) => `${m.role === 'user' ? 'User' : 'WolfAI'}: ${m.content}`)
       .join('\n');
 
-    // 5. System prompt — elite financial strategist with full data
     const systemPrompt = `You are **WolfAI**, an elite financial strategist and debt payoff expert. You have access to the user's complete portfolio: every loan, full amortization schedules (period-by-period), all extra payments and rate changes, and dashboard metrics. Use this data to give precise, actionable advice.
 
 **Persona**
@@ -91,12 +84,10 @@ ${recentHistory}
 - Keep responses under 250 words unless the user asks for a detailed breakdown.
 - If the user has no loans, encourage them to add one and explain how you can help once they do.`;
 
-    // 6. Generate response
     const result = await model.generateContent(systemPrompt);
     const response = result.response;
     const text = response.text();
 
-    // 7. Save AI response
     session.messages.push({ role: 'assistant', content: text });
     await session.save();
 

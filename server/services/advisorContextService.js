@@ -1,29 +1,18 @@
-/**
- * Advisor Context Service — Builds the complete "brain" context for WolfAI.
- * Aggregates ALL data: loans, events, full amortization schedules, baseline comparison,
- * and dashboard metrics so the AI has maximum fidelity for analysis and advice.
- */
-
 const Loan = require('../models/Loan');
 const LoanEvent = require('../models/LoanEvent');
 const { buildSchedule } = require('./amortizationService');
 
-/** Format a number as INR for context strings */
 function fmtINR(num) {
   if (num == null || !Number.isFinite(num)) return 'N/A';
   return `₹${Math.round(num).toLocaleString('en-IN')}`;
 }
 
-/** Format date for context */
 function fmtDate(d) {
   if (!d) return 'N/A';
   const date = new Date(d);
   return Number.isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString('en-IN');
 }
 
-/**
- * Build dashboard-level metrics for the user's portfolio.
- */
 async function getDashboardMetrics(userId) {
   const loans = await Loan.find({ ownerId: userId });
   if (loans.length === 0) {
@@ -60,10 +49,6 @@ async function getDashboardMetrics(userId) {
   };
 }
 
-/**
- * Serialize schedule rows into a compact table for AI consumption.
- * Includes: period, type, from→to date, opening bal, interest, principal, extra, total, closing bal.
- */
 function scheduleToTable(schedule, maxRows = 600) {
   const rows = schedule.slice(0, maxRows);
   const header = 'Period | Type | From | To | Opening Bal | Interest | Principal | Extra | Total | Closing Bal';
@@ -84,9 +69,6 @@ function scheduleToTable(schedule, maxRows = 600) {
   return [header, ...lines].join('\n');
 }
 
-/**
- * Build the full AI context: dashboard + every loan with full schedule, events, and comparison.
- */
 async function buildFullAdvisorContext(userId, options = {}) {
   const { activeLoanId = null, clientContextData = null } = options;
 

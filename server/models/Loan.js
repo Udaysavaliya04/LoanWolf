@@ -4,7 +4,7 @@ const LoanSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     principal: { type: Number, required: true },
-    annualInterestRate: { type: Number, required: true }, // percentage, e.g. 10.5
+    annualInterestRate: { type: Number, required: true }, 
     termMonths: { type: Number, required: true },
     startDate: { type: Date, required: true },
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
