@@ -41,11 +41,11 @@ const SupportPage = () => {
           
           <div className="support-header-left">
             <h2 className="animate-blur-in delay-100" style={{ fontFamily: 'Bricolage Grotesque', fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
-              Fuel the <span className="text-gradient-gold">Engine</span>
+              Fuel this <span className="text-gradient-gold">platform</span>
             </h2>
             <p className="muted animate-blur-in delay-200 support-subtitle">
-              LoanWolf is ad-free and privacy-first. If our math engine saved you months of debt, consider leaving a tip. 100% goes directly to the developer via UPI.
-            </p>
+            My primary focus of building loanwolf was never to earn money through subscription, ads or any other means but to help people to take control of their debt and save their hard-earned money.<br></br><br></br> If this tool has helped you by any means consider buying me a coffee. <br></br><br></br>Your support means the world to me. Thank you for keeping this platform running.
+          </p>
 
             <div className="support-presets-row animate-blur-in delay-300">
               {['50', '100', '200', '500'].map((preset) => (
@@ -70,7 +70,7 @@ const SupportPage = () => {
                     placeholder="Custom Amount" 
                     value={customAmount}
                     onChange={handleCustomChange}
-                    style={{ paddingLeft: '2rem', fontSize: '1.1rem', fontWeight: '500' }}
+                    style={{ paddingLeft: '2rem', fontSize: '1.1rem', fontWeight: '500', fontFamily: 'Inter, sans-serif' }}
                   />
                 </div>
               </div>

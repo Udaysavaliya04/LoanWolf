@@ -249,7 +249,7 @@ function HomePage() {
               </span>
             </div>
             <div className="footer-right">
-              <a href="#" onClick={(e) => { e.preventDefault(); navigate('/support'); }} className="footer-link">Support me</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate('/support'); }} className="footer-link">Buy me a coffee</a>
               <span className="footer-sep">•</span>
               <a href="https://x.com/Uday_Code" className="footer-link">Twitter</a>
               <span className="footer-sep">•</span>
