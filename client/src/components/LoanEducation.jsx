@@ -98,6 +98,24 @@ function LoanEducation() {
                 <p>Banks intentionally provide you with simple summary PDFs. They <b>rarely</b> provide you with a month-by-month interactive amortization schedule, because seeing the 300 rows of massive interest payments makes customers actively want to find ways to escape the trap.</p>
               </div>
             </div>
+
+            <div className="f-card glass-panel wide scroll-reveal delay-200">
+              <div className="f-icon-box" style={{ color: '#a855f7' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div className="f-content">
+                <h3>The Loyalty Penalty</h3>
+                <p>Banks penalize loyalty. New customers are lured with the lowest rates, while existing borrowers are quietly kept on higher "spreads." A mere 0.5% rate difference bleeds lakhs of rupees over a decade. Your only defense in the debt matrix? A Balance Transfer.</p>              </div>
+             </div>
+
+            <div className="f-card glass-panel scroll-reveal delay-300">
+              <div className="f-icon-box" style={{ color: '#ec4899' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
+              </div>
+              <div className="f-content">
+                <h3>The Bundled Insurance Trap</h3>
+                <p>Loan officers often pressure you to bundle overpriced bank insurance, quietly "capitalizing" the premium into your total loan amount. You end up paying 8.5% compound interest on an insurance policy for 20 years. You have the legal right to decline it and buy external term insurance at a fraction of the cost.</p>              </div>
+            </div>
           </div>
 
           <div className="bento-header scroll-reveal">
@@ -131,7 +149,7 @@ function LoanEducation() {
               </div>
             </div>
             
-            <div className="f-card glass-panel wide scroll-reveal delay-100">
+            <div className="f-card glass-panel scroll-reveal delay-100">
                <div className="f-icon-box">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
                </div>
@@ -140,12 +158,20 @@ function LoanEducation() {
                  <p>When the Reserve Bank hikes interest rates, banks <b>do not increase your EMI</b>. Instead, they quietly extend your loan tenure in the background. A seemingly small 0.5% rate hike can add literally <i>years</i> of extra payments to the end of your loan without you ever noticing until it's too late. The only defense is manually increasing your EMI.</p>
                </div>
             </div>
+
+            <div className="f-card glass-panel scroll-reveal delay-200">
+               <div className="f-icon-box" style={{ color: '#f97316' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+               </div>
+               <div className="f-content">
+                 <h3>The Prepayment Myth</h3>
+                 <p>Many still believe banks fine you for paying off your loan early. <b>Fact:</b> The RBI legally abolished prepayment penalties on all individual floating-rate home loans. You can prepay ₹10,000 or your entire balance tomorrow, 100% fee-free. The cage is unlocked.</p>               </div>
+            </div>
             
-            <div className="f-card glass-panel scroll-reveal delay-200" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+            <div className="f-card glass-panel scroll-reveal delay-300" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
                <h3 style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '1rem', fontFamily: 'Bricolage Grotesque' }}>Take Back Control</h3>
                <button onClick={() => navigate('/register')} className="primary-btn" style={{ width: '100%', maxWidth: '200px' }}>Start Simulating</button>
             </div>
-
           </div>
         </section>
 
