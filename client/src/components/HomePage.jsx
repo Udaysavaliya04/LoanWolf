@@ -240,7 +240,7 @@ function HomePage() {
           <div className="footer-glass glass-panel">
             <div className="footer-left">
               <span className="footer-copy">
-                &copy; 2026 Loanwolf. 
+                &copy; 2026 Loanwolf. All rights reserved.
               </span>
             </div>
             <div className="footer-center">
