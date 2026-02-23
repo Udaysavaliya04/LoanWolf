@@ -792,7 +792,7 @@ async function fetchLoans() {
         !currentUser ? (
           <AuthLayout mode="login" onModeChange={(mode) => {
             setAuthMode(mode);
-            navigate('/login');
+            navigate(`/${mode === 'register' ? 'register' : 'login'}`);
           }} error={error}>
             <LoginForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
           </AuthLayout>

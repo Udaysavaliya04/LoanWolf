@@ -955,7 +955,7 @@ body {
   box-shadow: 0 10px 20px rgba(255, 215, 0, 0.15);
 }
 
-.auth-back-home {
+.auth-back-home, .support-back-home {
   border-radius: var(--radius);
   font-size: 0.85rem;
   padding: 0.45rem 1.1rem;
@@ -978,14 +978,14 @@ body {
   transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.auth-back-home:hover {
+.auth-back-home:hover, .support-back-home:hover {
   box-shadow: 
     0 6px 0 #666,
     0 15px 20px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
-.auth-back-home:active {
+.auth-back-home:active, .support-back-home:active {
   transform: translateY(4px);
   box-shadow: 
     0 0 0 #666,
@@ -1000,17 +1000,23 @@ body {
   }
 
   .auth-back-home {
-    position: relative;
-    top: 0;
-    right: 0;
-    align-self: flex-end;
-    margin-bottom: 1rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
     padding: 0.35rem 0.8rem;
     font-size: 0.8rem;
   }
   
-  /* --- SUPPORT PAGE DESKTOP UPGRADES --- */
-  /* Mobile-first card override to reduce vertical height on small screens */
+  .support-back-home {
+    position: relative;
+    top: 0;
+    right: 0;
+    align-self: flex-end;
+    margin-bottom: 0.8rem;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
   .support-card {
     padding-top: 1.2rem;
     padding-bottom: 2rem;
@@ -1044,6 +1050,7 @@ body {
 }
 
 .auth-toggle {
+  position: relative;
   display: inline-flex;
   border-radius: 999px;
   border: 1px solid var(--border-subtle);
