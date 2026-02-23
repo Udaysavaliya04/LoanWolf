@@ -36,7 +36,7 @@ function HomePage() {
           <nav className="site-nav">
           </nav>
           <div className="site-header-auth">
-            <button type="button" className="secondary-btn site-header-logout" onClick={() => navigate('/login')}>
+            <button type="button" className="secondary-btn site-header-logout" style={{height: '32px'}} onClick={() => navigate('/login')}>
               Log In
             </button>
             <button type="button" className="primary-btn site-header-get-started" onClick={() => navigate('/register')}>
@@ -51,24 +51,28 @@ function HomePage() {
           <a href="https://www.producthunt.com/products/loanwolf?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-loanwolf" target="_blank" rel="noopener noreferrer" className="ph-badge-wrapper animate-blur-in">
             <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1077962&theme=dark" alt="LOANWOLF - Track shifting rates, extra payments, and escape debt faster | Product Hunt" className="ph-badge" width="250" height="54" />
           </a>
-          <h1 className="titan-text animate-blur-in delay-100">
+
+          <div className="animate-blur-in delay-100" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem', marginTop: '0.75rem', width: '100%', padding: '0 1rem' }}>
+            <button type="button" className="rotating-hero-btn" onClick={() => navigate('/learnloans')} style={{ padding: '0.4rem 1.2rem', fontSize: '0.9rem', maxWidth: '100%' }}>
+              <span className="text-gold hide-on-mobile" style={{ fontWeight: 'bold' }}>Guide</span> 
+              <span className="hide-on-mobile" style={{ margin: '0 8px', color: 'rgba(255,255,255,0.3)' }}>|</span> 
+              Learn how banks trap you in debt →
+            </button>
+          </div>
+
+          <h1 className="titan-text animate-blur-in delay-200">
             Architect your <br />
-            <span className="titan-highlight">financial <span className="text-gold">freedom!</span></span>
+            <span className="text-gold">financial <span className="text-gold">freedom!</span></span>
           </h1>
-          <p className="titan-subtitle animate-blur-in delay-200">
+          <p className="titan-subtitle animate-blur-in delay-300">
             Precision analytics for floating & Fixed -rate mortgages. <br></br>Simulate strategic prepayments, monitor interest drift, and accelerate your path to zero debt.
           </p>
-          <div className="hero-cta-group animate-blur-in delay-300">
-            <button type="button" className="secondary-btn hero-login-btn" onClick={() => navigate('/login')}>
+          <div className="hero-cta-group animate-blur-in delay-400">
+            <button type="button" className="secondary-btn hero-login-btn" style={{}} onClick={() => navigate('/login')}>
               Log In
             </button>
             <button type="button" className="primary-btn hero-get-started-btn" onClick={() => navigate('/register')}>
               Sign Up
-            </button>
-          </div>
-          <div className="animate-blur-in delay-300" style={{ marginTop: '2rem', textAlign: 'center' }}>
-            <button type="button" className="rotating-hero-btn" onClick={() => navigate('/learnloans')}>
-              Learn how banks trap you in debt →
             </button>
           </div>
         </div>
