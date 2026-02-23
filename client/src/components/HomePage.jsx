@@ -249,6 +249,8 @@ function HomePage() {
               </span>
             </div>
             <div className="footer-right">
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate('/support'); }} className="footer-link">Support me</a>
+              <span className="footer-sep">•</span>
               <a href="https://x.com/Uday_Code" className="footer-link">Twitter</a>
               <span className="footer-sep">•</span>
               <a href="https://github.com/Udaysavaliya04" className="footer-link">GitHub</a>

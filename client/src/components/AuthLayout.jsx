@@ -5,7 +5,7 @@ function AuthLayout({ mode, onModeChange, children, error }) {
   const navigate = useNavigate();
   return (
     <div className="auth-shell">
-      <button type="button" className="auth-back-home" onClick={() => navigate('/')}>
+      <button type="button" className="auth-back-home" onClick={() => { window.scrollTo(0, 0); navigate('/'); }}>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 1 }}><path fill="none" d="M5 12h14M5 12l6 6m-6-6l6-6"/></svg>
          Return to home
       </button>

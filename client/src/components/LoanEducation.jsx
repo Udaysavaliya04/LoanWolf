@@ -189,9 +189,13 @@ function LoanEducation() {
               </span>
             </div>
             <div className="footer-right">
-              <a href="#" className="footer-link">Twitter</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate('/support'); }} className="footer-link">Support me</a>
               <span className="footer-sep">•</span>
-              <a href="#" className="footer-link">GitHub</a>
+              <a href="https://x.com/Uday_Code" className="footer-link">Twitter</a>
+              <span className="footer-sep">•</span>
+              <a href="https://github.com/Udaysavaliya04" className="footer-link">GitHub</a>
+              <span className="footer-sep">•</span>
+              <a href="https://www.linkedin.com/in/uday-savaliya-b30bb7286" className="footer-link">LinkedIn</a>
             </div>
           </div>
           <div className="footer-big-text">LOANWOLF</div>
