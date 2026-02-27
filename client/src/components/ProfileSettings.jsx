@@ -234,7 +234,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
         )}
 
         <div className="form-actions">
-          <button type="submit" className="primary-btn" style={{ marginTop: '0.8rem', width: '100%' }} disabled={status === 'saving'}>
+          <button type="submit" className="primary-btn" style={{ marginTop: '0.8rem', marginBottom: '0.8rem', width: '100%' }} disabled={status === 'saving'}>
             {status === 'saving' ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
