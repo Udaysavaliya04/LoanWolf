@@ -38,6 +38,10 @@ body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   background-color: var(--bg);
+  background-image: url('/bg.webp') ;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--text-primary);
 }
 
@@ -1194,6 +1198,8 @@ body {
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 1;
 }
 
@@ -1438,10 +1444,6 @@ body {
   justify-content: center;
   width: 100%;
   font-family: Bricolage Grotesque, sans-serif;
-  
-  /* Full width decoration */
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin-top: 5rem;
   position: relative;
@@ -1456,7 +1458,7 @@ body {
   font-size: 15vw;
   font-weight: 300;
   line-height: 0.8;
-  background: linear-gradient(0deg, #000000 0%, #ffec7176 50%, rgb(255, 204, 0) 100%);
+  background: linear-gradient(0deg, #000000 0%, #ffdd0076 50%, rgb(255, 204, 0) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1620,6 +1622,8 @@ body {
   border-radius: var(--radius);
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.02);
@@ -2328,6 +2332,8 @@ body {
 .marquee-container {
   width: 100%;
   overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
@@ -2362,6 +2368,7 @@ body {
   gap: 1rem;
   transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   position: relative;
   z-index: 1;
 }
