@@ -778,9 +778,13 @@ async function fetchLoans() {
     return <LoadingSpinner />;
   }
 
+  const hideBg = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/profile');
+
   return (
-    <Routes>
-      <Route path="/" element={
+    <>
+      {!hideBg && <div className="global-bg"></div>}
+      <Routes>
+        <Route path="/" element={
         !currentUser ? <HomePage /> : <Navigate to="/dashboard" replace />
       } />
       
@@ -829,6 +833,7 @@ async function fetchLoans() {
 
       <Route path="*" element={<Navigate to={currentUser ? "/dashboard" : "/"} replace />} />
     </Routes>
+    </>
   );
 
   function renderDashboard() {

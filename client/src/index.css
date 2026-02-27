@@ -26,11 +26,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-image: url('/bg.webp');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+  background-color: #000;
 }
 
 a {
