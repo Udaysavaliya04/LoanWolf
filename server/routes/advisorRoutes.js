@@ -48,7 +48,7 @@ router.post('/chat', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const modelName = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+    const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const recentHistory = session.messages
