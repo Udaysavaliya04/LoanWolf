@@ -133,7 +133,7 @@ export default function WolfAIChat({ currentUser, contextData }) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask WolfAI anything..."
+            placeholder="Ask WolfAI..."
             disabled={loading}
           />
           <button type="submit" className="primary-btn send-btn" disabled={loading || !input.trim()}>
