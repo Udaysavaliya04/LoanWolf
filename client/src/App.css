@@ -456,7 +456,7 @@ body {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   padding: 0.3rem 0;
-  z-index: 20;
+  z-index: 999;
   font-family: Inter;
 }
 
@@ -1045,7 +1045,7 @@ body {
 
 .auth-card-gradient {
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; Removed to fix dropdown clipping */
 }
 
 .auth-card-gradient::before {
