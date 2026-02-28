@@ -119,7 +119,7 @@ function LoanEducation() {
           </div>
 
           <div className="bento-header scroll-reveal">
-            <h2>The Mathematics of <span className="text-gradient-gold">Escape</span></h2>
+            <h2 style={{fontFamily: 'Bricolage Grotesque'}}>The Mathematics of <span className="text-gradient-gold">Escape</span></h2>
             <p style={{fontFamily: 'Bricolage Grotesque',letterSpacing: '-0.02em', fontSize: '1rem'}}>Every single penny you prepay bypasses the interest check completely and acts as a direct strike against your principal balance.</p>
           </div>
 
