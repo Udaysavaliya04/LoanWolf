@@ -252,6 +252,8 @@ body {
 .form-row input,
 .form-row select,
 .form-row textarea {
+  width: 100%;
+  box-sizing: border-box;
   border-radius: var(--radius);
   border: 1px solid var(--input);
   background-color: var(--background);
