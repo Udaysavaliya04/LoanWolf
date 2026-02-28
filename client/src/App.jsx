@@ -56,7 +56,6 @@ const INITIAL_SCENARIOS = [
 ];
 
 
-// --- Luxury Modern Spinner ---
 const LoadingSpinner = () => (
   <div className="spinner-wrapper">
     <div className="luxury-spinner">
@@ -76,7 +75,7 @@ function App() {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '', currency: 'INR' });
   const [loanForm, setLoanForm] = useState(EMPTY_LOAN_FORM);
   const [loans, setLoans] = useState([]);
@@ -96,15 +95,14 @@ function App() {
   const [scenarios, setScenarios] = useState(INITIAL_SCENARIOS);
   const [scenarioResults, setScenarioResults] = useState([]);
   const [runningScenarios, setRunningScenarios] = useState(false);
-  const [advisorMode, setAdvisorMode] = useState('chat'); // 'chat' | 'extra' | 'target'
+  const [advisorMode, setAdvisorMode] = useState('chat'); 
   const [advisorExtra, setAdvisorExtra] = useState('');
   const [advisorTargetDate, setAdvisorTargetDate] = useState('');
   const [advisorResult, setAdvisorResult] = useState(null);
   const [runningAdvice, setRunningAdvice] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Edit States
-  const [editingLoanId, setEditingLoanId] = useState(null); // ID of loan being edited (null = create mode)
+  const [editingLoanId, setEditingLoanId] = useState(null); 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
 
@@ -121,17 +119,14 @@ function App() {
     }
   }
 
-  // Refresh dashboard when loans or events change
   useEffect(() => {
     if (currentUser) fetchDashboard();
   }, [loans, events]);
 
-  // Ensure scroll resets to top on all page navigation
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname, currentUser]);
 
-  // Helper for dynamic currency
   const formatMoney = (val) => formatCurrency(val, currentUser?.currency);
 
 async function fetchLoans() {
@@ -290,7 +285,6 @@ async function fetchLoans() {
       termMonths: loan.termMonths,
       startDate: loan.startDate ? loan.startDate.split('T')[0] : '',
     });
-    // Scroll to form (top/left)
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
