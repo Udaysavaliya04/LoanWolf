@@ -107,7 +107,7 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
             </span>
           </button>
           {currencyOpen && (
-            <div className="dropdown-menu" style={{ width: '100%' }}>
+            <div className="dropdown-menu" style={{ width: '100%', bottom: '100%', top: 'auto', marginBottom: '0.35rem', marginTop: 0, background: '#000' }}>
               {currencies.map((c) => (
                 <button
                   key={c.code}
