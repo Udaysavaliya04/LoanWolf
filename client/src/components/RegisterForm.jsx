@@ -11,7 +11,7 @@ function RegisterForm({ values, onChange, onSubmit }) {
           name="name"
           value={values.name}
           onChange={onChange}
-          placeholder="Your name"
+          placeholder="Full Name"
           autoComplete="name"
           required
         />
@@ -23,7 +23,7 @@ function RegisterForm({ values, onChange, onSubmit }) {
           name="email"
           value={values.email}
           onChange={onChange}
-          placeholder="you@gmail.com"
+          placeholder="name@example.com"
           autoComplete="email"
           required
         />
@@ -36,7 +36,7 @@ function RegisterForm({ values, onChange, onSubmit }) {
             name="password"
             value={values.password}
             onChange={onChange}
-            placeholder="Create a strong password"
+            placeholder="Enter a strong password..."
             autoComplete="new-password"
             required
             className="password-input"

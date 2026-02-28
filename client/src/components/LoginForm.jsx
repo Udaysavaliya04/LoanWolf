@@ -12,7 +12,7 @@ function LoginForm({ values, onChange, onSubmit }) {
           name="email"
           value={values.email}
           onChange={onChange}
-          placeholder="you@example.com"
+          placeholder="name@example.com"
           autoComplete="email"
           required
         />
@@ -25,7 +25,7 @@ function LoginForm({ values, onChange, onSubmit }) {
             name="password"
             value={values.password}
             onChange={onChange}
-            placeholder="••••••••"
+            placeholder="Enter your password..."
             autoComplete="current-password"
             required
             className="password-input"
