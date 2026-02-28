@@ -1012,7 +1012,7 @@ async function fetchLoans() {
                 required
               />
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem' }}>
               <button type="submit" className="primary-btn" style={{ width: '100%' }}>
                 {editingLoanId ? 'Update loan' : 'Save loan'}
               </button>
@@ -1115,8 +1115,8 @@ async function fetchLoans() {
                     >
                       <span>
                         {eventForm.type === 'EXTRA_PAYMENT'
-                          ? 'Extra principal payment'
-                          : 'Interest rate change'}
+                          ? 'Extra Principal Payment'
+                          : 'Interest Rate Change'}
                       </span>
                       <span className="dropdown-icon" aria-hidden="true">
                           <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -1136,7 +1136,7 @@ async function fetchLoans() {
                             setEventTypeMenuOpen(false);
                           }}
                         >
-                          Extra principal payment
+                          Extra Principal Payment
                         </button>
                         <button
                           type="button"
@@ -1147,7 +1147,7 @@ async function fetchLoans() {
                             setEventTypeMenuOpen(false);
                           }}
                         >
-                          Interest rate change
+                          Interest Rate Change
                         </button>
                       </div>
                     )}
@@ -1188,6 +1188,7 @@ async function fetchLoans() {
                       onChange={handleEventInputChange}
                       min="0"
                       step="0.01"
+                      placeholder='e.g. 8.5'
                       required
                     />
                   </div>
@@ -1210,7 +1211,7 @@ async function fetchLoans() {
               {events.length === 0 ? (
                 <p className="muted">No events for this loan yet.</p>
               ) : (
-                <div className="table-wrapper">
+                <div className="table-wrapper" style={{ marginBottom: '0.3rem' }}>
                   <table className="table">
                     <thead>
                       <tr>

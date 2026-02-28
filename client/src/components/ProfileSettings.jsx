@@ -6,7 +6,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
     currency: user.currency || 'INR',
     password: '',
   });
-  const [status, setStatus] = useState(''); // 'saving', 'success', 'error'
+  const [status, setStatus] = useState(''); 
   const [errorMsg, setErrorMsg] = useState('');
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [milestonesData, setMilestonesData] = useState([]);
@@ -75,7 +75,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
     try {
       await onUpdateProfile(formData);
       setStatus('success');
-      setFormData((prev) => ({ ...prev, password: '' })); // Clear password on success
+      setFormData((prev) => ({ ...prev, password: '' })); 
       setTimeout(() => setStatus(''), 3000);
     } catch (err) {
       console.error(err);
@@ -87,9 +87,16 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
   const currencies = [
     { code: 'INR', symbol: '₹', label: 'INR (₹)' },
     { code: 'USD', symbol: '$', label: 'USD ($)' },
-    { code: 'EUR', symbol: '€', label: 'EUR (€)' },
+    { code: 'EUR', symbol: '€', label: 'EUR (€)' }, 
     { code: 'GBP', symbol: '£', label: 'GBP (£)' },
     { code: 'JPY', symbol: '¥', label: 'JPY (¥)' },
+    { code: 'AUD', symbol: 'A$', label: 'AUD (A$)' },
+    { code: 'CAD', symbol: 'C$', label: 'CAD (C$)' },
+    { code: 'CNY', symbol: '¥', label: 'CNY (¥)' },
+    { code: 'NZD', symbol: 'NZ$', label: 'NZD (NZ$)' },
+    { code: 'BRL', symbol: 'R$', label: 'BRL (R$)' },
+    { code: 'RUB', symbol: '₽', label: 'RUB (₽)' },
+    { code: 'HKD', symbol: 'HK$', label: 'HKD (HK$)' },
   ];
 
   const currentCurrency = currencies.find(c => c.code === formData.currency) || currencies[0];
@@ -132,7 +139,6 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
         </div>
       )}
 
-      {/* Gamification Section */}
       <div className="milestone-section" style={{ marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
           <span>Your Achievements</span>
@@ -151,9 +157,13 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
               <div key={idx}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                   {loanData.milestones.map((m, mIdx) => (
-                    <div key={m.id} className="f-card animate-blur-in" style={{ padding: '1.5rem', animationDelay: `${mIdx * 0.1}s` }}>
+                    <div key={m.id} className="f-card animate-blur-in" style={{ padding: '1.5rem', animationDelay: `${mIdx * 0.1}s`, borderColor: 'var(--border)' }}>
                       <div className="f-icon-box" style={{ marginBottom: '1rem', fontSize: '1.5rem', width: '40px', height: '40px' }}>
-                        {m.icon}
+                        {typeof m.icon === 'string' && m.icon.includes('<svg') ? (
+                          <span dangerouslySetInnerHTML={{ __html: m.icon }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px' }} />
+                        ) : (
+                          m.icon
+                        )}
                       </div>
                       <div className="f-content">
                         <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{m.title}</h3>
