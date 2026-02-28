@@ -19,7 +19,7 @@ function setTokenCookie(res, user) {
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body || {};
+    const { email, password, name, currency } = req.body || {};
     if (!email || !password || !name) {
       return res.status(400).json({ message: 'Name, email and password are required' });
     }
@@ -30,10 +30,10 @@ router.post('/register', async (req, res) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, passwordHash, name });
+    const user = await User.create({ email, passwordHash, name, currency: currency || 'INR' });
 
     setTokenCookie(res, user);
-    res.status(201).json({ id: user._id, email: user.email, name: user.name });
+    res.status(201).json({ id: user._id, email: user.email, name: user.name, currency: user.currency });
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: 'Failed to register', error: err.message });
@@ -58,7 +58,7 @@ router.post('/login', async (req, res) => {
     }
 
     setTokenCookie(res, user);
-    res.json({ id: user._id, email: user.email, name: user.name });
+    res.json({ id: user._id, email: user.email, name: user.name, currency: user.currency });
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: 'Failed to login', error: err.message });
@@ -77,11 +77,11 @@ router.get('/me', async (req, res) => {
       return res.status(200).json({ user: null });
     }
     const payload = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(payload.userId).select('_id email name');
+    const user = await User.findById(payload.userId).select('_id email name currency');
     if (!user) {
       return res.status(200).json({ user: null });
     }
-    res.json({ user: { id: user._id, email: user.email, name: user.name } });
+    res.json({ user: { id: user._id, email: user.email, name: user.name, currency: user.currency } });
   } catch (err) {
     console.error(err);
     res.status(200).json({ user: null });

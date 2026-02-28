@@ -1,7 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-function RegisterForm({ values, onChange, onSubmit }) {
+const currencies = [
+  { code: 'INR', symbol: '₹', label: 'INR (₹)' },
+  { code: 'USD', symbol: '$', label: 'USD ($)' },
+  { code: 'EUR', symbol: '€', label: 'EUR (€)' }, 
+  { code: 'GBP', symbol: '£', label: 'GBP (£)' },
+  { code: 'JPY', symbol: '¥', label: 'JPY (¥)' },
+  { code: 'AUD', symbol: 'A$', label: 'AUD (A$)' },
+  { code: 'CAD', symbol: 'C$', label: 'CAD (C$)' },
+  { code: 'CNY', symbol: '¥', label: 'CNY (¥)' },
+  { code: 'NZD', symbol: 'NZ$', label: 'NZD (NZ$)' },
+  { code: 'BRL', symbol: 'R$', label: 'BRL (R$)' },
+  { code: 'RUB', symbol: '₽', label: 'RUB (₽)' },
+  { code: 'HKD', symbol: 'HK$', label: 'HKD (HK$)' },
+];
+
+function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const currencyRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (currencyRef.current && !currencyRef.current.contains(e.target)) {
+        setCurrencyOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleCurrencySelect = (code) => {
+    onCurrencyChange(code);
+    setCurrencyOpen(false);
+  };
+
+  const currentCurrency = currencies.find(c => c.code === values.currency) || currencies[0];
 
   return (
     <form className="form auth-form animate-blur-in delay-300" onSubmit={onSubmit}>
@@ -55,6 +89,40 @@ function RegisterForm({ values, onChange, onSubmit }) {
           </button>
         </div>
       </div>
+
+      <div className="form-row">
+        <label>Preferred Currency</label>
+        <div className="dropdown" ref={currencyRef}>
+          <button
+            type="button"
+            className="dropdown-trigger"
+            onClick={() => setCurrencyOpen(!currencyOpen)}
+            style={{ width: '100%', justifyContent: 'space-between' }}
+          >
+            <span>{currentCurrency.label}</span>
+            <span className="dropdown-icon" aria-hidden="true">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <path d='m6 9 6 6 6-6' />
+              </svg>
+            </span>
+          </button>
+          {currencyOpen && (
+            <div className="dropdown-menu" style={{ width: '100%' }}>
+              {currencies.map((c) => (
+                <button
+                  key={c.code}
+                  type="button"
+                  className={`dropdown-item${c.code === values.currency ? ' dropdown-item-active' : ''}`}
+                  onClick={() => handleCurrencySelect(c.code)}
+                >
+                  <div className="dropdown-item-main">{c.label}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <button type="submit" className="primary-btn auth-primary-btn">
         Sign up
       </button>

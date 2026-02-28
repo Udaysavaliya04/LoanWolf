@@ -77,7 +77,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
-  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '', currency: 'INR' });
   const [loanForm, setLoanForm] = useState(EMPTY_LOAN_FORM);
   const [loans, setLoans] = useState([]);
   const [selectedLoanId, setSelectedLoanId] = useState('');
@@ -231,13 +231,17 @@ async function fetchLoans() {
     setAuthForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAuthCurrencyChange = (currency) => {
+    setAuthForm((prev) => ({ ...prev, currency }));
+  };
+
   const submitAuth = async (e) => {
     e.preventDefault();
     setError('');
     try {
       const body =
         authMode === 'register'
-          ? { name: authForm.name, email: authForm.email, password: authForm.password }
+          ? { name: authForm.name, email: authForm.email, password: authForm.password, currency: authForm.currency }
           : { email: authForm.email, password: authForm.password };
       const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
       const res = await fetch(withBase(endpoint), {
@@ -252,7 +256,7 @@ async function fetchLoans() {
       }
       const data = await res.json();
       setCurrentUser(data);
-      setAuthForm({ name: '', email: '', password: '' });
+      setAuthForm({ name: '', email: '', password: '', currency: 'INR' });
       await fetchLoans();
       window.scrollTo(0, 0);
     } catch (err) {
@@ -811,7 +815,7 @@ async function fetchLoans() {
             setAuthMode(mode);
             navigate(`/${mode === 'register' ? 'register' : 'login'}`);
           }} error={error}>
-            <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
+            <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} onCurrencyChange={handleAuthCurrencyChange} />
           </AuthLayout>
         ) : <Navigate to="/dashboard" replace />
       } />
