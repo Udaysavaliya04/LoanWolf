@@ -49,7 +49,7 @@ async function getDashboardMetrics(userId) {
   };
 }
 
-function scheduleToTable(schedule, maxRows = 600) {
+function scheduleToTable(schedule, maxRows = 120) {
   const rows = schedule.slice(0, maxRows);
   const header = 'Period | Type | From | To | Opening Bal | Interest | Principal | Extra | Total | Closing Bal';
   const lines = rows.map((r) =>
@@ -70,7 +70,13 @@ function scheduleToTable(schedule, maxRows = 600) {
 }
 
 async function buildFullAdvisorContext(userId, options = {}) {
-  const { activeLoanId = null, clientContextData = null } = options;
+  const {
+    activeLoanId = null,
+    clientContextData = null,
+    maxLoansForContext = 4,
+    maxRowsForActiveLoan = 160,
+    maxRowsForOtherLoan = 60,
+  } = options;
 
   const loans = await Loan.find({ ownerId: userId }).sort({ createdAt: -1 });
   const dashboard = await getDashboardMetrics(userId);
@@ -90,11 +96,13 @@ async function buildFullAdvisorContext(userId, options = {}) {
   }
 
   // —— PER-LOAN: full schedule inputs + events + comparison ——
-  for (const loan of loans) {
+  const loansForContext =
+    maxLoansForContext > 0 ? loans.slice(0, maxLoansForContext) : loans;
+
+  for (const loan of loansForContext) {
     const events = await LoanEvent.find({ loanId: loan._id }).sort({ date: 1 }).lean();
     const fullData = await buildSchedule(loan._id);
     const { schedule, summary, baselineSummary, comparison } = fullData;
-    const currentRow = schedule.find((r) => r.tranType === 'Proj');
     const isActive = activeLoanId && loan._id.toString() === activeLoanId.toString();
 
     context += `---\n## LOAN: ${loan.name}${isActive ? ' (CURRENTLY VIEWED BY USER)' : ''}\n\n`;
@@ -142,7 +150,13 @@ async function buildFullAdvisorContext(userId, options = {}) {
 
     // Full amortization schedule (every row) so AI can analyze by period
     context += '### Full amortization schedule (period-by-period)\n';
-    context += scheduleToTable(schedule) + '\n\n';
+    const rowBudget = isActive ? maxRowsForActiveLoan : maxRowsForOtherLoan;
+    context += scheduleToTable(schedule, rowBudget) + '\n\n';
+  }
+
+  if (loans.length > loansForContext.length) {
+    context += `---\n## NOTE\n`;
+    context += `- ${loans.length - loansForContext.length} additional loan(s) were omitted from detailed context for performance.\n\n`;
   }
 
   // —— CLIENT-SIDE CONTEXT (what user is looking at right now) ——

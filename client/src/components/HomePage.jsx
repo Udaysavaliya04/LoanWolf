@@ -164,12 +164,12 @@ function HomePage() {
           <div className="marquee-container">
             <div className="marquee-track">
               {[
-                { name: "Talwinder", tag: "Saved ₹12L", text: "I realized I was paying 40% more interest than I thought. The prepay simulator is a lifesaver." },
+                { name: "Talwinder", tag: "Saved $12K", text: "I realized I was paying 40% more interest than I thought. The prepay simulator is a lifesaver." },
                 { name: "Aditya", tag: "Debt-free in 7 yrs", text: "Standard bank calculators hide the truth. LoanWolf showed me exactly how to kill my loan fast." },
-                { name: "Arijit", tag: "Saved ₹4.5L", text: "The 'What-if' lab is genius. I simulated a rate hike and adjusted my EMI immediately." },
+                { name: "Arijit", tag: "Saved £4.5K", text: "The 'What-if' lab is genius. I simulated a rate hike and adjusted my EMI immediately." },
                 { name: "michael", tag: "Peace of Mind", text: "Finally, a dashboard that speaks my language. No confusing bank jargon, just raw numbers." },
                 { name: "Ranveer", tag: "Optimization Geek", text: "I track my loan like I track my stocks now. Seeing the principal drop is addictive." },
-                { name: "Justin", tag: "Saved ₹12L", text: "I realized I was paying 40% more interest than I thought. The prepay simulator is a lifesaver." },
+                { name: "Justin", tag: "Saved ₹19L", text: "I realized I was paying 40% more interest than I thought. The prepay simulator is a lifesaver." },
                 { name: "Shreya", tag: "Debt-free in 3 yrs", text: "Standard bank calculators hide the truth. LoanWolf showed me exactly how to kill my loan fast." },
                 { name: "Ricky", tag: "Saved lakhs", text: "The 'What-if' lab is genius. I simulated a rate hike and adjusted my EMI immediately." },
                 { name: "Sneha", tag: "Crazy Savings", text: "Finally, a dashboard that speaks my language. No confusing bank jargon, just raw numbers." },
