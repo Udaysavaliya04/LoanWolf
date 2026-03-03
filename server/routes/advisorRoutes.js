@@ -10,8 +10,19 @@ router.use(requireAuth);
 
 function buildModelCandidates() {
   const preferred = process.env.GEMINI_MODEL;
-  const defaults = ['gemini-2.0-flash', 'gemini-1.5-flash'];
-  return Array.from(new Set([preferred, ...defaults].filter(Boolean)));
+  const fromEnv = (process.env.GEMINI_MODEL_CANDIDATES || '')
+    .split(',')
+    .map((m) => m.trim())
+    .filter(Boolean);
+
+  // Keep defaults on stable/free-friendly text models.
+  const defaults = [
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-1.5-flash',
+  ];
+
+  return Array.from(new Set([preferred, ...fromEnv, ...defaults].filter(Boolean)));
 }
 
 function classifyGeminiError(err) {
@@ -132,9 +143,11 @@ ${recentHistory}
 
     let text = null;
     let lastErr = null;
+    let attemptedModels = [];
 
     // 1st pass: full context, then compact context fallback.
     for (const candidate of modelCandidates) {
+      attemptedModels.push(candidate);
       const model = genAI.getGenerativeModel({ model: candidate });
       try {
         const result = await model.generateContent(buildPrompt(fullContext));
@@ -173,9 +186,10 @@ ${recentHistory}
           : classified.type === 'context_too_large'
             ? 'Your portfolio context is too large for one request. Please retry with a shorter query.'
             : classified.type === 'model_unavailable'
-              ? 'Configured AI model is unavailable on server. Please check GEMINI_MODEL.'
+            ? 'Configured AI model is unavailable on server. Please check GEMINI_MODEL.'
               : 'Failed to generate advice due to an AI provider error.',
       code: classified.type,
+      attemptedModels,
     });
   }
 });
