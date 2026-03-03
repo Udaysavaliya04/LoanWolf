@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function AuthLayout({ mode, onModeChange, children, error }) {
+function AuthLayout({ mode, onModeChange, children }) {
   const navigate = useNavigate();
   return (
     <div className="auth-shell">
@@ -34,8 +34,6 @@ function AuthLayout({ mode, onModeChange, children, error }) {
             Sign up
           </button>
         </div>
-
-        {error && <div className="error-banner auth-error-banner">{error}</div>}
 
         {children}
       </div>

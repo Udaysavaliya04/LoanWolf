@@ -7,7 +7,7 @@
 :root {
   font-family: 'Inter', sans-serif;
   color-scheme: dark;
-  --radius: 0.75rem;
+  --radius: 0.80rem;
   --background: hsl(0, 0%, 0%);
   --foreground: hsl(0, 0%, 100%);
   --card: hsl(0 0% 0%);
