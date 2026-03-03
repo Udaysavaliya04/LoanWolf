@@ -783,7 +783,7 @@ body {
 
 .advisor-mode-button {
   border: none;
-  border-radius: var(--radius);
+  border-radius: 999px;
   padding: 0.25rem 0.7rem;
   font-size: 0.78rem;
   background: transparent;
