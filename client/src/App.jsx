@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import AuthLayout from './components/AuthLayout';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
@@ -84,8 +84,8 @@ function App() {
   const [eventForm, setEventForm] = useState(EMPTY_EVENT_FORM);
   const [scheduleData, setScheduleData] = useState(null);
   const [loadingSchedule, setLoadingSchedule] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const [error, setError] = useState('');
-  const scheduleRef = useRef(null);
   const loanMenuRef = useRef(null);
   const eventTypeMenuRef = useRef(null);
   const [loanMenuOpen, setLoanMenuOpen] = useState(false);
@@ -456,40 +456,294 @@ async function fetchLoans() {
   };
 
   const exportScheduleAsPdf = async () => {
-    if (!scheduleData || !scheduleRef.current) return;
+    if (!scheduleData) {
+      setError('Generate schedule before exporting PDF');
+      return;
+    }
     try {
-      const element = scheduleRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        windowWidth: document.documentElement.scrollWidth,
-      });
+      setExportingPdf(true);
+      setError('');
 
-      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('l', 'pt', 'a4');
+      pdf.setCharSpace(0);
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
+      const marginX = 36;
+      const headerTop = 20;
+      const headerBottomY = 56;
+      const contentTop = 78;
+      const footerY = pageHeight - 20;
+      const lineColor = [218, 222, 227];
+      const titleColor = [17, 24, 39];
+      const labelColor = [75, 85, 99];
+      const successColor = [22, 163, 74];
+      const currencyCode = (currentUser?.currency || 'INR').toUpperCase();
 
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const formatPdfAmount = (value, includeCurrency = true) => {
+        const num = typeof value === 'number' ? value : Number(value || 0);
+        const formatted = new Intl.NumberFormat('en-IN', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+        }).format(num);
+        return includeCurrency ? `${currencyCode} ${formatted}` : formatted;
+      };
 
-      let position = 0;
-      let heightLeft = imgHeight;
+      const loanName = scheduleData.loan?.name || currentLoan?.name || 'Loan';
+      const generatedAt = new Date();
+      const generatedLabel = generatedAt.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const filenameLoanPart = loanName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'loan';
+      const datePart = generatedAt.toISOString().slice(0, 10);
+      const fileName = `loanwolf-${filenameLoanPart}-amortization-${datePart}.pdf`;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      let cursorY = contentTop;
 
-      while (heightLeft > 0) {
+      const drawPageChrome = (pageNo, totalPages) => {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(14);
+        pdf.setTextColor(...titleColor);
+        pdf.text('LoanWolf Amortization Statement', marginX, headerTop + 8);
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(...labelColor);
+        pdf.text(`Loan: ${loanName}`, marginX, headerTop + 24);
+        pdf.text(`Generated: ${generatedLabel}`, pageWidth - marginX, headerTop + 24, {
+          align: 'right',
+        });
+
+        pdf.setDrawColor(...lineColor);
+        pdf.line(marginX, headerBottomY, pageWidth - marginX, headerBottomY);
+
+        pdf.setFontSize(9);
+        pdf.setTextColor(...labelColor);
+        pdf.line(marginX, footerY - 10, pageWidth - marginX, footerY - 10);
+        pdf.text(`Currency: ${currentUser?.currency || 'INR'}`, marginX, footerY);
+        pdf.text(`Page ${pageNo} of ${totalPages}`, pageWidth - marginX, footerY, {
+          align: 'right',
+        });
+      };
+
+      const ensurePageSpace = (requiredHeight) => {
+        if (cursorY + requiredHeight <= footerY - 24) return;
         pdf.addPage();
-        position = heightLeft - imgHeight;
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        cursorY = contentTop;
+      };
+
+      const drawKpiGrid = (items) => {
+        const gap = 10;
+        const cols = 3;
+        const cardWidth = (pageWidth - marginX * 2 - gap * (cols - 1)) / cols;
+        const cardHeight = 54;
+
+        items.forEach((item, index) => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = marginX + col * (cardWidth + gap);
+          const y = cursorY + row * (cardHeight + gap);
+
+          pdf.setFillColor(248, 250, 252);
+          pdf.setDrawColor(...lineColor);
+          pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4, 'FD');
+
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(...labelColor);
+          pdf.text(item.label, x + 10, y + 16);
+
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(12);
+          pdf.setTextColor(...titleColor);
+          pdf.text(item.value, x + 10, y + 37);
+        });
+
+        cursorY += Math.ceil(items.length / cols) * (cardHeight + gap) + 4;
+      };
+
+      pdf.setTextColor(...titleColor);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.text('Loan Summary', marginX, cursorY);
+      cursorY += 20;
+
+      const introRows = [
+        [
+          ['Principal', formatPdfAmount(scheduleData.loan?.principal || 0)],
+          ['Interest Rate', `${Number(scheduleData.loan?.annualInterestRate || 0).toFixed(2)}% p.a.`],
+        ],
+        [
+          ['Term', `${Number(scheduleData.loan?.termMonths || 0).toLocaleString()} months`],
+          ['Start Date', formatDate(scheduleData.loan?.startDate)],
+        ],
+      ];
+
+      const leftX = marginX;
+      const rightX = marginX + (pageWidth - marginX * 2) / 2;
+      pdf.setFontSize(10);
+      introRows.forEach((row, rowIndex) => {
+        const y = cursorY + rowIndex * 22;
+        row.forEach((pair, colIndex) => {
+          const x = colIndex === 0 ? leftX : rightX;
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(...labelColor);
+          pdf.text(`${pair[0]}:`, x, y);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(...titleColor);
+          pdf.text(pair[1], x + 86, y);
+        });
+      });
+      cursorY += introRows.length * 22 + 12;
+
+      ensurePageSpace(170);
+      drawKpiGrid([
+        { label: 'Total interest', value: formatPdfAmount(scheduleData.summary.totalInterest) },
+        { label: 'Total paid', value: formatPdfAmount(scheduleData.summary.totalPaid) },
+        { label: 'Total principal', value: formatPdfAmount(scheduleData.summary.totalPrincipalPaid) },
+        { label: 'Extra payments', value: formatPdfAmount(scheduleData.summary.totalExtraPayments) },
+        { label: 'Remaining balance', value: formatPdfAmount(scheduleData.summary.remainingBalance) },
+        {
+          label: 'Payoff date',
+          value: scheduleData.summary.payoffDate
+            ? formatDate(scheduleData.summary.payoffDate)
+            : 'Not fully repaid',
+        },
+      ]);
+
+      if (scheduleData.baselineSummary && scheduleData.comparison) {
+        ensurePageSpace(90);
+        pdf.setFillColor(241, 245, 249);
+        pdf.setDrawColor(...lineColor);
+        pdf.roundedRect(marginX, cursorY, pageWidth - marginX * 2, 70, 4, 4, 'FD');
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor(...titleColor);
+        pdf.text('Comparison vs Original Plan', marginX + 10, cursorY + 18);
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.setTextColor(...labelColor);
+        pdf.text(
+          `Original interest: ${formatPdfAmount(scheduleData.baselineSummary.totalInterest)}`,
+          marginX + 10,
+          cursorY + 36
+        );
+        pdf.text(
+          `New interest: ${formatPdfAmount(scheduleData.summary.totalInterest)}`,
+          marginX + 280,
+          cursorY + 36
+        );
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(...successColor);
+        pdf.text(
+          `Interest saved: ${formatPdfAmount(
+            Math.max(0, scheduleData.comparison.interestSaved || 0)
+          )}`,
+          marginX + 10,
+          cursorY + 54
+        );
+        pdf.text(
+          `EMIs saved: ${Math.max(0, scheduleData.comparison.monthsSaved || 0).toLocaleString()} months`,
+          marginX + 280,
+          cursorY + 54
+        );
+
+        cursorY += 84;
       }
 
-      pdf.save('loan-amortization.pdf');
+      ensurePageSpace(42);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(13);
+      pdf.setTextColor(...titleColor);
+      pdf.text('Amortization Table', marginX, cursorY);
+      cursorY += 10;
+
+      const tableBody = scheduleData.schedule.map((row) => [
+        row.period,
+        formatDate(row.fromDate),
+        formatDate(row.toDate),
+        formatPdfAmount(row.openingBalance, false),
+        formatPdfAmount(row.extraPayment, false),
+        `${Number(row.rateAnnualPct || 0).toFixed(2)}%`,
+        formatPdfAmount(row.emiFixed, false),
+        formatPdfAmount(row.interest, false),
+        formatPdfAmount(row.principalComponent, false),
+        formatPdfAmount(row.closingBalance, false),
+      ]);
+
+      autoTable(pdf, {
+        startY: cursorY + 8,
+        margin: { left: marginX, right: marginX, top: contentTop, bottom: 34 },
+        head: [[
+          '#',
+          'From Date',
+          'To Date',
+          `Opening (${currencyCode})`,
+          `Prepay (${currencyCode})`,
+          'ROI',
+          `EMI (${currencyCode})`,
+          `Interest (${currencyCode})`,
+          `Principal (${currencyCode})`,
+          `Closing (${currencyCode})`,
+        ]],
+        body: tableBody,
+        theme: 'grid',
+        styles: {
+          font: 'helvetica',
+          fontSize: 8,
+          cellPadding: { top: 3, right: 4, bottom: 3, left: 4 },
+          textColor: [17, 24, 39],
+          lineColor,
+          lineWidth: 0.5,
+          overflow: 'hidden',
+          valign: 'middle',
+          halign: 'center',
+        },
+        headStyles: {
+          fillColor: [31, 41, 55],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center',
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252],
+        },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 24 },
+          1: { halign: 'center', cellWidth: 62 },
+          2: { halign: 'center', cellWidth: 62 },
+          3: { halign: 'right', cellWidth: 88 },
+          4: { halign: 'right', cellWidth: 78 },
+          5: { halign: 'center', cellWidth: 44 },
+          6: { halign: 'right', cellWidth: 82 },
+          7: { halign: 'right', cellWidth: 82 },
+          8: { halign: 'right', cellWidth: 82 },
+          9: { halign: 'right', cellWidth: 82 },
+        },
+        rowPageBreak: 'avoid',
+      });
+
+      const totalPages = pdf.getNumberOfPages();
+      for (let pageNo = 1; pageNo <= totalPages; pageNo += 1) {
+        pdf.setPage(pageNo);
+        drawPageChrome(pageNo, totalPages);
+      }
+
+      pdf.save(fileName);
     } catch (err) {
       console.error('Failed to export schedule', err);
-      setError('Failed to export schedule as PDF');
+      setError('Failed to generate professional PDF. Please try again.');
+    } finally {
+      setExportingPdf(false);
     }
   };
 
@@ -1286,7 +1540,7 @@ async function fetchLoans() {
         </section>
       </main>
 
-      <section className="panel panel-full" id="schedule" ref={scheduleRef}>
+      <section className="panel panel-full" id="schedule">
         <div className="panel-header">
           <h2>Amortization schedule</h2>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1297,9 +1551,9 @@ async function fetchLoans() {
               type="button"
               className="secondary-btn"
               onClick={exportScheduleAsPdf}
-              disabled={!scheduleData}
+              disabled={!scheduleData || exportingPdf}
             >
-              Export as PDF
+              {exportingPdf ? 'Exporting PDF...' : 'Export as PDF'}
             </button>
           </div>
         </div>
