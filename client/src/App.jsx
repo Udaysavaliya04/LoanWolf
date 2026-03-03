@@ -15,6 +15,7 @@ import SupportPage from './components/SupportPage';
 
 const EMPTY_LOAN_FORM = {
   name: '',
+  loanType: 'HOME',
   principal: '',
   annualInterestRate: '',
   termMonths: '',
@@ -55,6 +56,15 @@ const INITIAL_SCENARIOS = [
   { id: 'C', name: 'Scenario C', lumpSumAmount: '', lumpSumDate: '', newRatePct: '', newRateDate: '' },
 ];
 
+const LOAN_TYPE_OPTIONS = [
+  { value: 'HOME', label: 'Home Loan' },
+  { value: 'PERSONAL', label: 'Personal Loan' },
+  { value: 'AUTO', label: 'Auto Loan' },
+  { value: 'EDUCATION', label: 'Education Loan' },
+  { value: 'BUSINESS', label: 'Business Loan' },
+  { value: 'OTHER', label: 'Other Loan' },
+];
+
 
 const LoadingSpinner = () => (
   <div className="spinner-wrapper">
@@ -85,10 +95,14 @@ function App() {
   const [scheduleData, setScheduleData] = useState(null);
   const [loadingSchedule, setLoadingSchedule] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
-  const [error, setError] = useState('');
+  const [appError, setAppError] = useState('');
+  const [authError, setAuthError] = useState('');
+  const setError = setAppError;
   const loanMenuRef = useRef(null);
+  const loanTypeMenuRef = useRef(null);
   const eventTypeMenuRef = useRef(null);
   const [loanMenuOpen, setLoanMenuOpen] = useState(false);
+  const [loanTypeMenuOpen, setLoanTypeMenuOpen] = useState(false);
   const [eventTypeMenuOpen, setEventTypeMenuOpen] = useState(false);
   const [principalHover, setPrincipalHover] = useState(null);
   const [yearlyHover, setYearlyHover] = useState(null);
@@ -128,8 +142,39 @@ function App() {
   }
 
   useEffect(() => {
-    if (currentUser) fetchDashboard();
+    if (currentUser) {
+      fetchDashboard();
+    }
   }, [loans, events]);
+
+  useEffect(() => {
+    if (!currentUser) return undefined;
+
+    const refreshDashboard = () => {
+      fetchDashboard();
+    };
+
+    const intervalId = window.setInterval(refreshDashboard, 30000);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshDashboard();
+      }
+    };
+
+    const handleFocus = () => {
+      refreshDashboard();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [currentUser]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -225,6 +270,9 @@ async function fetchLoans() {
       if (loanMenuRef.current && !loanMenuRef.current.contains(e.target)) {
         setLoanMenuOpen(false);
       }
+      if (loanTypeMenuRef.current && !loanTypeMenuRef.current.contains(e.target)) {
+        setLoanTypeMenuOpen(false);
+      }
       if (eventTypeMenuRef.current && !eventTypeMenuRef.current.contains(e.target)) {
         setEventTypeMenuOpen(false);
       }
@@ -255,6 +303,7 @@ async function fetchLoans() {
   const handleAuthInputChange = (e) => {
     const { name, value } = e.target;
     setAuthForm((prev) => ({ ...prev, [name]: value }));
+    if (authError) setAuthError('');
   };
 
   const handleAuthCurrencyChange = (currency) => {
@@ -263,7 +312,7 @@ async function fetchLoans() {
 
   const submitAuth = async (e) => {
     e.preventDefault();
-    setError('');
+    setAuthError('');
     try {
       const body =
         authMode === 'register'
@@ -287,7 +336,7 @@ async function fetchLoans() {
       window.scrollTo(0, 0);
     } catch (err) {
       console.error(err);
-      setError(err.message);
+      setAuthError(err.message);
     }
   };
 
@@ -308,6 +357,8 @@ async function fetchLoans() {
     setFeedbackText('');
     setFeedbackSuccess(false);
     setFeedbackHidden(false);
+    setAppError('');
+    setAuthError('');
     window.scrollTo(0, 0);
   };
 
@@ -315,6 +366,7 @@ async function fetchLoans() {
     setEditingLoanId(loan._id);
     setLoanForm({
       name: loan.name,
+      loanType: loan.loanType || 'HOME',
       principal: loan.principal,
       annualInterestRate: loan.annualInterestRate,
       termMonths: loan.termMonths,
@@ -334,6 +386,7 @@ async function fetchLoans() {
     try {
       const payload = {
         name: loanForm.name,
+        loanType: loanForm.loanType,
         principal: Number(loanForm.principal),
         annualInterestRate: Number(loanForm.annualInterestRate),
         termMonths: Number(loanForm.termMonths),
@@ -367,6 +420,7 @@ async function fetchLoans() {
     try {
       const payload = {
         name: loanForm.name,
+        loanType: loanForm.loanType,
         principal: Number(loanForm.principal),
         annualInterestRate: Number(loanForm.annualInterestRate),
         termMonths: Number(loanForm.termMonths),
@@ -1083,8 +1137,9 @@ async function fetchLoans() {
         !currentUser ? (
           <AuthLayout mode="login" onModeChange={(mode) => {
             setAuthMode(mode);
+            setAuthError('');
             navigate(`/${mode === 'register' ? 'register' : 'login'}`);
-          }} error={error}>
+          }} error={authError}>
             <LoginForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
           </AuthLayout>
         ) : <Navigate to="/dashboard" replace />
@@ -1096,8 +1151,9 @@ async function fetchLoans() {
         !currentUser ? (
           <AuthLayout mode="register" onModeChange={(mode) => {
             setAuthMode(mode);
+            setAuthError('');
             navigate(`/${mode === 'register' ? 'register' : 'login'}`);
-          }} error={error}>
+          }} error={authError}>
             <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} onCurrencyChange={handleAuthCurrencyChange} />
           </AuthLayout>
         ) : <Navigate to="/dashboard" replace />
@@ -1224,7 +1280,7 @@ async function fetchLoans() {
         </div>
       </header>
 
-      {error && <div className="error-banner">{error}</div>}
+      {appError && <div className="error-banner">{appError}</div>}
 
       <main className="layout animate-blur-in delay-100" id="dashboard">
         <section className="panel">
@@ -1239,6 +1295,44 @@ async function fetchLoans() {
                 placeholder="e.g. Home loan"
                 required
               />
+            </div>
+            <div className="form-row">
+              <label>Loan type</label>
+              <div className="dropdown" ref={loanTypeMenuRef}>
+                <button
+                  type="button"
+                  className="dropdown-trigger"
+                  onClick={() => setLoanTypeMenuOpen((open) => !open)}
+                >
+                  <span>
+                    {LOAN_TYPE_OPTIONS.find((type) => type.value === loanForm.loanType)?.label ||
+                      'Select loan type'}
+                  </span>
+                  <span className="dropdown-icon" aria-hidden="true">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                      <path d='m6 9 6 6 6-6' />
+                    </svg>
+                  </span>
+                </button>
+                {loanTypeMenuOpen && (
+                  <div className="dropdown-menu">
+                    <div className="dropdown-label">Loan Type</div>
+                    {LOAN_TYPE_OPTIONS.map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        className={`dropdown-item${loanForm.loanType === type.value ? ' dropdown-item-active' : ''}`}
+                        onClick={() => {
+                          setLoanForm((prev) => ({ ...prev, loanType: type.value }));
+                          setLoanTypeMenuOpen(false);
+                        }}
+                      >
+                        <div className="dropdown-item-main">{type.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="form-row">
               <label>Loan Amount</label>
@@ -1328,7 +1422,7 @@ async function fetchLoans() {
                     {currentLoan
                       ? `${currentLoan.name} — ${formatMoney(
                         currentLoan.principal
-                      )} @ ${currentLoan.annualInterestRate}% (${currentLoan.termMonths}m)`
+                      )} @ ${currentLoan.annualInterestRate}% (${currentLoan.termMonths}m, ${currentLoan.loanType || 'HOME'})`
                       : 'Select a loan'}
                   </span>
                   <span className="dropdown-icon" aria-hidden="true">
@@ -1354,8 +1448,7 @@ async function fetchLoans() {
                         <div className="dropdown-item-main">{loan.name}</div>
                         <div className="dropdown-item-sub">
                           {formatMoney(loan.principal)} · {loan.annualInterestRate}% ·{' '}
-                          {loan.termMonths}m
-                        </div>
+                          {loan.termMonths}m · {loan.loanType || 'HOME'}</div>
                       </button>
                     ))}
                   </div>
@@ -1372,6 +1465,9 @@ async function fetchLoans() {
                   </p>
                   <p>
                     <strong>Term:</strong> {currentLoan.termMonths} months
+                  </p>
+                  <p>
+                    <strong>Type:</strong> {currentLoan.loanType || 'HOME'}
                   </p>
                   <p>
                     <strong>Start:</strong>{' '}
@@ -2179,3 +2275,4 @@ async function fetchLoans() {
 }
 
 export default App;
+

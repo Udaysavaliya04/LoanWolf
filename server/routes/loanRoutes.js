@@ -5,14 +5,22 @@ const { buildSchedule } = require('../services/amortizationService');
 const requireAuth = require('../middleware/requireAuth');
 
 const router = express.Router();
+const LOAN_TYPES = ['HOME', 'PERSONAL', 'AUTO', 'EDUCATION', 'BUSINESS', 'OTHER'];
+
+function normalizeLoanType(value) {
+  if (value == null || value === '') return 'HOME';
+  const code = String(value).toUpperCase();
+  return LOAN_TYPES.includes(code) ? code : 'OTHER';
+}
 
 router.use(requireAuth);
 
 router.post('/', async (req, res) => {
   try {
-    const { name, principal, annualInterestRate, termMonths, startDate } = req.body;
+    const { name, loanType, principal, annualInterestRate, termMonths, startDate } = req.body;
     const loan = await Loan.create({
       name,
+      loanType: normalizeLoanType(loanType),
       principal,
       annualInterestRate,
       termMonths,
@@ -42,38 +50,47 @@ router.get('/dashboard', async (req, res) => {
     let totalDebt = 0;
     let weightedRateSum = 0;
     let maxPayoffDate = null;
+    const now = new Date();
 
     const results = await Promise.all(
       loans.map(async (loan) => {
         const data = await buildSchedule(loan._id);
-        
-        const currentEntry = data.schedule.find(row => row.tranType === 'Proj');
-        
+        const rows = data.schedule || [];
+
         let currentBalance = 0;
-        if (currentEntry) {
-          currentBalance = currentEntry.openingBalance;
-        } else if (data.schedule.length > 0) {
-            // No Proj rows? Either loan is fully paid (bal=0) or fully future?
-            // If loan starts in future, all rows are Proj. If none are Proj, all are Amrt.
-            // If all Amrt, balance is closing balance of last row.
-             const last = data.schedule[data.schedule.length - 1];
-             if (last.closingBalance > 0) currentBalance = last.closingBalance;
+        let currentRate = Number(loan.annualInterestRate || 0);
+
+        if (rows.length > 0) {
+          const activeRow = rows.find((row) => {
+            const from = new Date(row.fromDate);
+            const to = new Date(row.toDate);
+            return from <= now && to > now;
+          });
+
+          if (activeRow) {
+            currentBalance = Number(activeRow.openingBalance || 0);
+            currentRate = Number(activeRow.rateAnnualPct || currentRate);
+          } else {
+            const pastRows = rows.filter((row) => new Date(row.toDate) <= now);
+            if (pastRows.length > 0) {
+              const lastPast = pastRows[pastRows.length - 1];
+              currentBalance = Number(lastPast.closingBalance || 0);
+              currentRate = Number(lastPast.rateAnnualPct || currentRate);
+            } else {
+              const firstRow = rows[0];
+              currentBalance = Number(firstRow.openingBalance || loan.principal || 0);
+              currentRate = Number(firstRow.rateAnnualPct || currentRate);
+            }
+          }
         }
-        
-        return { loan, summary: data.summary, currentBalance };
+
+        return { summary: data.summary, currentBalance, currentRate };
       })
     );
 
-    // DEBUG: Check what we got back
-    if (process.env.NODE_ENV !== 'production') {
-       console.log('Dashboard Debug: Found', results.length, 'loans');
-    }
-
-    results.forEach(({ loan, summary, currentBalance }) => {
-      const balance = currentBalance;
-      
-      totalDebt += balance;
-      weightedRateSum += balance * loan.annualInterestRate;
+    results.forEach(({ summary, currentBalance, currentRate }) => {
+      totalDebt += currentBalance;
+      weightedRateSum += currentBalance * currentRate;
 
       if (summary.payoffDate) {
         const date = new Date(summary.payoffDate);
@@ -82,8 +99,6 @@ router.get('/dashboard', async (req, res) => {
         }
       }
     });
-
-    console.log('Total Debt:', totalDebt, 'Weighted Rate Sum:', weightedRateSum);
 
     const blendedRate = totalDebt > 0 ? weightedRateSum / totalDebt : 0;
 
@@ -136,16 +151,17 @@ router.post('/:id/events', async (req, res) => {
 // Update a loan
 router.put('/:id', async (req, res) => {
   try {
-    const { name, principal, annualInterestRate, termMonths, startDate } = req.body;
+    const { name, loanType, principal, annualInterestRate, termMonths, startDate } = req.body;
     const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
 
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
-    loan.name = name || loan.name;
-    loan.principal = principal || loan.principal;
-    loan.annualInterestRate = annualInterestRate || loan.annualInterestRate;
-    loan.termMonths = termMonths || loan.termMonths;
-    loan.startDate = startDate || loan.startDate;
+    if (name !== undefined) loan.name = name;
+    if (loanType !== undefined) loan.loanType = normalizeLoanType(loanType);
+    if (principal !== undefined) loan.principal = principal;
+    if (annualInterestRate !== undefined) loan.annualInterestRate = annualInterestRate;
+    if (termMonths !== undefined) loan.termMonths = termMonths;
+    if (startDate !== undefined) loan.startDate = startDate;
 
     await loan.save();
     res.json(loan);
@@ -412,4 +428,3 @@ router.post('/:id/advice', async (req, res) => {
 });
 
 module.exports = router;
-

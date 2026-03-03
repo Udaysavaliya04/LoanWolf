@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const LoanSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    loanType: {
+      type: String,
+      enum: ['HOME', 'PERSONAL', 'AUTO', 'EDUCATION', 'BUSINESS', 'OTHER'],
+      default: 'HOME',
+    },
     principal: { type: Number, required: true },
     annualInterestRate: { type: Number, required: true }, 
     termMonths: { type: Number, required: true },
@@ -13,5 +18,6 @@ const LoanSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Loan', LoanSchema);
+LoanSchema.index({ ownerId: 1, loanType: 1 });
 
+module.exports = mongoose.model('Loan', LoanSchema);

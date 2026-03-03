@@ -11,9 +11,10 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [milestonesData, setMilestonesData] = useState([]);
   const [loadingMilestones, setLoadingMilestones] = useState(true);
+  const [liveOverview, setLiveOverview] = useState(null);
   const currencyRef = useRef(null);
   
-  // Custom fetch to get the schedule for each loan to extract milestones
+  // Fetch schedules for milestones + live profile overview derived from schedule rows.
   useEffect(() => {
     let isMounted = true;
     const fetchMilestones = async () => {
@@ -23,28 +24,98 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
         const loans = await res.json();
         
         const allMilestones = [];
+        let totalDebt = 0;
+        let weightedRateSum = 0;
+        let maxPayoffDate = null;
+        const now = new Date();
+
         for (const loan of loans) {
+          try {
             const scheduleRes = await fetch(`${API_BASE}/api/loans/${loan._id}/schedule`, { credentials: 'include' });
-            if (scheduleRes.ok) {
-               const scheduleData = await scheduleRes.json();
-               if (scheduleData.milestones && scheduleData.milestones.length > 0) {
-                 allMilestones.push({ loanName: loan.name, milestones: scheduleData.milestones });
-               }
+            if (!scheduleRes.ok) continue;
+
+            const scheduleData = await scheduleRes.json();
+            if (scheduleData.milestones && scheduleData.milestones.length > 0) {
+              allMilestones.push({ loanName: loan.name, milestones: scheduleData.milestones });
             }
+
+            const rows = scheduleData.schedule || [];
+            let currentBalance = 0;
+            let currentRate = Number(loan.annualInterestRate || 0);
+
+            if (rows.length > 0) {
+              const activeRow = rows.find((row) => {
+                const from = new Date(row.fromDate);
+                const to = new Date(row.toDate);
+                return from <= now && to > now;
+              });
+
+              if (activeRow) {
+                currentBalance = Number(activeRow.openingBalance || 0);
+                currentRate = Number(activeRow.rateAnnualPct || currentRate);
+              } else {
+                const pastRows = rows.filter((row) => new Date(row.toDate) <= now);
+                if (pastRows.length > 0) {
+                  const lastPast = pastRows[pastRows.length - 1];
+                  currentBalance = Number(lastPast.closingBalance || 0);
+                  currentRate = Number(lastPast.rateAnnualPct || currentRate);
+                } else {
+                  const firstRow = rows[0];
+                  currentBalance = Number(firstRow.openingBalance || loan.principal || 0);
+                  currentRate = Number(firstRow.rateAnnualPct || currentRate);
+                }
+              }
+            }
+
+            totalDebt += currentBalance;
+            weightedRateSum += currentBalance * currentRate;
+
+            if (scheduleData.summary?.payoffDate) {
+              const payoff = new Date(scheduleData.summary.payoffDate);
+              if (!Number.isNaN(payoff.getTime()) && (!maxPayoffDate || payoff > maxPayoffDate)) {
+                maxPayoffDate = payoff;
+              }
+            }
+          } catch (scheduleErr) {
+            console.error('Failed to process loan schedule in profile overview', scheduleErr);
+          }
         }
         
         if (isMounted) {
             setMilestonesData(allMilestones);
+            setLiveOverview({
+              totalDebt,
+              blendedInterestRate: totalDebt > 0 ? weightedRateSum / totalDebt : 0,
+              debtFreeDate: maxPayoffDate,
+              loanCount: Array.isArray(loans) ? loans.length : 0,
+            });
             setLoadingMilestones(false);
         }
       } catch (err) {
         console.error("Failed to fetch milestones:", err);
-        if (isMounted) setLoadingMilestones(false);
+        if (isMounted) {
+          setLoadingMilestones(false);
+          setLiveOverview(null);
+        }
       }
     };
     
     fetchMilestones();
-    return () => { isMounted = false; };
+    const intervalId = window.setInterval(fetchMilestones, 30000);
+
+    const onFocus = () => fetchMilestones();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') fetchMilestones();
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   useEffect(() => {
@@ -100,6 +171,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
   ];
 
   const currentCurrency = currencies.find(c => c.code === formData.currency) || currencies[0];
+  const overviewData = liveOverview;
 
   const formatMoney = (val) => {
     return new Intl.NumberFormat('en-IN', {
@@ -108,6 +180,43 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
       maximumFractionDigits: 0,
     }).format(val);
   };
+
+  const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
+
+  const monthsUntilDebtFree = (() => {
+    if (!dashboardData?.debtFreeDate) return null;
+    const now = new Date();
+    const end = new Date(dashboardData.debtFreeDate);
+    if (Number.isNaN(end.getTime())) return null;
+    const months =
+      (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth());
+    return Math.max(0, months);
+  })();
+
+  const debtHealth = (() => {
+    if (!dashboardData) return null;
+    const totalDebt = Number(dashboardData.totalDebt || 0);
+    const blendedRate = Number(dashboardData.blendedInterestRate || 0);
+    const horizonMonths = monthsUntilDebtFree ?? 120;
+
+    const debtLoadScore = clamp(100 - Math.log10(totalDebt + 1) * 18);
+    const rateScore = clamp(100 - blendedRate * 7.5);
+    const horizonScore = clamp(100 - horizonMonths * 0.8);
+    const overall = clamp(debtLoadScore * 0.35 + rateScore * 0.35 + horizonScore * 0.3);
+
+    const grade =
+      overall >= 85 ? 'Excellent' : overall >= 70 ? 'Strong' : overall >= 55 ? 'Stable' : 'Needs Focus';
+
+    return {
+      overall: Math.round(overall),
+      grade,
+      metrics: [
+        { key: 'debtLoad', label: 'Debt Load', score: Math.round(debtLoadScore) },
+        { key: 'rate', label: 'Rate Quality', score: Math.round(rateScore) },
+        { key: 'horizon', label: 'Payoff Horizon', score: Math.round(horizonScore) },
+      ],
+    };
+  })();
 
   return (
     <div className="panel profile-panel animate-blur-in">
@@ -118,22 +227,53 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
         </button>
       </div>
 
-      {dashboardData && (
+      {overviewData && (
         <div className="dashboard-summary glass-panel animate-fade-in-up dashboard-full-width" style={{ marginBottom: '2rem' }}>
           <div className="dashboard-metric">
             <div className="metric-label">Total Outstanding</div>
-            <div className="metric-value">{formatMoney(dashboardData.totalDebt)}</div>
+            <div className="metric-value">{formatMoney(overviewData.totalDebt)}</div>
           </div>
           <div className="metric-divider"></div>
           <div className="dashboard-metric">
             <div className="metric-label">Blended Rate</div>
-            <div className="metric-value">{dashboardData.blendedInterestRate.toFixed(2)}%</div>
+            <div className="metric-value">{Number(overviewData.blendedInterestRate || 0).toFixed(2)}%</div>
           </div>
           <div className="metric-divider"></div>
           <div className="dashboard-metric">
             <div className="metric-label">Debt Free By</div>
             <div className="metric-value ">
-              {dashboardData.debtFreeDate ? new Date(dashboardData.debtFreeDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '-'}
+              {overviewData.debtFreeDate ? new Date(overviewData.debtFreeDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '-'}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {debtHealth && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Debt Health Snapshot</h3>
+          <div className="debt-health-overview-card">
+            <div className="debt-health-overview-left">
+              <div className="debt-health-ring">
+                <div className="debt-health-ring-value">
+                  {debtHealth.overall}
+                  <span>/100</span>
+                </div>
+              </div>
+              <div className="debt-health-grade" style={{ marginBottom: 0 }}>{debtHealth.grade}</div>
+            </div>
+
+            <div className="debt-health-overview-right">
+              {debtHealth.metrics.map((metric) => (
+                <div key={metric.key} className="debt-health-metric-card">
+                  <div className="debt-health-metric-row">
+                    <span>{metric.label}</span>
+                    <strong>{metric.score}</strong>
+                  </div>
+                  <div className="debt-health-meter">
+                    <span style={{ width: `${metric.score}%` }} />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
