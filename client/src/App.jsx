@@ -106,6 +106,14 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
 
+  // Feedback State
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackHover, setFeedbackHover] = useState(0);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+  const [feedbackHidden, setFeedbackHidden] = useState(false);
+
   const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
   const withBase = (path) => `${API_BASE}${path}`;
 
@@ -140,6 +148,29 @@ async function fetchLoans() {
     } catch (e) {
       console.error(e);
       setError('Failed to load loans');
+    }
+  }
+
+  async function submitFeedback() {
+    if (feedbackRating === 0) return;
+    setFeedbackSubmitting(true);
+    try {
+      const res = await fetch(withBase('/api/auth/feedback'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: feedbackRating, text: feedbackText }),
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setFeedbackSuccess(true);
+        setTimeout(() => {
+          setFeedbackHidden(true);
+        }, 3000);
+      }
+    } catch (e) {
+      console.error('Failed to submit feedback', e);
+    } finally {
+      setFeedbackSubmitting(false);
     }
   }
 
@@ -273,6 +304,10 @@ async function fetchLoans() {
     setScheduleData(null);
     setEditingLoanId(null);
     setLoanForm(EMPTY_LOAN_FORM);
+    setFeedbackRating(0);
+    setFeedbackText('');
+    setFeedbackSuccess(false);
+    setFeedbackHidden(false);
     window.scrollTo(0, 0);
   };
 
@@ -1809,8 +1844,67 @@ async function fetchLoans() {
         )}
       </section>
 
+      {/* Feedback System */}
+      {!feedbackHidden && (
+        <div className={`feedback-panel ${feedbackSuccess ? 'fade-out delay-2000' : ''}`}>
+          {feedbackSuccess ? (
+            <div className="feedback-success animate-blur-in">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <h4 style={{ margin: '0 0 0.25rem 0' }}>Thank you!</h4>
+              <p className="muted" style={{ margin: 0, fontSize: '0.9rem' }}>Your feedback helps improve LoanWolf.</p>
+            </div>
+          ) : (
+            <div className="feedback-content">
+              <h4 style={{ margin: '0 0 1rem 0', fontWeight: '500'}}>How is your experience?</h4>
+              <div className="stars-container">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star-icon ${star <= (feedbackHover || feedbackRating) ? 'active' : ''}`}
+                    onClick={() => setFeedbackRating(star)}
+                    onMouseEnter={() => setFeedbackHover(star)}
+                    onMouseLeave={() => setFeedbackHover(0)}
+                    aria-label={`Rate ${star} out of 5 stars`}
+                  >
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill={star <= (feedbackHover || feedbackRating) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </button>
+                ))}
+              </div>
+              
+              {feedbackRating > 0 && (
+                <div className="feedback-text-wrapper animate-blur-in">
+                  <textarea
+                    className="feedback-textarea"
+                    placeholder="Any specific thoughts or suggestions?"
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    rows="3"
+                  ></textarea>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem' }}>
+                    <button 
+                      className="primary-btn" 
+                      style={{ padding: '0.5rem 1.25rem', fontSize: '0.9rem' }}
+                      onClick={submitFeedback}
+                      disabled={feedbackSubmitting}
+                    >
+                      {feedbackSubmitting ? 'Sending...' : 'Send Feedback'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <footer className="footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span className="footer-text">Crafted with <svg className="footer-heart" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 2805.26 2354.44" viewBox="0 0 2805.26 2354.44"><g><polygon fill="#effaf4" points="2805.26 236.26 2686.59 236.26 2686.59 97.3 2488.4 97.3 2488.4 0 1731.69 0 1731.69 97.3 1591.16 97.3 1591.16 200.41 1505.22 200.41 1505.22 358.12 1318.94 358.12 1318.94 200.41 1214.11 200.41 1214.11 97.3 1073.57 97.3 1073.57 0 316.86 0 316.86 97.3 118.68 97.3 118.68 236.26 0 236.26 0 1107.43 135.33 1107.43 135.33 1303.43 294 1303.43 294 1467.82 497.03 1467.82 497.03 1632.22 670.95 1632.22 670.95 1846.94 875.39 1846.94 875.39 2035.08 1073.57 2035.08 1073.57 2234.95 1216.83 2234.95 1216.83 2354.44 1554.99 2354.44 1554.99 2234.95 1731.69 2234.95 1731.69 2035.08 1929.88 2035.08 1929.88 1846.94 2134.31 1846.94 2134.31 1632.22 2308.23 1632.22 2308.23 1467.82 2511.27 1467.82 2511.27 1303.43 2669.93 1303.43 2669.93 1107.43 2805.26 1107.43"/><g><polygon fill="#ff0900" points="2653.62 337.99 2547.77 337.99 2547.77 214.05 2371.01 214.05 2371.01 127.27 1696.12 127.27 1696.12 214.05 1570.78 214.05 1570.78 306.02 1494.13 306.02 1494.13 446.68 1327.99 446.68 1327.99 306.02 1234.49 306.02 1234.49 214.05 1109.15 214.05 1109.15 127.27 434.25 127.27 434.25 214.05 257.49 214.05 257.49 337.99 151.65 337.99 151.65 1114.97 272.35 1114.97 272.35 1289.78 413.86 1289.78 413.86 1436.4 594.94 1436.4 594.94 1583.03 750.06 1583.03 750.06 1774.53 932.39 1774.53 932.39 1942.33 1109.15 1942.33 1109.15 2120.59 1236.91 2120.59 1236.91 2227.16 1538.52 2227.16 1538.52 2120.59 1696.12 2120.59 1696.12 1942.33 1872.87 1942.33 1872.87 1774.53 2055.21 1774.53 2055.21 1583.03 2210.32 1583.03 2210.32 1436.4 2391.41 1436.4 2391.41 1289.78 2532.92 1289.78 2532.92 1114.97 2653.62 1114.97"/><rect width="173.49" height="152.5" x="2065.15" y="311.19" fill="#effaf4"/><rect width="24" height="24" x="2065.15" y="872.22" fill="#effaf4"/><rect width="24" height="24" x="1891.67" y="1024.72" fill="#effaf4"/><rect width="173.49" height="405.73" x="2238.64" y="456.69" fill="#effaf4"/></g></g></svg> by <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Uday Savaliya</a></span>
+        <span className="footer-text">Crafted with <svg className="footer-heart" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 2805.26 2354.44" viewBox="0 0 2805.26 2354.44"><g><polygon fill="#effaf4" points="2805.26 236.26 2686.59 236.26 2686.59 97.3 2488.4 97.3 2488.4 0 1731.69 0 1731.69 97.3 1591.16 97.3 1591.16 200.41 1505.22 200.41 1505.22 358.12 1318.94 358.12 1318.94 200.41 1214.11 200.41 1214.11 97.3 1073.57 97.3 1073.57 0 316.86 0 316.86 97.3 118.68 97.3 118.68 236.26 0 236.26 0 1107.43 135.33 1107.43 135.33 1303.43 294 1303.43 294 1467.82 497.03 1467.82 497.03 1632.22 670.95 1632.22 670.95 1846.94 875.39 1846.94 875.39 2035.08 1073.57 2035.08 1073.57 2234.95 1216.83 2234.95 1216.83 2354.44 1554.99 2354.44 1554.99 2234.95 1731.69 2234.95 1731.69 2035.08 1929.88 2035.08 1929.88 1846.94 2134.31 1846.94 2134.31 1632.22 2308.23 1632.22 2308.23 1467.82 2511.27 1467.82 2511.27 1303.43 2669.93 1303.43 2669.93 1107.43 2805.26 1107.43"/><g><polygon fill="#ff0900" points="2653.62 337.99 2547.77 337.99 2547.77 214.05 2371.01 214.05 2371.01 127.27 1696.12 127.27 1696.12 214.05 1570.78 214.05 1570.78 306.02 1494.13 306.02 1494.13 446.68 1327.99 446.68 1327.99 306.02 1234.49 306.02 1234.49 214.05 1109.15 214.05 1109.15 127.27 434.25 127.27 434.25 214.05 257.49 214.05 257.49 337.99 151.65 337.99 151.65 1114.97 272.35 1114.97 272.35 1289.78 413.86 1289.78 413.86 1436.4 594.94 1436.4 594.94 1583.03 750.06 1583.03 750.06 1774.53 932.39 1774.53 932.39 1942.33 1109.15 1942.33 1109.15 2120.59 1236.91 2120.59 1236.91 2227.16 1538.52 2227.16 1538.52 2120.59 1696.12 2120.59 1696.12 1942.33 1872.87 1942.33 1872.87 1774.53 2055.21 1774.53 2055.21 1583.03 2210.32 1583.03 2210.32 1436.4 2391.41 1436.4 2391.41 1289.78 2532.92 1289.78 2532.92 1114.97 2653.62 1114.97"/><rect width="173.49" height="152.5" x="2065.15" y="311.19" fill="#effaf4"/><rect width="24" height="24" x="2065.15" y="872.22" fill="#effaf4"/><rect width="24" height="24" x="1891.67" y="1024.72" fill="#effaf4"/><rect width="173.49" height="405.73" x="2238.64" y="456.69" fill="#effaf4"/></g></g></svg> by <a href="https://github.com/UdaySavaliya04" style={{ color: 'inherit', textDecoration: 'none' }}>Uday Savaliya</a></span>
         <div>
           <a href="#" onClick={(e) => { e.preventDefault(); navigate('/support'); }} className="footer-link">Buy me a coffee</a>
         </div>

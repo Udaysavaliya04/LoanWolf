@@ -64,13 +64,13 @@ const SupportPage = () => {
             <div className="auth-form support-form-wrapper animate-blur-in delay-400">
               <div className="form-row" style={{ marginBottom: 0 }}>
                 <div style={{ position: 'relative' }}>
-                  <span style={{  position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold' }}>₹</span>
+                  <span style={{  position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontWeight: 'bold' , fontFamily:'Bricolage Grotesque'}}>₹</span>
                   <input 
                     type="text" 
                     placeholder="Custom Amount" 
                     value={customAmount}
                     onChange={handleCustomChange}
-                    style={{ paddingLeft: '2rem', fontSize: '1.1rem', fontWeight: '500', fontFamily: 'Inter, sans-serif' }}
+                    style={{ paddingLeft: '2rem', fontSize: '1.1rem', fontWeight: '500', fontFamily: 'Bricolage Grotesque' }}
                   />
                 </div>
               </div>

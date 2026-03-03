@@ -118,5 +118,31 @@ router.put('/profile', async (req, res) => {
   }
 });
 
+router.post('/feedback', async (req, res) => {
+  try {
+    const token = req.cookies && req.cookies.token;
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+    const payload = jwt.verify(token, JWT_SECRET);
+    const userId = payload.userId;
+
+    const { rating, text } = req.body || {};
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Valid rating (1-5) is required' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.feedbacks.push({ rating, text });
+    await user.save();
+
+    res.status(200).json({ message: 'Feedback submitted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Failed to submit feedback', error: err.message });
+  }
+});
+
 module.exports = router;
 
