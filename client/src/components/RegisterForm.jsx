@@ -97,22 +97,24 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
             type="button"
             className="dropdown-trigger"
             onClick={() => setCurrencyOpen(!currencyOpen)}
+            aria-expanded={currencyOpen}
             style={{ width: '100%', justifyContent: 'space-between' }}
           >
             <span>{currentCurrency.label}</span>
             <span className="dropdown-icon" aria-hidden="true">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                <path d='m6 9 6 6 6-6' />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 9l6 6 6-6" />
               </svg>
             </span>
           </button>
           {currencyOpen && (
-            <div className="dropdown-menu" style={{ width: '100%', bottom: '100%', top: 'auto', marginBottom: '0.35rem', marginTop: 0, background: '#000' }}>
-              {currencies.map((c) => (
+            <div className="dropdown-menu" style={{ width: '100%', bottom: '100%', top: 'auto', marginBottom: '0.35rem', marginTop: 0, background: '#000', transformOrigin: 'bottom center' }}>
+              {currencies.map((c, idx) => (
                 <button
                   key={c.code}
                   type="button"
                   className={`dropdown-item${c.code === values.currency ? ' dropdown-item-active' : ''}`}
+                  style={{ '--item-index': idx }}
                   onClick={() => handleCurrencySelect(c.code)}
                 >
                   <div className="dropdown-item-main">{c.label}</div>

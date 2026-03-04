@@ -1303,25 +1303,27 @@ async function fetchLoans() {
                   type="button"
                   className="dropdown-trigger"
                   onClick={() => setLoanTypeMenuOpen((open) => !open)}
+                  aria-expanded={loanTypeMenuOpen}
                 >
                   <span>
                     {LOAN_TYPE_OPTIONS.find((type) => type.value === loanForm.loanType)?.label ||
                       'Select loan type'}
                   </span>
                   <span className="dropdown-icon" aria-hidden="true">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                      <path d='m6 9 6 6 6-6' />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 9l6 6 6-6" />
                     </svg>
                   </span>
                 </button>
                 {loanTypeMenuOpen && (
-                  <div className="dropdown-menu">
+                  <div className="dropdown-menu no-scrollbar-menu">
                     <div className="dropdown-label">Loan Type</div>
-                    {LOAN_TYPE_OPTIONS.map((type) => (
+                    {LOAN_TYPE_OPTIONS.map((type, idx) => (
                       <button
                         key={type.value}
                         type="button"
                         className={`dropdown-item${loanForm.loanType === type.value ? ' dropdown-item-active' : ''}`}
+                        style={{ '--item-index': idx }}
                         onClick={() => {
                           setLoanForm((prev) => ({ ...prev, loanType: type.value }));
                           setLoanTypeMenuOpen(false);
@@ -1417,6 +1419,7 @@ async function fetchLoans() {
                   type="button"
                   className="dropdown-trigger"
                   onClick={() => setLoanMenuOpen((open) => !open)}
+                  aria-expanded={loanMenuOpen}
                 >
                   <span>
                     {currentLoan
@@ -1426,20 +1429,21 @@ async function fetchLoans() {
                       : 'Select a loan'}
                   </span>
                   <span className="dropdown-icon" aria-hidden="true">
-                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                        <path d='m6 9 6 6 6-6' />
-                      </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
                   </span>
                 </button>
                 {loanMenuOpen && (
-                  <div className="dropdown-menu">
+                  <div className="dropdown-menu no-scrollbar-menu">
                     <div className="dropdown-label">Loans</div>
-                    {loans.map((loan) => (
+                    {loans.map((loan, idx) => (
                       <button
                         key={loan._id}
                         type="button"
                         className={`dropdown-item${loan._id === selectedLoanId ? ' dropdown-item-active' : ''
                           }`}
+                        style={{ '--item-index': idx }}
                         onClick={() => {
                           setSelectedLoanId(loan._id);
                           setLoanMenuOpen(false);
@@ -1495,6 +1499,7 @@ async function fetchLoans() {
                       type="button"
                       className="dropdown-trigger"
                       onClick={() => setEventTypeMenuOpen((open) => !open)}
+                      aria-expanded={eventTypeMenuOpen}
                     >
                       <span>
                         {eventForm.type === 'EXTRA_PAYMENT'
@@ -1502,18 +1507,19 @@ async function fetchLoans() {
                           : 'Interest Rate Change'}
                       </span>
                       <span className="dropdown-icon" aria-hidden="true">
-                          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 -4 24 24" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                              <path d='m6 9 6 6 6-6' />
-                            </svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
                       </span>
                     </button>
                     {eventTypeMenuOpen && (
-                      <div className="dropdown-menu">
+                      <div className="dropdown-menu no-scrollbar-menu">
                         <div className="dropdown-label">Event type</div>
                         <button
                           type="button"
                           className={`dropdown-item${eventForm.type === 'EXTRA_PAYMENT' ? ' dropdown-item-active' : ''
                             }`}
+                          style={{ '--item-index': 0 }}
                           onClick={() => {
                             setEventForm((prev) => ({ ...prev, type: 'EXTRA_PAYMENT' }));
                             setEventTypeMenuOpen(false);
@@ -1525,6 +1531,7 @@ async function fetchLoans() {
                           type="button"
                           className={`dropdown-item${eventForm.type === 'RATE_CHANGE' ? ' dropdown-item-active' : ''
                             }`}
+                          style={{ '--item-index': 1 }}
                           onClick={() => {
                             setEventForm((prev) => ({ ...prev, type: 'RATE_CHANGE' }));
                             setEventTypeMenuOpen(false);

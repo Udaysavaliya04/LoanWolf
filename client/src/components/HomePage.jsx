@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function HomePage() {
@@ -284,10 +284,25 @@ function HomePage() {
 }
 
 const FaqItem = ({ question, answer, isOpen, onClick }) => {
+  const answerRef = useRef(null);
+  const [answerHeight, setAnswerHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const updateHeight = () => {
+      if (!answerRef.current) return;
+      setAnswerHeight(answerRef.current.scrollHeight);
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, [answer]);
+
   return (
     <div 
       className={`faq-item glass-panel ${isOpen ? 'open' : ''}`} 
       onClick={onClick}
+      style={{ '--faq-content-height': `${answerHeight}px` }}
     >
       <div className="faq-question">
         <span>{question}</span>
@@ -299,7 +314,9 @@ const FaqItem = ({ question, answer, isOpen, onClick }) => {
         </div>
       </div>
       <div className="faq-answer">
-        <p>{answer}</p>
+        <div ref={answerRef} className="faq-answer-inner">
+          <p>{answer}</p>
+        </div>
       </div>
     </div>
   );
