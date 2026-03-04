@@ -1656,8 +1656,6 @@ body {
   box-sizing: border-box;
 }
 
-
-
 .footer-glass {
   max-width: 100% !important;
   justify-content: space-between;
@@ -1703,6 +1701,57 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.home-cta-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto var(--section-gap) auto;
+  padding: 0 1rem;
+}
+
+.home-cta-card {
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(circle at top right, rgba(50, 50, 50, 0.12), transparent 42%),
+    rgba(221, 221, 221, 0.02);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.home-cta-kicker {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f4d87a;
+  font-weight: 600;
+}
+
+.home-cta-card h3 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -0.03em;
+  color: #fff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.home-cta-card > p {
+  margin: 0.9rem auto 0;
+  max-width: 640px;
+  color: #a1a1aa;
+  line-height: 1.6;
+}
+
+.home-cta-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .faq-item {
@@ -1823,7 +1872,8 @@ body {
 }
 
 .bento-section,
-.faq-section {
+.faq-section,
+.home-cta-section {
   margin-bottom: var(--section-gap) !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
@@ -1857,7 +1907,8 @@ body {
 
   .home-hero,
   .bento-section,
-  .faq-section {
+  .faq-section,
+  .home-cta-section {
     margin-bottom: var(--section-gap-mobile) !important;
   }
 }

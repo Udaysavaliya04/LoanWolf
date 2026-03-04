@@ -36,7 +36,7 @@ const formatCurrency = (value, currency = 'INR') => {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
   }).format(num);
 };
 
@@ -537,7 +537,7 @@ async function fetchLoans() {
         const num = typeof value === 'number' ? value : Number(value || 0);
         const formatted = new Intl.NumberFormat('en-IN', {
           minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
+          maximumFractionDigits: 0,
         }).format(num);
         return includeCurrency ? `${currencyCode} ${formatted}` : formatted;
       };

@@ -236,6 +236,24 @@ function HomePage() {
           </div>
         </section>
 
+        <section className="home-cta-section scroll-reveal">
+          <div className="home-cta-card glass-panel">
+            <p className="home-cta-kicker">Ready to stop overpaying interest?</p>
+            <h3>Build your loan strategy in minutes.</h3>
+            <p>
+              Create your first schedule, simulate prepayments, and see exactly how much time and money you can save.
+            </p>
+            <div className="home-cta-actions">
+              <button type="button" className="secondary-btn" onClick={() => navigate('/login')}>
+                Log In
+              </button>
+              <button type="button" className="primary-btn" onClick={() => navigate('/register')}>
+                Sign Up
+              </button>
+            </div>
+          </div>
+        </section>
+
        <footer className="luxury-footer scroll-reveal">
           <div className="footer-glass glass-panel">
             <div className="footer-left">
@@ -288,4 +306,3 @@ const FaqItem = ({ question, answer, isOpen, onClick }) => {
 };
 
 export default HomePage;
-
