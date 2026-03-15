@@ -41,7 +41,7 @@ const SupportPage = () => {
           
           <div className="support-header-left">
             <h2 className="animate-blur-in delay-100" style={{ fontFamily: 'Bricolage Grotesque', fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
-              Fuel this <span className="text-gradient-gold">platform</span>
+              Fuel this <span className="text-gradient-gold">platform.</span>
             </h2>
             <p className="muted animate-blur-in delay-200 support-subtitle">
             My primary focus of building loanwolf was never to earn money through subscription, ads or any other means but to help people to take control of their debt and save their hard-earned money.<br></br><br></br> If this tool has helped you by any means consider buying me a coffee. <br></br><br></br>Your support means the world to me. Thank you for keeping this platform running.

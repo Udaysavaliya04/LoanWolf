@@ -1091,7 +1091,7 @@ html {
   width: 100%;
   max-width: 420px;
   padding: 1.8rem 1.6rem 2rem;
-  border-radius: var(--radius);
+  border-radius: 18px;
   border: 1px solid var(--border-subtle);
   background-color: var(--bg-elevated);
   box-shadow:
@@ -2934,7 +2934,7 @@ html {
 
 .chat-bubble.user {
   align-self: flex-end;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  background: rgb(214, 214, 214);
   color: #000;
   border-radius: 1.2rem 1.2rem 4px 1.2rem;
   font-weight: 500;

@@ -1181,7 +1181,23 @@ async function fetchLoans() {
 
   function renderDashboard() {
     return (
-    <div className="app">
+    <>
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: '60px',
+          left: 0,
+          width: '100vw',
+          height: '360px',
+          zIndex: 0,
+          pointerEvents: 'none',
+          background:
+            'linear-gradient(180deg, rgba(0, 43, 123, 0.4) 0%, rgba(0, 40, 109, 0.3) 28%, rgba(0, 21, 75, 0.2) 60%, rgba(3, 0, 48, 0.1) 82%, rgb(0, 0, 0.05) 100%)',
+          filter: 'saturate(0.1)',
+        }}
+      />
+    <div className="app" style={{ position: 'relative', zIndex: 1 }}>
       <header className="site-header animate-blur-in">
         <div className="site-header-inner">
           <div className="site-brand">
@@ -2277,6 +2293,7 @@ async function fetchLoans() {
         </button>
       )}
     </div>
+    </>
   );
   }
 }
