@@ -1729,7 +1729,7 @@ html {
 }
 
 .footer-sep {
-  color: #333;
+  color: var(--primary);
   font-size: 0.8rem;
 }
 
