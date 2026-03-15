@@ -530,7 +530,7 @@ html {
   border: none;
   background: transparent;
   color: var(--text-primary);
-  padding: 0.45rem 0.9rem;
+  padding: 0.45rem 0.6rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1142,10 +1142,11 @@ html {
     linear-gradient(180deg, #1A1A1A 0%, #050505 100%) content-box,
     conic-gradient(from var(--border-angle), 
       rgba(255, 255, 255, 0.1) 0%, 
-      rgba(255, 215, 0, 0.8) 40%, 
-      rgba(192, 125, 0, 0.8) 50%, 
-      rgba(255, 215, 0, 0.8) 60%, 
-      rgba(43, 29, 0, 0.4) 100%
+      rgba(255, 215, 0, 0.8) 20%, 
+      rgba(192, 125, 0, 0.8) 40%, 
+      rgba(255, 215, 0, 0.8) 60%,
+      rgba(255, 221, 0, 0.5) 80%, 
+      rgba(43, 29, 0, 0.1) 100%
     ) border-box;
   z-index: -1;
   animation: rotate-border 2s linear infinite;

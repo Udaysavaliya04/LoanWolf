@@ -219,16 +219,16 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
   })();
 
   return (
-    <div className="panel profile-panel animate-blur-in">
+    <div className="panel profile-panel animate-blur-in" style={{borderRadius:'16px'}}>
       <div className="panel-header" style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.5rem' }}>Profile/Settings</h2>
-        <button type="button" className="secondary-btn" onClick={onBack}>
+        <button type="button" className="secondary-btn" style={{marginTop: '-1rem'}}onClick={onBack}>
           Close
         </button>
       </div>
 
       {overviewData && (
-        <div className="dashboard-summary glass-panel animate-fade-in-up dashboard-full-width" style={{ marginBottom: '2rem' }}>
+        <div className="dashboard-summary glass-panel animate-fade-in-up dashboard-full-width" style={{ marginBottom: '2rem',background: 'transparent', boxShadow:'8px 8px 20px rgba(54, 54, 54, 0.2) inset, 0 0 0 1px rgba(0, 0, 0, 0.5)', borderColor: 'var(--border)' }}>
           <div className="dashboard-metric">
             <div className="metric-label">Total Outstanding</div>
             <div className="metric-value">{formatMoney(overviewData.totalDebt)}</div>
@@ -251,7 +251,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
       {debtHealth && (
         <div style={{ marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Debt Health Snapshot</h3>
-          <div className="debt-health-overview-card">
+          <div className="debt-health-overview-card" style={{background: 'transparent', boxShadow:'8px 8px 20px rgba(54, 54, 54, 0.2) inset, 0 0 0 1px rgba(0, 0, 0, 0.5)'}}>
             <div className="debt-health-overview-left">
               <div className="debt-health-ring">
                 <div className="debt-health-ring-value">
@@ -366,13 +366,13 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
         </div>
 
         <div className="form-row">
-          <label>New Password (leave blank to keep current)</label>
+          <label>Want to change your password?</label>
           <input
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="New Password..."
+            placeholder="Enter new password..."
             minLength="6"
             style={{ fontFamily: "'Inter', sans-serif" }}
           />

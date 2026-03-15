@@ -128,7 +128,7 @@ function HomePage() {
 
             <div className="f-card glass-panel full-width workflow-strip scroll-reveal">
               <div className="workflow-header">
-                <h3>The Monthly Optimization Cycle</h3>
+                <h3><span className="text-gradient-gold">The Monthly Optimization Cycle</span></h3>
               </div>
               <div className="workflow-steps">
                 <div className="step">
