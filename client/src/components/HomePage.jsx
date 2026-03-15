@@ -87,7 +87,7 @@ function HomePage() {
               </div>
               <div className="f-content">
                 <h3>Live Amortization Table</h3>
-                <p>Full EMI breakdown without pagination. Every month shows opening balance, interest, principal, and prepayments in a single view.</p>
+                <p>Full EMI breakdown. Every month shows opening balance, interest, principal, and prepayments in a single view.</p>
               </div>
               <div className="f-visual-table">
                 <div className="row head"><span>Month</span><span>Interest</span><span>Principal</span></div>
@@ -158,7 +158,7 @@ function HomePage() {
 
         <section className="testimonials-section scroll-reveal">
           <div className="testimonials-header">
-            <h2>Loved by <span className="text-gradient-gold">Early Adopters</span></h2>
+            <h2><span className="text-gradient-gold">Loved by </span>Early Adopters</h2>
           </div>
           
           <div className="marquee-container">
@@ -239,15 +239,15 @@ function HomePage() {
         <section className="home-cta-section scroll-reveal">
           <div className="home-cta-card glass-panel">
             <p className="home-cta-kicker">Ready to stop overpaying interest?</p>
-            <h3>Build your loan strategy in minutes.</h3>
+            <h3>Build your loan strategy <span className="text-gradient-gold">in minutes.</span></h3>
             <p>
               Create your first schedule, simulate prepayments, and see exactly how much time and money you can save.
             </p>
             <div className="home-cta-actions">
-              <button type="button" className="secondary-btn" onClick={() => navigate('/login')}>
+              <button type="button" className="secondary-btn" style={{borderRadius: '12px'}} onClick={() => navigate('/login')}>
                 Log In
               </button>
-              <button type="button" className="primary-btn" onClick={() => navigate('/register')}>
+              <button type="button" className="primary-btn" style={{borderRadius: '12px'}} onClick={() => navigate('/register')}>
                 Sign Up
               </button>
             </div>
