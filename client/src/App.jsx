@@ -117,6 +117,10 @@ function App() {
   const scheduleTableWrapperRef = useRef(null);
   const scheduleTableRef = useRef(null);
   const scheduleHeaderRowRef = useRef(null);
+  const advisorToggleRef = useRef(null);
+  const advisorChatButtonRef = useRef(null);
+  const advisorExtraButtonRef = useRef(null);
+  const advisorTargetButtonRef = useRef(null);
   const [loanMenuOpen, setLoanMenuOpen] = useState(false);
   const [loanTypeMenuOpen, setLoanTypeMenuOpen] = useState(false);
   const [eventTypeMenuOpen, setEventTypeMenuOpen] = useState(false);
@@ -143,6 +147,7 @@ function App() {
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
   const [feedbackHidden, setFeedbackHidden] = useState(false);
+  const [advisorPillStyle, setAdvisorPillStyle] = useState({ left: 0, width: 0 });
   const [floatingScheduleHeader, setFloatingScheduleHeader] = useState({
     visible: false,
     top: 0,
@@ -314,6 +319,36 @@ async function fetchLoans() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const updateAdvisorPill = () => {
+      const toggleEl = advisorToggleRef.current;
+      if (!toggleEl) return;
+
+      const activeButton =
+        advisorMode === 'chat'
+          ? advisorChatButtonRef.current
+          : advisorMode === 'extra'
+            ? advisorExtraButtonRef.current
+            : advisorTargetButtonRef.current;
+
+      if (!activeButton) return;
+
+      setAdvisorPillStyle((prev) => {
+        const next = {
+          left: activeButton.offsetLeft,
+          width: activeButton.offsetWidth,
+        };
+
+        return prev.left === next.left && prev.width === next.width ? prev : next;
+      });
+    };
+
+    updateAdvisorPill();
+    window.addEventListener('resize', updateAdvisorPill);
+
+    return () => window.removeEventListener('resize', updateAdvisorPill);
+  }, [advisorMode]);
 
   useEffect(() => {
     if (!scheduleData) {
@@ -2197,9 +2232,18 @@ async function fetchLoans() {
             <div className="scenarios-title" style={{marginRight: '0.9rem'}}>Advisor</div>
             
           </div>
-          <div className="advisor-mode-toggle">
+          <div className="advisor-mode-toggle" ref={advisorToggleRef}>
+            <span
+              className="advisor-mode-pill"
+              aria-hidden="true"
+              style={{
+                transform: `translateX(${advisorPillStyle.left}px)`,
+                width: `${advisorPillStyle.width}px`,
+              }}
+            />
             <button
               type="button"
+              ref={advisorChatButtonRef}
               className={
                 'advisor-mode-button' + (advisorMode === 'chat' ? ' advisor-mode-button-active' : '')
               }
@@ -2209,6 +2253,7 @@ async function fetchLoans() {
             </button>
             <button
               type="button"
+              ref={advisorExtraButtonRef}
               className={
                 'advisor-mode-button' + (advisorMode === 'extra' ? ' advisor-mode-button-active' : '')
               }
@@ -2218,6 +2263,7 @@ async function fetchLoans() {
             </button>
             <button
               type="button"
+              ref={advisorTargetButtonRef}
               className={
                 'advisor-mode-button' + (advisorMode === 'target' ? ' advisor-mode-button-active' : '')
               }
