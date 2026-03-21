@@ -141,12 +141,13 @@ html {
   text-decoration: none;
   padding: 0.25rem 0.6rem;
   border-radius: var(--radius);
-  transition: color 120ms ease, background-color 120ms ease;
+  transition: color 120ms ease, background-color 500ms ease-in-out;
 }
 
 .site-nav-link:hover {
   color: var(--text-primary);
   background-color: rgba(148, 163, 184, 0.12);
+  box-shadow: 0 2px 4px rgba(148, 163, 184, 0.1) inset;
 }
 
 .site-header-user {
@@ -639,11 +640,30 @@ html {
 }
 
 .table thead {
-  position: sticky;
-  top: 0;
   background-color: var(--card);
   box-shadow: 0 1px 0 rgba(15, 23, 42, 1);
-  z-index: 1;
+}
+
+.amortization-table-wrapper {
+  position: relative;
+}
+
+.amortization-floating-header {
+  position: fixed;
+  z-index: 45;
+  overflow: hidden;
+  pointer-events: none;
+  border-left: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+  background-color: var(--card);
+}
+
+.amortization-floating-header-table {
+  margin-top: 0;
+}
+
+.amortization-floating-header th {
+  background-color: var(--primary-foreground);
 }
 
 .table th,
@@ -672,7 +692,7 @@ html {
 }
 
 .table tbody tr:hover {
-  background-color: rgba(31, 41, 55, 0.8);
+  background-color: rgba(52, 52, 52, 0.5);
 }
 
 .summary-grid {
@@ -2487,6 +2507,14 @@ html {
   gap: 0.5rem;
 }
 
+.events-actions-cell {
+  text-align: center !important;
+}
+
+.events-action-btn-group {
+  justify-content: center;
+}
+
 .action-btn {
   background: rgba(26, 26, 26, 0.597);
   border: none;
@@ -2499,6 +2527,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 4px rgba(148, 163, 184, 0.1) inset;
 }
 
 .action-btn:hover {
@@ -2509,6 +2538,7 @@ html {
 .action-btn.delete:hover {
   background: rgba(220, 38, 38, 0.3);
   color: #ffffff;
+
 }
 
 .loan-actions {

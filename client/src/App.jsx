@@ -65,6 +65,18 @@ const LOAN_TYPE_OPTIONS = [
   { value: 'OTHER', label: 'Other Loan' },
 ];
 
+const SCHEDULE_TABLE_COLUMNS = [
+  '#',
+  'From Date',
+  'To Date',
+  'Opening Prin. Bal.',
+  'Prep/Adj/Disb',
+  'ROI (%)',
+  'EMI Recble',
+  'Int. Comp.',
+  'Prin. Comp.',
+  'Closing Prin.',
+];
 
 const LoadingSpinner = () => (
   <div className="spinner-wrapper">
@@ -101,6 +113,10 @@ function App() {
   const loanMenuRef = useRef(null);
   const loanTypeMenuRef = useRef(null);
   const eventTypeMenuRef = useRef(null);
+  const scheduleSectionRef = useRef(null);
+  const scheduleTableWrapperRef = useRef(null);
+  const scheduleTableRef = useRef(null);
+  const scheduleHeaderRowRef = useRef(null);
   const [loanMenuOpen, setLoanMenuOpen] = useState(false);
   const [loanTypeMenuOpen, setLoanTypeMenuOpen] = useState(false);
   const [eventTypeMenuOpen, setEventTypeMenuOpen] = useState(false);
@@ -127,6 +143,15 @@ function App() {
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
   const [feedbackHidden, setFeedbackHidden] = useState(false);
+  const [floatingScheduleHeader, setFloatingScheduleHeader] = useState({
+    visible: false,
+    top: 0,
+    left: 0,
+    width: 0,
+    tableWidth: 0,
+    scrollLeft: 0,
+    columnWidths: [],
+  });
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
   const withBase = (path) => `${API_BASE}${path}`;
@@ -289,6 +314,103 @@ async function fetchLoans() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!scheduleData) {
+      setFloatingScheduleHeader((prev) =>
+        prev.visible || prev.columnWidths.length || prev.width || prev.tableWidth
+          ? {
+              visible: false,
+              top: 0,
+              left: 0,
+              width: 0,
+              tableWidth: 0,
+              scrollLeft: 0,
+              columnWidths: [],
+            }
+          : prev
+      );
+      return undefined;
+    }
+
+    const updateFloatingScheduleHeader = () => {
+      const wrapperEl = scheduleTableWrapperRef.current;
+      const tableEl = scheduleTableRef.current;
+      const headerRowEl = scheduleHeaderRowRef.current;
+
+      if (!wrapperEl || !tableEl || !headerRowEl) {
+        setFloatingScheduleHeader((prev) => ({ ...prev, visible: false }));
+        return;
+      }
+
+      const siteHeaderEl = document.querySelector('.site-header');
+      const siteHeaderHeight = siteHeaderEl?.getBoundingClientRect().height || 0;
+      const wrapperRect = wrapperEl.getBoundingClientRect();
+      const headerRowRect = headerRowEl.getBoundingClientRect();
+      const headerCells = Array.from(headerRowEl.children);
+      const columnWidths = headerCells.map((cell) => cell.getBoundingClientRect().width);
+      const floatingTop = siteHeaderHeight;
+      const shouldShow =
+        headerRowRect.top <= floatingTop && wrapperRect.bottom > floatingTop + headerRowRect.height;
+
+      setFloatingScheduleHeader((prev) => {
+        const next = {
+          visible: shouldShow,
+          top: floatingTop,
+          left: wrapperRect.left,
+          width: wrapperRect.width,
+          tableWidth: tableEl.getBoundingClientRect().width,
+          scrollLeft: wrapperEl.scrollLeft,
+          columnWidths,
+        };
+
+        const unchanged =
+          prev.visible === next.visible &&
+          prev.top === next.top &&
+          prev.left === next.left &&
+          prev.width === next.width &&
+          prev.tableWidth === next.tableWidth &&
+          prev.scrollLeft === next.scrollLeft &&
+          prev.columnWidths.length === next.columnWidths.length &&
+          prev.columnWidths.every((width, index) => width === next.columnWidths[index]);
+
+        return unchanged ? prev : next;
+      });
+    };
+
+    let frameId = 0;
+    const scheduleUpdate = () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+      frameId = window.requestAnimationFrame(updateFloatingScheduleHeader);
+    };
+
+    const wrapperEl = scheduleTableWrapperRef.current;
+    scheduleUpdate();
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    wrapperEl?.addEventListener('scroll', scheduleUpdate, { passive: true });
+
+    let resizeObserver;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(scheduleUpdate);
+      if (scheduleSectionRef.current) resizeObserver.observe(scheduleSectionRef.current);
+      if (scheduleTableWrapperRef.current) resizeObserver.observe(scheduleTableWrapperRef.current);
+      if (scheduleTableRef.current) resizeObserver.observe(scheduleTableRef.current);
+    }
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      wrapperEl?.removeEventListener('scroll', scheduleUpdate);
+      resizeObserver?.disconnect();
+    };
+  }, [scheduleData]);
 
   const handleLoanInputChange = (e) => {
     const { name, value } = e.target;
@@ -822,6 +944,25 @@ async function fetchLoans() {
   };
 
   const currentLoan = loans.find((l) => l._id === selectedLoanId) || null;
+
+  const renderScheduleTableHeader = () => (
+    <>
+      {floatingScheduleHeader.columnWidths.length === SCHEDULE_TABLE_COLUMNS.length && (
+        <colgroup>
+          {floatingScheduleHeader.columnWidths.map((width, index) => (
+            <col key={SCHEDULE_TABLE_COLUMNS[index]} style={{ width: `${width}px` }} />
+          ))}
+        </colgroup>
+      )}
+      <thead>
+        <tr ref={scheduleHeaderRowRef}>
+          {SCHEDULE_TABLE_COLUMNS.map((label) => (
+            <th key={label}>{label}</th>
+          ))}
+        </tr>
+      </thead>
+    </>
+  );
 
   const buildPrincipalSeries = () => {
     if (!scheduleData) return { current: [], baseline: [] };
@@ -1625,7 +1766,7 @@ async function fetchLoans() {
                         <th>Type</th>
                         <th>Amount / Rate</th>
                         <th>Note</th>
-                        <th>Actions</th>
+                        <th className="events-actions-cell">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1641,8 +1782,8 @@ async function fetchLoans() {
                                 : '-'}
                           </td>
                           <td>{ev.note || '-'}</td>
-                          <td>
-                            <div className="action-btn-group">
+                          <td className="events-actions-cell">
+                            <div className="action-btn-group events-action-btn-group">
                               <button className="action-btn delete" onClick={() => handleDeleteEvent(ev._id)} title="Delete Event">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                               </button>
@@ -1659,7 +1800,7 @@ async function fetchLoans() {
         </section>
       </main>
 
-      <section className="panel panel-full" id="schedule">
+      <section className="panel panel-full" id="schedule" ref={scheduleSectionRef}>
         <div className="panel-header">
           <h2>Amortization schedule</h2>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1682,6 +1823,43 @@ async function fetchLoans() {
           </p>
         ) : (
           <>
+            {floatingScheduleHeader.visible && (
+              <div
+                className="amortization-floating-header"
+                style={{
+                  top: `${floatingScheduleHeader.top}px`,
+                  left: `${floatingScheduleHeader.left}px`,
+                  width: `${floatingScheduleHeader.width}px`,
+                }}
+              >
+                <table
+                  className="table amortization-floating-header-table"
+                  style={{
+                    width: `${Math.max(
+                      floatingScheduleHeader.tableWidth,
+                      floatingScheduleHeader.width
+                    )}px`,
+                    transform: `translateX(-${floatingScheduleHeader.scrollLeft}px)`,
+                  }}
+                  aria-hidden="true"
+                >
+                  {floatingScheduleHeader.columnWidths.length === SCHEDULE_TABLE_COLUMNS.length && (
+                    <colgroup>
+                      {floatingScheduleHeader.columnWidths.map((width, index) => (
+                        <col key={SCHEDULE_TABLE_COLUMNS[index]} style={{ width: `${width}px` }} />
+                      ))}
+                    </colgroup>
+                  )}
+                  <thead>
+                    <tr>
+                      {SCHEDULE_TABLE_COLUMNS.map((label) => (
+                        <th key={label}>{label}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            )}
             <div className="summary-grid">
               <div>
                 <h4>Total interest</h4>
@@ -1858,22 +2036,9 @@ async function fetchLoans() {
               </div>
             </div>
 
-            <div className="table-wrapper">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>From Date</th>
-                    <th>To Date</th>
-                    <th>Opening Prin. Bal.</th>
-                    <th>Prep/Adj/Disb</th>
-                    <th>ROI (%)</th>
-                    <th>EMI Recble</th>
-                    <th>Int. Comp.</th>
-                    <th>Prin. Comp.</th>
-                    <th>Closing Prin.</th>
-                  </tr>
-                </thead>
+            <div className="table-wrapper amortization-table-wrapper" ref={scheduleTableWrapperRef}>
+              <table className="table" ref={scheduleTableRef}>
+                {renderScheduleTableHeader()}
                 <tbody>
                   {scheduleData.schedule.map((row) => (
                     <tr key={row.period}>
