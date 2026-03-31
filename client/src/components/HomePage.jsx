@@ -156,8 +156,8 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="testimonials-section scroll-reveal">
-          <div className="testimonials-header">
+        <section className="testimonials-section">
+          <div className="testimonials-header scroll-reveal">
             <h2><span className="text-gradient-gold">Loved by </span>Early Adopters</h2>
           </div>
           
@@ -175,7 +175,7 @@ function HomePage() {
                 { name: "Sneha", tag: "Crazy Savings", text: "Finally, a dashboard that speaks my language. No confusing bank jargon, just raw numbers." },
                 { name: "Elvis", tag: "Optimization Geek", text: "I track my loan like I track my stocks now. Seeing the principal drop is addictive." },
               ].map((t, i) => (
-                <div key={i} className="testimonial-card glass-panel">
+                <div key={i} className="testimonial-card glass-panel scroll-reveal">
                   <div className="t-header">
                     <div className="t-avatar">{t.name[0]}</div>
                     <div className="t-info">
@@ -190,8 +190,8 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="faq-section scroll-reveal">
-          <div className="faq-header" style={{ fontFamily: 'Bricolage Grotesque' }}>
+        <section className="faq-section">
+          <div className="faq-header scroll-reveal" style={{ fontFamily: 'Bricolage Grotesque' }}>
             <h2>Frequently Asked <span className="text-gradient-gold">Questions</span></h2>
           </div>
 
@@ -236,8 +236,8 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="home-cta-section scroll-reveal">
-          <div className="home-cta-card glass-panel">
+        <section className="home-cta-section">
+          <div className="home-cta-card glass-panel scroll-reveal">
             <p className="home-cta-kicker">Ready to stop overpaying interest?</p>
             <h3>Build your loan strategy <span className="text-gradient-gold">in minutes.</span></h3>
             <p>
