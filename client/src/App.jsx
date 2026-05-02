@@ -471,11 +471,12 @@ async function fetchLoans() {
     e.preventDefault();
     setAuthError('');
     try {
+      const isRegistering = location.pathname === '/register';
       const body =
-        authMode === 'register'
+        isRegistering
           ? { name: authForm.name, email: authForm.email, password: authForm.password, currency: authForm.currency }
           : { email: authForm.email, password: authForm.password };
-      const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+      const endpoint = isRegistering ? '/api/auth/register' : '/api/auth/login';
       const res = await fetch(withBase(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
