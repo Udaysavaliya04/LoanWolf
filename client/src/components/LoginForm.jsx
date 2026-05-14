@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import AuthWarmupNotice from './AuthWarmupNotice';
 
-function LoginForm({ values, onChange, onSubmit }) {
+function LoginForm({ values, onChange, onSubmit, isSubmitting = false, waitLevel = 'quiet' }) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -14,6 +15,7 @@ function LoginForm({ values, onChange, onSubmit }) {
           onChange={onChange}
           placeholder="name@example.com"
           autoComplete="email"
+          disabled={isSubmitting}
           required
         />
       </div>
@@ -27,6 +29,7 @@ function LoginForm({ values, onChange, onSubmit }) {
             onChange={onChange}
             placeholder="Enter your password..."
             autoComplete="current-password"
+            disabled={isSubmitting}
             required
             className="password-input"
           />
@@ -34,6 +37,7 @@ function LoginForm({ values, onChange, onSubmit }) {
             type="button"
             className="password-toggle"
             onClick={() => setShowPassword(!showPassword)}
+            disabled={isSubmitting}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -44,12 +48,17 @@ function LoginForm({ values, onChange, onSubmit }) {
           </button>
         </div>
       </div>
-      <button type="submit" className="primary-btn auth-primary-btn">
-        Log in
+      <button type="submit" className="primary-btn auth-primary-btn" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <span className="auth-btn-spinner" aria-hidden="true" />
+            Opening dashboard
+          </>
+        ) : 'Log in'}
       </button>
+      {isSubmitting ? <AuthWarmupNotice level={waitLevel} /> : null}
     </form>
   );
 }
 
 export default LoginForm;
-

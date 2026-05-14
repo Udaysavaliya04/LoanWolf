@@ -109,6 +109,8 @@ function App() {
   const [exportingPdf, setExportingPdf] = useState(false);
   const [appError, setAppError] = useState('');
   const [authError, setAuthError] = useState('');
+  const [authSubmitting, setAuthSubmitting] = useState(false);
+  const [authWaitLevel, setAuthWaitLevel] = useState('quiet');
   const setError = setAppError;
   const loanMenuRef = useRef(null);
   const loanTypeMenuRef = useRef(null);
@@ -467,9 +469,27 @@ async function fetchLoans() {
     setAuthForm((prev) => ({ ...prev, currency }));
   };
 
+  useEffect(() => {
+    if (!authSubmitting) {
+      setAuthWaitLevel('quiet');
+      return undefined;
+    }
+
+    const settlingTimer = window.setTimeout(() => setAuthWaitLevel('settling'), 1800);
+    const wakeupTimer = window.setTimeout(() => setAuthWaitLevel('wakeup'), 6500);
+
+    return () => {
+      window.clearTimeout(settlingTimer);
+      window.clearTimeout(wakeupTimer);
+    };
+  }, [authSubmitting]);
+
   const submitAuth = async (e) => {
     e.preventDefault();
+    if (authSubmitting) return;
     setAuthError('');
+    setAuthSubmitting(true);
+    setAuthWaitLevel('quiet');
     try {
       const isRegistering = location.pathname === '/register';
       const body =
@@ -495,6 +515,8 @@ async function fetchLoans() {
     } catch (err) {
       console.error(err);
       setAuthError(err.message);
+    } finally {
+      setAuthSubmitting(false);
     }
   };
 
@@ -1317,7 +1339,13 @@ async function fetchLoans() {
             setAuthError('');
             navigate(`/${mode === 'register' ? 'register' : 'login'}`);
           }} error={authError}>
-            <LoginForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} />
+            <LoginForm
+              values={authForm}
+              onChange={handleAuthInputChange}
+              onSubmit={submitAuth}
+              isSubmitting={authSubmitting}
+              waitLevel={authWaitLevel}
+            />
           </AuthLayout>
         ) : <Navigate to="/dashboard" replace />
       } />
@@ -1331,7 +1359,14 @@ async function fetchLoans() {
             setAuthError('');
             navigate(`/${mode === 'register' ? 'register' : 'login'}`);
           }} error={authError}>
-            <RegisterForm values={authForm} onChange={handleAuthInputChange} onSubmit={submitAuth} onCurrencyChange={handleAuthCurrencyChange} />
+            <RegisterForm
+              values={authForm}
+              onChange={handleAuthInputChange}
+              onSubmit={submitAuth}
+              onCurrencyChange={handleAuthCurrencyChange}
+              isSubmitting={authSubmitting}
+              waitLevel={authWaitLevel}
+            />
           </AuthLayout>
         ) : <Navigate to="/dashboard" replace />
       } />

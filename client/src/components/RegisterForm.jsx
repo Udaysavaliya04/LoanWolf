@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import AuthWarmupNotice from './AuthWarmupNotice';
 
 const currencies = [
   { code: 'INR', symbol: '₹', label: 'INR (₹)' },
@@ -15,7 +16,7 @@ const currencies = [
   { code: 'HKD', symbol: 'HK$', label: 'HKD (HK$)' },
 ];
 
-function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
+function RegisterForm({ values, onChange, onSubmit, onCurrencyChange, isSubmitting = false, waitLevel = 'quiet' }) {
   const [showPassword, setShowPassword] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const currencyRef = useRef(null);
@@ -47,6 +48,7 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
           onChange={onChange}
           placeholder="Full Name"
           autoComplete="name"
+          disabled={isSubmitting}
           required
         />
       </div>
@@ -59,6 +61,7 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
           onChange={onChange}
           placeholder="name@example.com"
           autoComplete="email"
+          disabled={isSubmitting}
           required
         />
       </div>
@@ -72,6 +75,7 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
             onChange={onChange}
             placeholder="Enter a strong password..."
             autoComplete="new-password"
+            disabled={isSubmitting}
             required
             className="password-input"
           />
@@ -79,6 +83,7 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
             type="button"
             className="password-toggle"
             onClick={() => setShowPassword(!showPassword)}
+            disabled={isSubmitting}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -98,6 +103,7 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
             className="dropdown-trigger"
             onClick={() => setCurrencyOpen(!currencyOpen)}
             aria-expanded={currencyOpen}
+            disabled={isSubmitting}
             style={{ width: '100%', justifyContent: 'space-between' }}
           >
             <span>{currentCurrency.label}</span>
@@ -125,9 +131,15 @@ function RegisterForm({ values, onChange, onSubmit, onCurrencyChange }) {
         </div>
       </div>
 
-      <button type="submit" className="primary-btn auth-primary-btn">
-        Sign up
+      <button type="submit" className="primary-btn auth-primary-btn" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <span className="auth-btn-spinner" aria-hidden="true" />
+            Creating workspace
+          </>
+        ) : 'Sign up'}
       </button>
+      {isSubmitting ? <AuthWarmupNotice level={waitLevel} /> : null}
     </form>
   );
 }
