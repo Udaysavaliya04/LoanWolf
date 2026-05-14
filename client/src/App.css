@@ -3308,6 +3308,497 @@ html {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
+/* Visual loan education */
+.loan-education-shell {
+  max-width: 100%;
+}
+
+.edu-main {
+  padding-top: 108px;
+}
+
+.edu-hero {
+  width: min(1120px, calc(100% - 2rem));
+  min-height: 58vh;
+  margin: 0 auto 4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.edu-hero-copy h1 {
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.edu-hero-copy p {
+  max-width: 520px;
+  margin: 1.2rem 0 0;
+  color: var(--text-muted);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.edu-kicker {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #facc15;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.edu-hero-btn {
+  margin-top: 1.6rem;
+}
+
+.edu-hero-visual {
+  min-height: 420px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015)),
+    rgba(0, 0, 0, 0.45);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+}
+
+.edu-hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: 16%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.edu-mini-card,
+.edu-payoff-ring {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.46);
+  backdrop-filter: blur(18px);
+}
+
+.edu-mini-card {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.edu-mini-card span,
+.edu-payoff-ring span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.edu-mini-card strong {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2rem;
+}
+
+.edu-payoff-ring {
+  grid-column: 1 / -1;
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(0, 0, 0, 0.92) 48%, transparent 49%),
+    conic-gradient(#ef4444 0 180deg, #f59e0b 180deg 270deg, #22c55e 270deg 360deg);
+}
+
+.edu-payoff-ring div {
+  width: 138px;
+  height: 138px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edu-payoff-ring strong {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.edu-section {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto 5rem;
+}
+
+.edu-section-header {
+  margin-bottom: 1.5rem;
+}
+
+.edu-section-header h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.edu-split-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.edu-split-card {
+  gap: 1.2rem;
+}
+
+.edu-card-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.edu-card-topline strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.edu-split-bar {
+  height: 76px;
+  display: flex;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.edu-split-bar span {
+  display: block;
+  transition: width 0.4s ease;
+}
+
+.edu-interest {
+  background: linear-gradient(180deg, #ef4444, #7f1d1d);
+}
+
+.edu-principal {
+  background: linear-gradient(180deg, #22c55e, #14532d);
+}
+
+.edu-split-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.edu-dot {
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  border-radius: 999px;
+  margin-right: 0.35rem;
+}
+
+.edu-dot.interest {
+  background: #ef4444;
+}
+
+.edu-dot.principal {
+  background: #22c55e;
+}
+
+.edu-timeline-card {
+  padding: 2.2rem;
+}
+
+.edu-balance-line {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.7rem;
+  position: relative;
+}
+
+.edu-balance-line::before {
+  content: "";
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+  opacity: 0.5;
+}
+
+.edu-balance-point {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.edu-balance-pill {
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 8px #050505;
+}
+
+.edu-balance-point.danger .edu-balance-pill { background: #7f1d1d; }
+.edu-balance-point.warn .edu-balance-pill { background: #713f12; }
+.edu-balance-point.steady .edu-balance-pill { background: #1e3a8a; }
+.edu-balance-point.good .edu-balance-pill { background: #14532d; }
+.edu-balance-point.done .edu-balance-pill { background: #f8fafc; color: #000; }
+
+.edu-balance-point span {
+  color: #fff;
+  font-weight: 700;
+}
+
+.edu-balance-point small {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.edu-trap-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.edu-trap-card {
+  min-height: 190px;
+  justify-content: space-between;
+}
+
+.edu-trap-visual {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.edu-trap-card h3 {
+  margin: 1rem 0 0.35rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.edu-trap-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.edu-move-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.edu-move-card,
+.edu-myth-card,
+.edu-cta {
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px);
+}
+
+.edu-move-card {
+  padding: 1.4rem;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+}
+
+.edu-move-number {
+  color: #facc15;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+
+.edu-move-card h3 {
+  margin: 1.2rem 0 0.4rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.35rem;
+}
+
+.edu-move-card strong {
+  color: #fff;
+  font-size: 0.92rem;
+}
+
+.edu-move-card p {
+  margin: auto 0 0;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.edu-myth-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.edu-myth-card {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  overflow: hidden;
+}
+
+.edu-myth-card div {
+  padding: 1rem 1.1rem;
+}
+
+.edu-myth-card div:first-child {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.edu-myth-card div:last-child {
+  background: rgba(34, 197, 94, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edu-myth-card span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.edu-myth-card p {
+  margin: 0;
+  color: #fff;
+  line-height: 1.35;
+}
+
+.edu-cta {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.edu-cta h2 {
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  letter-spacing: -0.05em;
+}
+
+.edu-cta p {
+  margin: 0.45rem 0 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .edu-hero,
+  .edu-split-grid,
+  .edu-move-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .edu-hero {
+    min-height: auto;
+    gap: 1.5rem;
+  }
+
+  .edu-hero-visual {
+    min-height: 360px;
+  }
+
+  .edu-balance-line {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .edu-balance-line::before {
+    top: 34px;
+    bottom: 34px;
+    left: 34px;
+    right: auto;
+    width: 1px;
+    height: auto;
+  }
+
+  .edu-balance-point {
+    grid-template-columns: 68px minmax(0, 1fr);
+    justify-items: start;
+    text-align: left;
+  }
+
+  .edu-balance-point small {
+    grid-column: 2;
+  }
+
+  .edu-trap-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .edu-cta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .edu-main {
+    padding-top: 92px;
+  }
+
+  .edu-section {
+    margin-bottom: 3.5rem;
+  }
+
+  .edu-hero-copy h1 {
+    font-size: clamp(2.8rem, 16vw, 4.8rem);
+  }
+
+  .edu-trap-grid,
+  .edu-myth-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .edu-myth-card div:last-child {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .edu-split-legend,
+  .edu-card-topline {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+}
+
 
 @keyframes fadeOut {
   from {
