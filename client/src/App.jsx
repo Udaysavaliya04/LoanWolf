@@ -81,11 +81,11 @@ const MONTH_OPTIONS = [
 ];
 
 const SCHEDULE_TABLE_COLUMNS = [
-  '#',
+  'No.',
   'From Date',
   'To Date',
   'Opening Prin. Bal.',
-  'Prep/Adj/Disb',
+  'Prepay/Adj',
   'ROI (%)',
   'EMI Recble',
   'Int. Comp.',
@@ -955,7 +955,7 @@ async function fetchLoans() {
         startY: cursorY + 8,
         margin: { left: marginX, right: marginX, top: contentTop, bottom: 34 },
         head: [[
-          '#',
+          'No.',
           'From Date',
           'To Date',
           `Opening (${currencyCode})`,
@@ -2152,20 +2152,33 @@ async function fetchLoans() {
               <table className="table" ref={scheduleTableRef}>
                 {renderScheduleTableHeader()}
                 <tbody>
-                  {scheduleData.schedule.map((row) => (
-                    <tr key={row.period}>
-                      <td>{row.period}</td>
-                      <td>{formatDate(row.fromDate)}</td>
-                      <td>{formatDate(row.toDate)}</td>
-                      <td>{formatMoney(row.openingBalance)}</td>
-                      <td>{formatMoney(row.extraPayment)}</td>
-                      <td>{row.rateAnnualPct.toFixed(2)}%</td>
-                      <td>{formatMoney(row.emiFixed)}</td>
-                      <td>{formatMoney(row.interest)}</td>
-                      <td>{formatMoney(row.principalComponent)}</td>
-                      <td>{formatMoney(row.closingBalance)}</td>
-                    </tr>
-                  ))}
+                  {(() => {
+                    const tippingPointRow = scheduleData.schedule.find(
+                      (row) => row.principalComponent > row.interest
+                    );
+                    const tippingPeriod = tippingPointRow ? tippingPointRow.period : null;
+
+                    return scheduleData.schedule.map((row) => {
+                      const isTippingPoint = row.period === tippingPeriod;
+                      return (
+                        <tr
+                          key={row.period}
+                          className={isTippingPoint ? 'tipping-point-highlight' : ''}
+                        >
+                          <td>{row.period}</td>
+                          <td>{formatDate(row.fromDate)}</td>
+                          <td>{formatDate(row.toDate)}</td>
+                          <td>{formatMoney(row.openingBalance)}</td>
+                          <td>{formatMoney(row.extraPayment)}</td>
+                          <td>{row.rateAnnualPct.toFixed(2)}%</td>
+                          <td>{formatMoney(row.emiFixed)}</td>
+                          <td>{formatMoney(row.interest)}</td>
+                          <td>{formatMoney(row.principalComponent)}</td>
+                          <td>{formatMoney(row.closingBalance)}</td>
+                        </tr>
+                      );
+                    });
+                  })()}
                 </tbody>
               </table>
             </div>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
+const ProfileSettings = ({ user, onUpdateProfile, onBack }) => {
   const [formData, setFormData] = useState({
     name: user.name || '',
     currency: user.currency || 'INR',
@@ -181,42 +181,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
     }).format(val);
   };
 
-  const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
 
-  const monthsUntilDebtFree = (() => {
-    if (!dashboardData?.debtFreeDate) return null;
-    const now = new Date();
-    const end = new Date(dashboardData.debtFreeDate);
-    if (Number.isNaN(end.getTime())) return null;
-    const months =
-      (end.getFullYear() - now.getFullYear()) * 12 + (end.getMonth() - now.getMonth());
-    return Math.max(0, months);
-  })();
-
-  const debtHealth = (() => {
-    if (!dashboardData) return null;
-    const totalDebt = Number(dashboardData.totalDebt || 0);
-    const blendedRate = Number(dashboardData.blendedInterestRate || 0);
-    const horizonMonths = monthsUntilDebtFree ?? 120;
-
-    const debtLoadScore = clamp(100 - Math.log10(totalDebt + 1) * 18);
-    const rateScore = clamp(100 - blendedRate * 7.5);
-    const horizonScore = clamp(100 - horizonMonths * 0.8);
-    const overall = clamp(debtLoadScore * 0.35 + rateScore * 0.35 + horizonScore * 0.3);
-
-    const grade =
-      overall >= 85 ? 'Excellent' : overall >= 70 ? 'Strong' : overall >= 55 ? 'Stable' : 'Needs Focus';
-
-    return {
-      overall: Math.round(overall),
-      grade,
-      metrics: [
-        { key: 'debtLoad', label: 'Debt Load', score: Math.round(debtLoadScore) },
-        { key: 'rate', label: 'Rate Quality', score: Math.round(rateScore) },
-        { key: 'horizon', label: 'Payoff Horizon', score: Math.round(horizonScore) },
-      ],
-    };
-  })();
 
   return (
     <div className="panel profile-panel animate-blur-in" style={{borderRadius:'16px'}}>
@@ -248,36 +213,7 @@ const ProfileSettings = ({ user, onUpdateProfile, onBack, dashboardData }) => {
         </div>
       )}
 
-      {debtHealth && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Debt Health Snapshot</h3>
-          <div className="debt-health-overview-card" style={{background: 'transparent', boxShadow:'8px 8px 20px rgba(54, 54, 54, 0.2) inset, 0 0 0 1px rgba(0, 0, 0, 0.5)'}}>
-            <div className="debt-health-overview-left">
-              <div className="debt-health-ring">
-                <div className="debt-health-ring-value">
-                  {debtHealth.overall}
-                  <span>/100</span>
-                </div>
-              </div>
-              <div className="debt-health-grade" style={{ marginBottom: 0 }}>{debtHealth.grade}</div>
-            </div>
 
-            <div className="debt-health-overview-right">
-              {debtHealth.metrics.map((metric) => (
-                <div key={metric.key} className="debt-health-metric-card">
-                  <div className="debt-health-metric-row">
-                    <span>{metric.label}</span>
-                    <strong>{metric.score}</strong>
-                  </div>
-                  <div className="debt-health-meter">
-                    <span style={{ width: `${metric.score}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="milestone-section" style={{ marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
