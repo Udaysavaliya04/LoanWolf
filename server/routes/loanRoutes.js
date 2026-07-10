@@ -1,6 +1,7 @@
 const express = require('express');
 const Loan = require('../models/Loan');
 const LoanEvent = require('../models/LoanEvent');
+const Scenario = require('../models/Scenario');
 const { buildSchedule } = require('../services/amortizationService');
 const requireAuth = require('../middleware/requireAuth');
 
@@ -281,6 +282,128 @@ router.post('/:id/simulate', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: 'Failed to run scenarios', error: err.message });
+  }
+});
+
+// --- WHAT-IF SCENARIOS PERSISTENCE ---
+
+// Get all scenarios for a loan, with dynamic calculations
+router.get('/:id/scenarios', async (req, res) => {
+  try {
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    // Fetch baseline schedules
+    const vanilla = await buildSchedule(loan._id, { ignoreDbEvents: true });
+    const current = await buildSchedule(loan._id);
+
+    // Fetch saved scenarios
+    const dbScenarios = await Scenario.find({ loanId: loan._id, ownerId: req.user.id }).sort({ createdAt: 1 }).lean();
+
+    // Dynamically calculate results for each scenario
+    const results = await Promise.all(
+      dbScenarios.map(async (sc) => {
+        const extraEvents = [];
+        if (sc.lumpSumAmount && sc.lumpSumDate) {
+          extraEvents.push({
+            loanId: loan._id,
+            type: 'EXTRA_PAYMENT',
+            date: sc.lumpSumDate,
+            amount: sc.lumpSumAmount,
+          });
+        }
+        
+        // This calculates baseline events + hypothetical prepayment
+        const data = await buildSchedule(loan._id, { extraEvents });
+        return {
+          _id: sc._id,
+          name: sc.name,
+          lumpSumAmount: sc.lumpSumAmount,
+          lumpSumDate: sc.lumpSumDate,
+          summary: data.summary,
+          comparison: data.comparison,
+        };
+      })
+    );
+
+    res.json({
+      vanilla: {
+        summary: vanilla.summary,
+      },
+      current: {
+        summary: current.summary,
+        comparison: current.comparison,
+      },
+      scenarios: results,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to retrieve scenarios', error: err.message });
+  }
+});
+
+// Create a scenario
+router.post('/:id/scenarios', async (req, res) => {
+  try {
+    const { name, lumpSumAmount, lumpSumDate } = req.body;
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    if (!lumpSumAmount || !lumpSumDate) {
+      return res.status(400).json({ message: 'Provide lumpSumAmount and lumpSumDate' });
+    }
+
+    const scenario = new Scenario({
+      loanId: loan._id,
+      ownerId: req.user.id,
+      name: name || 'Prepayment Scenario',
+      lumpSumAmount: Number(lumpSumAmount),
+      lumpSumDate: new Date(lumpSumDate),
+    });
+
+    await scenario.save();
+    res.json(scenario);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Failed to create scenario', error: err.message });
+  }
+});
+
+// Update a scenario
+router.put('/:id/scenarios/:scenarioId', async (req, res) => {
+  try {
+    const { name, lumpSumAmount, lumpSumDate } = req.body;
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    const scenario = await Scenario.findOne({ _id: req.params.scenarioId, loanId: loan._id, ownerId: req.user.id });
+    if (!scenario) return res.status(404).json({ message: 'Scenario not found' });
+
+    if (name !== undefined) scenario.name = name;
+    if (lumpSumAmount !== undefined) scenario.lumpSumAmount = Number(lumpSumAmount);
+    if (lumpSumDate !== undefined) scenario.lumpSumDate = new Date(lumpSumDate);
+
+    await scenario.save();
+    res.json(scenario);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: 'Failed to update scenario', error: err.message });
+  }
+});
+
+// Delete a scenario
+router.delete('/:id/scenarios/:scenarioId', async (req, res) => {
+  try {
+    const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+
+    const scenario = await Scenario.findOneAndDelete({ _id: req.params.scenarioId, loanId: loan._id, ownerId: req.user.id });
+    if (!scenario) return res.status(404).json({ message: 'Scenario not found' });
+
+    res.json({ message: 'Scenario deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete scenario', error: err.message });
   }
 });
 

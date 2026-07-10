@@ -3841,3 +3841,101 @@ html {
 .delay-2000 {
   animation-delay: 2.2s;
 }
+
+/* Premium Monochrome Scenarios Table Layout */
+.scenarios-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 1rem;
+}
+
+.scenarios-form-panel {
+  padding: 0 0 1.25rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0;
+}
+
+.scenarios-results-panel {
+  padding: 0;
+  margin-top: 1.25rem;
+}
+
+.scenarios-premium-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scenarios-premium-table th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.scenarios-premium-table td {
+  padding: 0.95rem 1rem;
+  font-size: 0.82rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+.scenarios-premium-table tr.row-vanilla {
+  color: var(--text-muted);
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+.scenarios-premium-table tr.row-vanilla td {
+  color: var(--text-muted);
+}
+
+.scenarios-premium-table tr.row-current {
+  background-color: rgba(255, 255, 255, 0.03);
+  font-weight: 500;
+}
+
+.scenarios-premium-table tr.row-custom {
+  transition: background-color 0.2s;
+}
+
+.scenarios-premium-table tr.row-custom:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.scenarios-premium-table tr:last-child td {
+  border-bottom: none;
+}
+
+.table-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  display: inline-block;
+}
+
+.table-badge.badge-vanilla {
+  background: rgba(255, 255, 255, 0.05);
+  color: #777777;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.table-badge.badge-current {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.table-badge.badge-custom {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cccccc;
+  border-color: rgba(255, 255, 255, 0.15);
+}

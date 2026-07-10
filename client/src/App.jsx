@@ -51,11 +51,6 @@ const formatDate = (value) => {
   return `${dd}-${mm}-${yyyy}`;
 };
 
-const INITIAL_SCENARIOS = [
-  { id: 'A', name: 'Scenario A', lumpSumAmount: '', lumpSumDate: '' },
-  { id: 'B', name: 'Scenario B', lumpSumAmount: '', lumpSumDate: '' },
-  { id: 'C', name: 'Scenario C', lumpSumAmount: '', lumpSumDate: '' },
-];
 
 const LOAN_TYPE_OPTIONS = [
   { value: 'HOME', label: 'Home Loan' },
@@ -147,9 +142,11 @@ function App() {
   const [eventTypeMenuOpen, setEventTypeMenuOpen] = useState(false);
   const [principalHover, setPrincipalHover] = useState(null);
   const [yearlyHover, setYearlyHover] = useState(null);
-  const [scenarios, setScenarios] = useState(INITIAL_SCENARIOS);
-  const [scenarioResults, setScenarioResults] = useState([]);
-  const [runningScenarios, setRunningScenarios] = useState(false);
+  const [scenarios, setScenarios] = useState([]);
+  const [scenariosBaseline, setScenariosBaseline] = useState({ vanilla: null, current: null });
+  const [scenarioForm, setScenarioForm] = useState({ name: '', lumpSumAmount: '', lumpSumDate: '' });
+  const [editingScenarioId, setEditingScenarioId] = useState(null);
+  const [loadingScenarios, setLoadingScenarios] = useState(false);
   const [advisorMode, setAdvisorMode] = useState('chat'); 
   const [advisorExtra, setAdvisorExtra] = useState('');
   const [advisorTargetDate, setAdvisorTargetDate] = useState('');
@@ -316,8 +313,11 @@ async function fetchLoans() {
     if (selectedLoanId) {
       fetchLoanDetails(selectedLoanId);
       loadSchedule(selectedLoanId);
+      fetchScenarios(selectedLoanId);
     } else {
       setScheduleData(null);
+      setScenarios([]);
+      setScenariosBaseline({ vanilla: null, current: null });
     }
   }, [selectedLoanId]);
 
@@ -701,6 +701,7 @@ async function fetchLoans() {
       setEventForm(EMPTY_EVENT_FORM);
       await fetchLoanDetails(selectedLoanId);
       await loadSchedule(selectedLoanId);
+      await fetchScenarios(selectedLoanId);
     } catch (e) {
       console.error(e);
       setError(e.message);
@@ -1213,51 +1214,72 @@ async function fetchLoans() {
     );
   };
 
-  const updateScenarioField = (id, field, value) => {
-    setScenarios((prev) =>
-      prev.map((sc) => (sc.id === id ? { ...sc, [field]: value } : sc))
-    );
+  const fetchScenarios = async (loanId = selectedLoanId) => {
+    if (!loanId) return;
+    setLoadingScenarios(true);
+    try {
+      const res = await fetch(withBase(`/api/loans/${loanId}/scenarios`), { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to load scenarios');
+      const data = await res.json();
+      setScenarios(data.scenarios || []);
+      setScenariosBaseline({ vanilla: data.vanilla, current: data.current });
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoadingScenarios(false);
+    }
   };
 
-  const runScenarios = async () => {
+  const submitSaveScenario = async (e) => {
+    e.preventDefault();
     if (!selectedLoanId) {
-      setError('Select a loan first to run scenarios');
+      setError('Select a loan first');
       return;
     }
-    const payloadScenarios = scenarios
-      .map((sc) => ({
-        id: sc.id,
-        name: sc.name || `Scenario ${sc.id}`,
-        extraLumpSumAmount: sc.lumpSumAmount ? Number(sc.lumpSumAmount) : undefined,
-        extraLumpSumDate: sc.lumpSumDate || undefined,
-      }))
-      .filter((s) => s.extraLumpSumAmount && s.extraLumpSumDate);
-
-    if (payloadScenarios.length === 0) {
-      setError('Add at least one scenario with a lump sum prepayment.');
+    if (!scenarioForm.lumpSumAmount || !scenarioForm.lumpSumDate) {
+      setError('Provide lump sum amount and date');
       return;
     }
-
     setError('');
-    setRunningScenarios(true);
     try {
-      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/simulate`), {
-        method: 'POST',
+      const isEdit = !!editingScenarioId;
+      const url = isEdit
+        ? `/api/loans/${selectedLoanId}/scenarios/${editingScenarioId}`
+        : `/api/loans/${selectedLoanId}/scenarios`;
+      
+      const res = await fetch(withBase(url), {
+        method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenarios: payloadScenarios }),
+        body: JSON.stringify(scenarioForm),
         credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Failed to run scenarios');
+        throw new Error(err.message || 'Failed to save scenario');
       }
-      const data = await res.json();
-      setScenarioResults(data.scenarios || []);
-    } catch (e) {
-      console.error(e);
-      setError(e.message);
-    } finally {
-      setRunningScenarios(false);
+
+      setScenarioForm({ name: '', lumpSumAmount: '', lumpSumDate: '' });
+      setEditingScenarioId(null);
+      await fetchScenarios(selectedLoanId);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
+  };
+
+  const handleDeleteScenario = async (scenarioId) => {
+    if (!window.confirm('Are you sure you want to delete this scenario?')) return;
+    try {
+      const res = await fetch(withBase(`/api/loans/${selectedLoanId}/scenarios/${scenarioId}`), {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete scenario');
+      await fetchScenarios(selectedLoanId);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
     }
   };
 
@@ -1301,6 +1323,7 @@ async function fetchLoans() {
       
       await fetchLoanDetails(selectedLoanId); // Refresh data
       await loadSchedule(selectedLoanId);
+      await fetchScenarios(selectedLoanId);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -1331,6 +1354,7 @@ async function fetchLoans() {
       setEditingEvent(null);
       await fetchLoanDetails(selectedLoanId);
       await loadSchedule(selectedLoanId);
+      await fetchScenarios(selectedLoanId);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -2221,105 +2245,192 @@ async function fetchLoans() {
       </section>
 
       <section className="panel panel-full scenarios-panel" id="scenarios">
-        <div className="scenarios-header">
+        <div className="scenarios-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <div className="scenarios-title">What-if scenarios</div>
             <div className="scenarios-subtitle">
               Model prepayment strategies and custom lump-sum contributions to evaluate potential interest savings.
             </div>
           </div>
-          <div className="scenario-actions">
-            <button
-              type="button"
-              className="secondary-btn"
-              onClick={runScenarios}
-              disabled={!selectedLoanId || runningScenarios}
-            >
-              {runningScenarios ? 'Simulating…' : 'Run scenarios'}
-            </button>
-          </div>
+          {selectedLoanId && (
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {editingScenarioId && (
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  onClick={() => {
+                    setEditingScenarioId(null);
+                    setScenarioForm({ name: '', lumpSumAmount: '', lumpSumDate: '' });
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+              <button type="submit" form="scenario-form" className="primary-btn">
+                {editingScenarioId ? 'Update Scenario' : 'Save Scenario'}
+              </button>
+            </div>
+          )}
         </div>
 
         {!selectedLoanId ? (
           <p className="muted">Select a loan above to configure scenarios.</p>
         ) : (
-          <>
-            <div className="scenarios-grid">
-              {scenarios.map((sc) => (
-                <div key={sc.id} className="scenario-card">
-                  <h4>{sc.name}</h4>
-                  <div className="form-row" style={{marginBottom: '0.9rem'}}>
-                    <label>Scenario name</label>
-                    <input
-                      value={sc.name}
-                      onChange={(e) => updateScenarioField(sc.id, 'name', e.target.value)}
-                      placeholder={`Scenario ${sc.id}`}
-                    />
-                  </div>
-                  <div className="form-row" style={{ marginBottom: '0.9rem' }}>
-                    <label>Hypothetical lump sum (₹)</label>
-                    <input
-                      type="number"
-                      value={sc.lumpSumAmount}
-                      onChange={(e) => updateScenarioField(sc.id, 'lumpSumAmount', e.target.value)}
-                      min="0"
-                      step="0.01"
-                      placeholder="e.g. 2,00,000"
-                    />
-                  </div>
-                  <div className="form-row">
-                    <label>Lump sum date</label>
-                    <input
-                      type="date"
-                      value={sc.lumpSumDate}
-                      onChange={(e) => updateScenarioField(sc.id, 'lumpSumDate', e.target.value)}
-                    />
-                  </div>
+          <div className="scenarios-table-container">
+            <div className="scenarios-form-panel">
+              <form id="scenario-form" onSubmit={submitSaveScenario} className="form" style={{ display: 'flex', flexDirection: 'row', gap: '1.5rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 250px' }} className="form-row">
+                  <label>Scenario Name</label>
+                  <input
+                    type="text"
+                    value={scenarioForm.name}
+                    onChange={(e) => setScenarioForm((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. Diwali Bonus, Annual Increment"
+                    required
+                  />
                 </div>
-              ))}
+                <div style={{ flex: '1 1 250px' }} className="form-row">
+                  <label>Hypothetical Prepayment (₹)</label>
+                  <input
+                    type="number"
+                    value={scenarioForm.lumpSumAmount}
+                    onChange={(e) => setScenarioForm((prev) => ({ ...prev, lumpSumAmount: e.target.value }))}
+                    placeholder="e.g. 1,50,000"
+                    min="1"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div style={{ flex: '1 1 250px' }} className="form-row">
+                  <label>Target Prepayment Date</label>
+                  <input
+                    type="date"
+                    value={scenarioForm.lumpSumDate}
+                    onChange={(e) => setScenarioForm((prev) => ({ ...prev, lumpSumDate: e.target.value }))}
+                    required
+                  />
+                </div>
+              </form>
             </div>
 
-            {scenarioResults && scenarioResults.length > 0 && (
+            <div className="scenarios-results-panel">
               <div className="table-wrapper">
-                <table className="scenarios-table">
+                <table className="scenarios-premium-table">
                   <thead>
                     <tr>
-                      <th>Scenario</th>
-                      <th>Lump sum</th>
-                      <th>Total interest</th>
-                      <th>Interest saved</th>
-                      <th>Payoff date</th>
-                      <th>EMIs saved</th>
+                      <th>Scenario Name</th>
+                      <th>Prepayment Details</th>
+                      <th>Total Interest</th>
+                      <th>Interest Saved</th>
+                      <th>Projected Payoff</th>
+                      <th>Tenure Saved</th>
+                      <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {scenarioResults.map((sc) => (
-                      <tr key={sc.id}>
-                        <td>{sc.name}</td>
+                    {/* 1. Vanilla Baseline Row */}
+                    {scenariosBaseline.vanilla && (
+                      <tr className="row-vanilla">
                         <td>
-                          {(() => {
-                            const base = scenarios.find((s) => s.id === sc.id);
-                            if (!base || !base.lumpSumAmount || !base.lumpSumDate) return '-';
-                            return `${formatMoney(base.lumpSumAmount)} on ${formatDate(
-                              base.lumpSumDate
-                            )}`;
-                          })()}
+                          <strong>Original Terms (Baseline)</strong>
                         </td>
-                        <td>{formatMoney(sc.summary.totalInterest)}</td>
-                        <td>{formatMoney(Math.max(0, sc.comparison.interestSaved))}</td>
+                        <td>-</td>
+                        <td>{formatMoney(scenariosBaseline.vanilla.summary.totalInterest)}</td>
+                        <td>₹0</td>
                         <td>
-                          {sc.summary.payoffDate
-                            ? formatDate(sc.summary.payoffDate)
+                          {scenariosBaseline.vanilla.summary.payoffDate
+                            ? formatDate(scenariosBaseline.vanilla.summary.payoffDate)
                             : 'Not fully repaid'}
                         </td>
-                        <td>{Math.max(0, sc.comparison.monthsSaved).toLocaleString()}</td>
+                        <td>-</td>
+                        <td style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem' }}>Locked</td>
                       </tr>
-                    ))}
+                    )}
+
+                    {/* 2. Current Plan Row */}
+                    {scenariosBaseline.current && (
+                      <tr className="row-current">
+                        <td>
+                          <strong>Current Schedule (Active)</strong>
+                        </td>
+                        <td>-</td>
+                        <td>{formatMoney(scenariosBaseline.current.summary.totalInterest)}</td>
+                        <td>{formatMoney(Math.max(0, scenariosBaseline.current.comparison.interestSaved))}</td>
+                        <td>
+                          {scenariosBaseline.current.summary.payoffDate
+                            ? formatDate(scenariosBaseline.current.summary.payoffDate)
+                            : 'Not fully repaid'}
+                        </td>
+                        <td>
+                          {Math.max(0, scenariosBaseline.current.comparison.monthsSaved) > 0
+                            ? `${Math.max(0, scenariosBaseline.current.comparison.monthsSaved)} months`
+                            : '-'}
+                        </td>
+                        <td style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem' }}>Locked</td>
+                      </tr>
+                    )}
+
+                    {/* 3. Saved Custom Scenarios list */}
+                    {scenarios.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
+                          No custom scenarios saved yet. Use the form above to add one!
+                        </td>
+                      </tr>
+                    ) : (
+                      scenarios.map((sc) => (
+                        <tr key={sc._id} className="row-custom">
+                          <td>
+                            <strong>{sc.name}</strong>
+                          </td>
+                          <td>
+                            {formatMoney(sc.lumpSumAmount)} on {formatDate(sc.lumpSumDate)}
+                          </td>
+                          <td>{formatMoney(sc.summary.totalInterest)}</td>
+                          <td>
+                            <strong>{formatMoney(Math.max(0, sc.comparison.interestSaved))}</strong>
+                          </td>
+                          <td>
+                            {sc.summary.payoffDate ? formatDate(sc.summary.payoffDate) : 'Not fully repaid'}
+                          </td>
+                          <td>
+                            {Math.max(0, sc.comparison.monthsSaved) > 0
+                              ? `${Math.max(0, sc.comparison.monthsSaved)} months`
+                              : '-'}
+                          </td>
+                          <td className="events-actions-cell" style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              className="action-btn edit"
+                              onClick={() => {
+                                setEditingScenarioId(sc._id);
+                                setScenarioForm({
+                                  name: sc.name,
+                                  lumpSumAmount: sc.lumpSumAmount,
+                                  lumpSumDate: sc.lumpSumDate ? sc.lumpSumDate.split('T')[0] : '',
+                                });
+                              }}
+                              title="Edit Scenario"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>
+                            </button>
+                            <button
+                              type="button"
+                              className="action-btn delete"
+                              onClick={() => handleDeleteScenario(sc._id)}
+                              title="Delete Scenario"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path fill="none" d="M10 11v6m4-6v6m5-11v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
-            )}
-          </>
+            </div>
+          </div>
         )}
       </section>
 

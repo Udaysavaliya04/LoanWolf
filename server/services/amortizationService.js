@@ -104,7 +104,9 @@ async function buildSchedule(loanId, options = {}) {
     throw new Error('Loan not found');
   }
 
-  const dbEvents = await LoanEvent.find({ loanId }).sort({ date: 1 }).lean();
+  const dbEvents = options.ignoreDbEvents
+    ? []
+    : await LoanEvent.find({ loanId }).sort({ date: 1 }).lean();
   const extraEvents = Array.isArray(options.extraEvents) ? options.extraEvents : [];
   const events = [...dbEvents, ...extraEvents].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
