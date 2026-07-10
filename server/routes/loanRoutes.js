@@ -286,17 +286,18 @@ router.post('/:id/simulate', async (req, res) => {
 
 router.post('/:id/advice', async (req, res) => {
   try {
-    const { targetPayoffDate, extraPerMonth } = req.body || {};
+    const { targetPayoffDate, extraPerMonth, extraPerYear, paymentMonth, paymentDay } = req.body || {};
     const loanId = req.params.id;
 
-    if (!targetPayoffDate && !extraPerMonth) {
+    if (!targetPayoffDate && !extraPerMonth && !extraPerYear) {
       return res.status(400).json({
-        message: 'Provide either targetPayoffDate or extraPerMonth',
+        message: 'Provide either targetPayoffDate, extraPerYear or extraPerMonth',
       });
     }
 
     const base = await buildSchedule(loanId);
 
+    // Support legacy extraPerMonth if it's still sent
     if (extraPerMonth) {
       const extra = Number(extraPerMonth);
       if (!Number.isFinite(extra) || extra <= 0) {
@@ -336,6 +337,59 @@ router.post('/:id/advice', async (req, res) => {
       });
     }
 
+    // New extraPerYear logic
+    if (extraPerYear) {
+      const extra = Number(extraPerYear);
+      if (!Number.isFinite(extra) || extra <= 0) {
+        return res.status(400).json({ message: 'extraPerYear must be positive number' });
+      }
+
+      const m = paymentMonth ? Number(paymentMonth) : (base.loan.startDate ? new Date(base.loan.startDate).getMonth() + 1 : 1);
+      const d = paymentDay ? Number(paymentDay) : (base.loan.startDate ? new Date(base.loan.startDate).getDate() : 1);
+
+      const withExtra = await buildSchedule(loanId, {
+        extraPerYear: extra,
+        paymentMonth: m,
+        paymentDay: d,
+      });
+
+      const tips = [];
+      const savedInterest = withExtra.comparison.interestSaved;
+      const monthsSaved = withExtra.comparison.monthsSaved;
+      const dateStr = `${d.toString().padStart(2, '0')}/${m.toString().padStart(2, '0')}`;
+
+      tips.push(
+        `If you add ₹${Math.round(extra).toLocaleString('en-IN')} every year on ${dateStr} as extra principal, ` +
+          `you can save about ₹${Math.round(savedInterest).toLocaleString(
+            'en-IN'
+          )} in interest and close roughly ${monthsSaved} EMIs earlier (vs staying on the current track).`
+      );
+
+      if (monthsSaved > 0 && base.summary.payoffDate && withExtra.summary.payoffDate) {
+        tips.push(
+          `Your payoff date would move from ${new Date(
+            base.summary.payoffDate
+          ).toLocaleDateString()} to about ${new Date(
+            withExtra.summary.payoffDate
+          ).toLocaleDateString()}.`
+        );
+      }
+
+      return res.json({
+        mode: 'extraPerYear',
+        input: {
+          extraPerYear: extra,
+          paymentMonth: m,
+          paymentDay: d,
+        },
+        baseSummary: base.summary,
+        baseComparison: base.comparison,
+        withExtraSummary: withExtra.summary,
+        withExtraComparison: withExtra.comparison,
+        tips,
+      });
+    }
+
     const target = new Date(targetPayoffDate);
     if (Number.isNaN(target.getTime())) {
       return res.status(400).json({ message: 'Invalid targetPayoffDate' });
@@ -351,24 +405,31 @@ router.post('/:id/advice', async (req, res) => {
         input: { targetPayoffDate },
         baseSummary: base.summary,
         baseComparison: base.comparison,
-        recommendedExtraPerMonth: 0,
+        recommendedExtraPerYear: 0,
         summaryWithExtra: base.summary,
         comparisonWithExtra: base.comparison,
         tips: [
-          'Your current plan already pays off on or before your target date. You do not need extra EMI to hit this goal.',
+          'Your current plan already pays off on or before your target date. You do not need extra payments to hit this goal.',
         ],
       });
     }
 
-    let low = 500; // ₹500 minimum step
-    let high = base.loan.principal || 1_00_000;
-    high = Math.max(high, 10_000);
+    const m = paymentMonth ? Number(paymentMonth) : (base.loan.startDate ? new Date(base.loan.startDate).getMonth() + 1 : 1);
+    const d = paymentDay ? Number(paymentDay) : (base.loan.startDate ? new Date(base.loan.startDate).getDate() : 1);
+
+    let low = 1000;
+    let high = base.loan.principal ? base.loan.principal * 2 : 10_000_000;
+    high = Math.max(high, 100_000);
 
     let best = null;
 
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 20; i++) {
       const mid = (low + high) / 2;
-      const sim = await buildSchedule(loanId, { extraPerMonth: mid });
+      const sim = await buildSchedule(loanId, {
+        extraPerYear: mid,
+        paymentMonth: m,
+        paymentDay: d,
+      });
       const simPayoff = sim.summary.payoffDate ? new Date(sim.summary.payoffDate) : null;
 
       if (simPayoff && simPayoff <= target && sim.summary.remainingBalance <= 1) {
@@ -385,23 +446,28 @@ router.post('/:id/advice', async (req, res) => {
         input: { targetPayoffDate },
         baseSummary: base.summary,
         baseComparison: base.comparison,
-        recommendedExtraPerMonth: null,
+        recommendedExtraPerYear: null,
         summaryWithExtra: null,
         comparisonWithExtra: null,
         tips: [
-          'Even with very aggressive extra EMIs, this target date is hard to reach. Consider moving the target out or planning one-time lump sum pre-payments instead.',
+          'Even with very aggressive yearly extra payments, this target date is hard to reach. Consider moving the target out or planning one-time lump sum pre-payments instead.',
         ],
       });
     }
 
-    const roundedExtra = Math.round(best.extra / 100) * 100;
-    const withExtra = await buildSchedule(loanId, { extraPerMonth: roundedExtra });
+    const roundedExtra = Math.round(best.extra / 1000) * 1000;
+    const withExtra = await buildSchedule(loanId, {
+      extraPerYear: roundedExtra,
+      paymentMonth: m,
+      paymentDay: d,
+    });
 
+    const dateStr = `${d.toString().padStart(2, '0')}/${m.toString().padStart(2, '0')}`;
     const tips = [];
     tips.push(
-      `To finish around your target date, plan an extra EMI of about ₹${roundedExtra.toLocaleString(
+      `To finish around your target date, plan an extra payment of about ₹${roundedExtra.toLocaleString(
         'en-IN'
-      )} every month as pure principal.`
+      )} every year on ${dateStr} as pure principal.`
     );
     tips.push(
       `This would save roughly ₹${Math.round(
@@ -416,7 +482,7 @@ router.post('/:id/advice', async (req, res) => {
       input: { targetPayoffDate },
       baseSummary: base.summary,
       baseComparison: base.comparison,
-      recommendedExtraPerMonth: roundedExtra,
+      recommendedExtraPerYear: roundedExtra,
       summaryWithExtra: withExtra.summary,
       comparisonWithExtra: withExtra.comparison,
       tips,

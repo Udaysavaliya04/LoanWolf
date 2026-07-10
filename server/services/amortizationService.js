@@ -130,6 +130,10 @@ async function buildSchedule(loanId, options = {}) {
     ? new Decimal(options.extraPerMonth)
     : new Decimal(0);
 
+  const extraPerYear = options.extraPerYear ? new Decimal(options.extraPerYear) : null;
+  const payMonth = options.paymentMonth || (loan.startDate ? new Date(loan.startDate).getMonth() + 1 : 1);
+  const payDay = options.paymentDay || (loan.startDate ? new Date(loan.startDate).getDate() : 1);
+
   for (let i = 1; i <= maxMonths && balance.gt(0.01); i++) {
     const periodStartBalance = balance;
     const fromDate = addMonths(startDate, i - 1);
@@ -158,6 +162,18 @@ async function buildSchedule(loanId, options = {}) {
     }
 
     let extraPayment = recurringExtra;
+
+    if (extraPerYear) {
+      const targetDate1 = new Date(fromDate.getFullYear(), payMonth - 1, payDay);
+      const targetDate2 = new Date(toDate.getFullYear(), payMonth - 1, payDay);
+      if (
+        (targetDate1 >= fromDate && targetDate1 < toDate) ||
+        (targetDate2 >= fromDate && targetDate2 < toDate)
+      ) {
+        extraPayment = extraPayment.plus(extraPerYear);
+      }
+    }
+
     for (const ev of eventsThisPeriod.filter((e) => e.type === 'EXTRA_PAYMENT')) {
       if (typeof ev.amount === 'number') {
         extraPayment = extraPayment.plus(ev.amount);

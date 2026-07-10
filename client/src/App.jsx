@@ -65,6 +65,21 @@ const LOAN_TYPE_OPTIONS = [
   { value: 'OTHER', label: 'Other Loan' },
 ];
 
+const MONTH_OPTIONS = [
+  { value: 1, label: 'January' },
+  { value: 2, label: 'February' },
+  { value: 3, label: 'March' },
+  { value: 4, label: 'April' },
+  { value: 5, label: 'May' },
+  { value: 6, label: 'June' },
+  { value: 7, label: 'July' },
+  { value: 8, label: 'August' },
+  { value: 9, label: 'September' },
+  { value: 10, label: 'October' },
+  { value: 11, label: 'November' },
+  { value: 12, label: 'December' },
+];
+
 const SCHEDULE_TABLE_COLUMNS = [
   '#',
   'From Date',
@@ -123,8 +138,11 @@ function App() {
   const advisorChatButtonRef = useRef(null);
   const advisorExtraButtonRef = useRef(null);
   const advisorTargetButtonRef = useRef(null);
+  const paymentMonthMenuRefExtra = useRef(null);
+  const paymentMonthMenuRefTarget = useRef(null);
   const [loanMenuOpen, setLoanMenuOpen] = useState(false);
   const [loanTypeMenuOpen, setLoanTypeMenuOpen] = useState(false);
+  const [paymentMonthMenuOpen, setPaymentMonthMenuOpen] = useState(false);
   const [eventTypeMenuOpen, setEventTypeMenuOpen] = useState(false);
   const [principalHover, setPrincipalHover] = useState(null);
   const [yearlyHover, setYearlyHover] = useState(null);
@@ -134,6 +152,8 @@ function App() {
   const [advisorMode, setAdvisorMode] = useState('chat'); 
   const [advisorExtra, setAdvisorExtra] = useState('');
   const [advisorTargetDate, setAdvisorTargetDate] = useState('');
+  const [advisorPaymentMonth, setAdvisorPaymentMonth] = useState(10);
+  const [advisorPaymentDay, setAdvisorPaymentDay] = useState(15);
   const [advisorResult, setAdvisorResult] = useState(null);
   const [runningAdvice, setRunningAdvice] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -298,6 +318,17 @@ async function fetchLoans() {
   }, [selectedLoanId]);
 
   useEffect(() => {
+    if (selectedLoanId && loans.length > 0) {
+      const loan = loans.find((l) => l._id === selectedLoanId);
+      if (loan && loan.startDate) {
+        const d = new Date(loan.startDate);
+        setAdvisorPaymentMonth(d.getMonth() + 1);
+        setAdvisorPaymentDay(d.getDate());
+      }
+    }
+  }, [selectedLoanId, loans]);
+
+  useEffect(() => {
     function handleClickOutside(e) {
       if (loanMenuRef.current && !loanMenuRef.current.contains(e.target)) {
         setLoanMenuOpen(false);
@@ -307,6 +338,12 @@ async function fetchLoans() {
       }
       if (eventTypeMenuRef.current && !eventTypeMenuRef.current.contains(e.target)) {
         setEventTypeMenuOpen(false);
+      }
+      if (paymentMonthMenuRefExtra.current && !paymentMonthMenuRefExtra.current.contains(e.target)) {
+        setPaymentMonthMenuOpen(false);
+      }
+      if (paymentMonthMenuRefTarget.current && !paymentMonthMenuRefTarget.current.contains(e.target)) {
+        setPaymentMonthMenuOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -1279,16 +1316,20 @@ async function fetchLoans() {
     if (advisorMode === 'extra') {
       const val = Number(advisorExtra);
       if (!Number.isFinite(val) || val <= 0) {
-        setError('Enter a positive monthly extra amount.');
+        setError('Enter a positive yearly extra amount.');
         return;
       }
-      body.extraPerMonth = val;
+      body.extraPerYear = val;
+      body.paymentMonth = advisorPaymentMonth;
+      body.paymentDay = advisorPaymentDay;
     } else {
       if (!advisorTargetDate) {
         setError('Pick a target payoff date.');
         return;
       }
       body.targetPayoffDate = advisorTargetDate;
+      body.paymentMonth = advisorPaymentMonth;
+      body.paymentDay = advisorPaymentDay;
     }
 
     setError('');
@@ -2295,7 +2336,7 @@ async function fetchLoans() {
               }
               onClick={() => setAdvisorMode('extra')}
             >
-              Monthly surplus
+              Yearly surplus
             </button>
             <button
               type="button"
@@ -2309,7 +2350,7 @@ async function fetchLoans() {
             </button>
           </div>
         </div>
-
+ 
         {!selectedLoanId ? (
           <p className="muted">Please select a loan above to get personalized advice.</p>
         ) : (
@@ -2355,15 +2396,70 @@ async function fetchLoans() {
               {advisorMode === 'extra' ? (
                 <div className="form">
                   <div className="form-row">
-                    <label>I can spare (₹ per month)</label>
+                    <label>I can spare (₹ per year)</label>
                     <input
                       type="number"
                       value={advisorExtra}
                       onChange={(e) => setAdvisorExtra(e.target.value)}
                       min="0"
                       step="0.01"
-                      placeholder="e.g. 5,000"
+                      placeholder="e.g. 60,000"
                     />
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.7rem' }}>
+                    <div className="form-row" style={{ flex: 1 }}>
+                      <label>Payment month</label>
+                      <div className="dropdown" ref={paymentMonthMenuRefExtra}>
+                        <button
+                          type="button"
+                          className="dropdown-trigger"
+                          onClick={() => setPaymentMonthMenuOpen((open) => !open)}
+                          aria-expanded={paymentMonthMenuOpen}
+                        >
+                          <span>
+                            {MONTH_OPTIONS.find((m) => m.value === advisorPaymentMonth)?.label || 'Select Month'}
+                          </span>
+                          <span className="dropdown-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6 9l6 6 6-6" />
+                            </svg>
+                          </span>
+                        </button>
+                        {paymentMonthMenuOpen && (
+                          <div className="dropdown-menu no-scrollbar-menu">
+                            <div className="dropdown-label">Month</div>
+                            {MONTH_OPTIONS.map((m, idx) => (
+                              <button
+                                key={m.value}
+                                type="button"
+                                className={`dropdown-item${advisorPaymentMonth === m.value ? ' dropdown-item-active' : ''}`}
+                                style={{ '--item-index': idx }}
+                                onClick={() => {
+                                  setAdvisorPaymentMonth(m.value);
+                                  setPaymentMonthMenuOpen(false);
+                                }}
+                              >
+                                <div className="dropdown-item-main">{m.label}</div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="form-row" style={{ flex: 1 }}>
+                      <label>Payment day</label>
+                      <input
+                        type="number"
+                        value={advisorPaymentDay}
+                        onChange={(e) => {
+                          const val = Math.max(1, Math.min(31, Number(e.target.value)));
+                          setAdvisorPaymentDay(val);
+                        }}
+                        min="1"
+                        max="31"
+                        placeholder="e.g. 15"
+                      />
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -2375,6 +2471,61 @@ async function fetchLoans() {
                       value={advisorTargetDate}
                       onChange={(e) => setAdvisorTargetDate(e.target.value)}
                     />
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.7rem' }}>
+                    <div className="form-row" style={{ flex: 1 }}>
+                      <label>Payment month</label>
+                      <div className="dropdown" ref={paymentMonthMenuRefTarget}>
+                        <button
+                          type="button"
+                          className="dropdown-trigger"
+                          onClick={() => setPaymentMonthMenuOpen((open) => !open)}
+                          aria-expanded={paymentMonthMenuOpen}
+                        >
+                          <span>
+                            {MONTH_OPTIONS.find((m) => m.value === advisorPaymentMonth)?.label || 'Select Month'}
+                          </span>
+                          <span className="dropdown-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6 9l6 6 6-6" />
+                            </svg>
+                          </span>
+                        </button>
+                        {paymentMonthMenuOpen && (
+                          <div className="dropdown-menu no-scrollbar-menu">
+                            <div className="dropdown-label">Month</div>
+                            {MONTH_OPTIONS.map((m, idx) => (
+                              <button
+                                key={m.value}
+                                type="button"
+                                className={`dropdown-item${advisorPaymentMonth === m.value ? ' dropdown-item-active' : ''}`}
+                                style={{ '--item-index': idx }}
+                                onClick={() => {
+                                  setAdvisorPaymentMonth(m.value);
+                                  setPaymentMonthMenuOpen(false);
+                                }}
+                              >
+                                <div className="dropdown-item-main">{m.label}</div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="form-row" style={{ flex: 1 }}>
+                      <label>Payment day</label>
+                      <input
+                        type="number"
+                        value={advisorPaymentDay}
+                        onChange={(e) => {
+                          const val = Math.max(1, Math.min(31, Number(e.target.value)));
+                          setAdvisorPaymentDay(val);
+                        }}
+                        min="1"
+                        max="31"
+                        placeholder="e.g. 15"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -2404,12 +2555,26 @@ async function fetchLoans() {
                       as extra principal.
                     </p>
                   )}
+                  {advisorResult.mode === 'extraPerYear' && (
+                    <p style={{ margin: 0, marginBottom: '0.4rem' }}>
+                      Add roughly{' '}
+                      <strong>
+                        {formatMoney(advisorResult.input.extraPerYear || 0)} per year
+                      </strong>{' '}
+                      on{' '}
+                      <strong>
+                        {advisorResult.input.paymentDay.toString().padStart(2, '0')}/
+                        {advisorResult.input.paymentMonth.toString().padStart(2, '0')}
+                      </strong>{' '}
+                      as extra principal.
+                    </p>
+                  )}
                   {advisorResult.mode === 'targetPayoffDate' &&
-                    advisorResult.recommendedExtraPerMonth != null && (
+                    advisorResult.recommendedExtraPerYear != null && (
                       <p style={{ margin: 0, marginBottom: '0.4rem' }}>
                         To approach your target date, add about{' '}
                         <strong>
-                          {formatMoney(advisorResult.recommendedExtraPerMonth || 0)} per month
+                          {formatMoney(advisorResult.recommendedExtraPerYear || 0)} per year
                         </strong>{' '}
                         as extra principal.
                       </p>
