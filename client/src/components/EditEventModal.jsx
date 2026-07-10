@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const EditEventModal = ({ event, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +8,19 @@ const EditEventModal = ({ event, onSave, onCancel }) => {
     newAnnualInterestRate: event?.newAnnualInterestRate || '',
     note: event?.note || '',
   });
+
+  const typeMenuRef = useRef(null);
+  const [typeMenuOpen, setTypeMenuOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (typeMenuRef.current && !typeMenuRef.current.contains(e.target)) {
+        setTypeMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,10 +54,50 @@ const EditEventModal = ({ event, onSave, onCancel }) => {
           </div>
           <div className="form-row">
             <label>Type</label>
-            <select name="type" value={formData.type} onChange={handleChange} className="select-input">
-              <option value="EXTRA_PAYMENT">Extra Payment</option>
-              <option value="RATE_CHANGE">Rate Change</option>
-            </select>
+            <div className="dropdown" ref={typeMenuRef}>
+              <button
+                type="button"
+                className="dropdown-trigger"
+                onClick={() => setTypeMenuOpen((open) => !open)}
+                aria-expanded={typeMenuOpen}
+              >
+                <span>
+                  {formData.type === 'EXTRA_PAYMENT' ? 'Extra Payment' : 'Rate Change'}
+                </span>
+                <span className="dropdown-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </span>
+              </button>
+              {typeMenuOpen && (
+                <div className="dropdown-menu">
+                  <div className="dropdown-label">Event Type</div>
+                  <button
+                    type="button"
+                    className={`dropdown-item${formData.type === 'EXTRA_PAYMENT' ? ' dropdown-item-active' : ''}`}
+                    style={{ '--item-index': 0 }}
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, type: 'EXTRA_PAYMENT' }));
+                      setTypeMenuOpen(false);
+                    }}
+                  >
+                    <div className="dropdown-item-main">Extra Payment</div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`dropdown-item${formData.type === 'RATE_CHANGE' ? ' dropdown-item-active' : ''}`}
+                    style={{ '--item-index': 1 }}
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, type: 'RATE_CHANGE' }));
+                      setTypeMenuOpen(false);
+                    }}
+                  >
+                    <div className="dropdown-item-main">Rate Change</div>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {formData.type === 'EXTRA_PAYMENT' && (
