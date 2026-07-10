@@ -52,9 +52,9 @@ const formatDate = (value) => {
 };
 
 const INITIAL_SCENARIOS = [
-  { id: 'A', name: 'Scenario A', lumpSumAmount: '', lumpSumDate: '', newRatePct: '', newRateDate: '' },
-  { id: 'B', name: 'Scenario B', lumpSumAmount: '', lumpSumDate: '', newRatePct: '', newRateDate: '' },
-  { id: 'C', name: 'Scenario C', lumpSumAmount: '', lumpSumDate: '', newRatePct: '', newRateDate: '' },
+  { id: 'A', name: 'Scenario A', lumpSumAmount: '', lumpSumDate: '' },
+  { id: 'B', name: 'Scenario B', lumpSumAmount: '', lumpSumDate: '' },
+  { id: 'C', name: 'Scenario C', lumpSumAmount: '', lumpSumDate: '' },
 ];
 
 const LOAN_TYPE_OPTIONS = [
@@ -1230,17 +1230,11 @@ async function fetchLoans() {
         name: sc.name || `Scenario ${sc.id}`,
         extraLumpSumAmount: sc.lumpSumAmount ? Number(sc.lumpSumAmount) : undefined,
         extraLumpSumDate: sc.lumpSumDate || undefined,
-        newAnnualInterestRate: sc.newRatePct ? Number(sc.newRatePct) : undefined,
-        newRateFromDate: sc.newRateDate || undefined,
       }))
-      .filter(
-        (s) =>
-          (s.extraLumpSumAmount && s.extraLumpSumDate) ||
-          (s.newAnnualInterestRate && s.newRateFromDate)
-      );
+      .filter((s) => s.extraLumpSumAmount && s.extraLumpSumDate);
 
     if (payloadScenarios.length === 0) {
-      setError('Add at least one scenario with a lump sum or rate change.');
+      setError('Add at least one scenario with a lump sum prepayment.');
       return;
     }
 
@@ -2231,7 +2225,7 @@ async function fetchLoans() {
           <div>
             <div className="scenarios-title">What-if scenarios</div>
             <div className="scenarios-subtitle">
-              Simulate hypothetical lump sums and future rate changes without touching your real loan.
+              Model prepayment strategies and custom lump-sum contributions to evaluate potential interest savings.
             </div>
           </div>
           <div className="scenario-actions">
@@ -2273,31 +2267,12 @@ async function fetchLoans() {
                       placeholder="e.g. 2,00,000"
                     />
                   </div>
-                  <div className="form-row" style={{ marginBottom: '0.9rem' }}>
+                  <div className="form-row">
                     <label>Lump sum date</label>
                     <input
                       type="date"
                       value={sc.lumpSumDate}
                       onChange={(e) => updateScenarioField(sc.id, 'lumpSumDate', e.target.value)}
-                    />
-                  </div>
-                  <div className="form-row" style={{ marginBottom: '0.9rem' }}>
-                    <label>Future rate (%)</label>
-                    <input
-                      type="number"
-                      value={sc.newRatePct}
-                      onChange={(e) => updateScenarioField(sc.id, 'newRatePct', e.target.value)}
-                      min="0"
-                      step="0.01"
-                      placeholder="e.g. 7.10"
-                    />
-                  </div>
-                  <div className="form-row">
-                    <label>Rate from date</label>
-                    <input
-                      type="date"
-                      value={sc.newRateDate}
-                      onChange={(e) => updateScenarioField(sc.id, 'newRateDate', e.target.value)}
                     />
                   </div>
                 </div>
@@ -2311,7 +2286,6 @@ async function fetchLoans() {
                     <tr>
                       <th>Scenario</th>
                       <th>Lump sum</th>
-                      <th>Future rate</th>
                       <th>Total interest</th>
                       <th>Interest saved</th>
                       <th>Payoff date</th>
@@ -2329,13 +2303,6 @@ async function fetchLoans() {
                             return `${formatMoney(base.lumpSumAmount)} on ${formatDate(
                               base.lumpSumDate
                             )}`;
-                          })()}
-                        </td>
-                        <td>
-                          {(() => {
-                            const base = scenarios.find((s) => s.id === sc.id);
-                            if (!base || !base.newRatePct || !base.newRateDate) return '-';
-                            return `${base.newRatePct}% from ${formatDate(base.newRateDate)}`;
                           })()}
                         </td>
                         <td>{formatMoney(sc.summary.totalInterest)}</td>
