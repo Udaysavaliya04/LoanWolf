@@ -254,7 +254,7 @@ function HomePage() {
           </div>
         </section>
 
-       <footer className="luxury-footer scroll-reveal">
+       <footer className="site-footer scroll-reveal">
           <div className="footer-glass glass-panel">
             <div className="footer-left">
               <span className="footer-copy">

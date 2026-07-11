@@ -140,7 +140,7 @@ const SCHEDULE_TABLE_COLUMNS = [
 
 const LoadingSpinner = () => (
   <div className="spinner-wrapper">
-    <div className="luxury-spinner">
+    <div className="loading-spinner">
       <svg className="spinner-svg" viewBox="25 25 50 50">
         <circle className="spinner-track" cx="50" cy="50" r="20" fill="none" />
         <circle className="spinner-head" cx="50" cy="50" r="20" fill="none" />

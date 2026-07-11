@@ -1782,7 +1782,7 @@ html {
   }
 }
 
-.luxury-footer {
+.site-footer {
   display: flex;
   justify-content: center;
   width: 100%;
@@ -1902,7 +1902,7 @@ html {
 }
 
 .bento-section,
-.luxury-footer,
+.site-footer,
 .footer-glass {
   max-width: 100% !important;
   width: 100% !important;
@@ -2151,7 +2151,7 @@ html {
   padding-right: 1rem !important;
 }
 
-.luxury-footer {
+.site-footer {
   margin-top: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 4rem !important;
@@ -2276,7 +2276,7 @@ html {
   justify-content: center;
 }
 
-.luxury-spinner {
+.loading-spinner {
   width: 60px;
   height: 60px;
   position: relative;
