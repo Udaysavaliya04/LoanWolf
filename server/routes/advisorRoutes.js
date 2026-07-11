@@ -15,7 +15,6 @@ function buildModelCandidates() {
     .map((m) => m.trim())
     .filter(Boolean);
 
-  // Keep defaults on stable/free-friendly text models.
   const defaults = [
     'gemini-2.5-flash-lite',
     'gemini-2.5-flash',

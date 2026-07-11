@@ -200,7 +200,7 @@ router.put('/:id/events/:eventId', async (req, res) => {
 
     event.type = type || event.type;
     event.date = date || event.date;
-    // Allow setting to null/undefined if explicitly passed? For now just simple update
+
     if (amount !== undefined) event.amount = amount;
     if (newAnnualInterestRate !== undefined) event.newAnnualInterestRate = newAnnualInterestRate;
     event.note = note !== undefined ? note : event.note;
@@ -287,7 +287,6 @@ router.post('/:id/simulate', async (req, res) => {
 
 // --- WHAT-IF SCENARIOS PERSISTENCE ---
 
-// Get all scenarios for a loan, with dynamic calculations
 router.get('/:id/scenarios', async (req, res) => {
   try {
     const loan = await Loan.findOne({ _id: req.params.id, ownerId: req.user.id });
@@ -313,7 +312,6 @@ router.get('/:id/scenarios', async (req, res) => {
           });
         }
         
-        // This calculates baseline events + hypothetical prepayment
         const data = await buildSchedule(loan._id, { extraEvents });
         return {
           _id: sc._id,
@@ -420,7 +418,6 @@ router.post('/:id/advice', async (req, res) => {
 
     const base = await buildSchedule(loanId);
 
-    // Support legacy extraPerMonth if it's still sent
     if (extraPerMonth) {
       const extra = Number(extraPerMonth);
       if (!Number.isFinite(extra) || extra <= 0) {
@@ -460,7 +457,6 @@ router.post('/:id/advice', async (req, res) => {
       });
     }
 
-    // New extraPerYear logic
     if (extraPerYear) {
       const extra = Number(extraPerYear);
       if (!Number.isFinite(extra) || extra <= 0) {

@@ -53,7 +53,6 @@ function buildBaselineScheduleForLoan(loan) {
       principalComponent = new Decimal(0);
     }
 
-    // Ensure we never pay more principal than remaining balance.
     if (principalComponent.gt(periodStartBalance)) {
       principalComponent = periodStartBalance;
     }

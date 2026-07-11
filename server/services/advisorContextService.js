@@ -148,7 +148,6 @@ async function buildFullAdvisorContext(userId, options = {}) {
       context += `- EMIs saved: ${comparison.monthsSaved} months\n\n`;
     }
 
-    // Full amortization schedule (every row) so AI can analyze by period
     context += '### Full amortization schedule (period-by-period)\n';
     const rowBudget = isActive ? maxRowsForActiveLoan : maxRowsForOtherLoan;
     context += scheduleToTable(schedule, rowBudget) + '\n\n';
@@ -159,7 +158,6 @@ async function buildFullAdvisorContext(userId, options = {}) {
     context += `- ${loans.length - loansForContext.length} additional loan(s) were omitted from detailed context for performance.\n\n`;
   }
 
-  // —— CLIENT-SIDE CONTEXT (what user is looking at right now) ——
   if (clientContextData && clientContextData.currentLoan) {
     context += '---\n## ACTIVE VIEW (user is currently on this loan in the UI)\n';
     context += `- Loan name: ${clientContextData.currentLoan.name}\n`;
