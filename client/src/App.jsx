@@ -13,6 +13,55 @@ import LoanEducation from './components/LoanEducation';
 import SupportPage from './components/SupportPage';
 import EditEventModal from './components/EditEventModal';
 
+// Caching variables for Inter PDF fonts
+let cachedRegularFont = null;
+let cachedBoldFont = null;
+
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
+async function loadInterFonts(pdfInstance) {
+  try {
+    if (!cachedRegularFont || !cachedBoldFont) {
+      const [regRes, boldRes] = await Promise.all([
+        fetch('https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf'),
+        fetch('https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf')
+      ]);
+
+      if (!regRes.ok || !boldRes.ok) {
+        throw new Error('Failed to download fonts');
+      }
+
+      const [regBuf, boldBuf] = await Promise.all([
+        regRes.arrayBuffer(),
+        boldRes.arrayBuffer()
+      ]);
+
+      cachedRegularFont = arrayBufferToBase64(regBuf);
+      cachedBoldFont = arrayBufferToBase64(boldBuf);
+    }
+
+    pdfInstance.addFileToVFS('Inter-Regular.ttf', cachedRegularFont);
+    pdfInstance.addFont('Inter-Regular.ttf', 'Inter', 'normal');
+
+    pdfInstance.addFileToVFS('Inter-Bold.ttf', cachedBoldFont);
+    pdfInstance.addFont('Inter-Bold.ttf', 'Inter', 'bold');
+    
+    return true;
+  } catch (err) {
+    console.warn('Inter font failed to load, falling back to Helvetica:', err);
+    return false;
+  }
+}
+
+
 
 const EMPTY_LOAN_FORM = {
   name: '',
@@ -743,13 +792,16 @@ async function fetchLoans() {
       setError('');
 
       const pdf = new jsPDF('l', 'pt', 'a4');
+      const hasInter = await loadInterFonts(pdf);
+      const fontName = hasInter ? 'Inter' : 'helvetica';
       pdf.setCharSpace(0);
+      
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const marginX = 36;
       const headerTop = 20;
-      const headerBottomY = 56;
-      const contentTop = 78;
+      const headerBottomY = 60;
+      const contentTop = 82;
       const footerY = pageHeight - 20;
       const lineColor = [218, 222, 227];
       const titleColor = [17, 24, 39];
@@ -785,12 +837,12 @@ async function fetchLoans() {
       let cursorY = contentTop;
 
       const drawPageChrome = (pageNo, totalPages) => {
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont(fontName, 'bold');
         pdf.setFontSize(14);
         pdf.setTextColor(...titleColor);
         pdf.text('LoanWolf Amortization Statement', marginX, headerTop + 8);
 
-        pdf.setFont('helvetica', 'normal');
+        pdf.setFont(fontName, 'normal');
         pdf.setFontSize(9);
         pdf.setTextColor(...labelColor);
         pdf.text(`Loan: ${loanName}`, marginX, headerTop + 24);
@@ -817,10 +869,10 @@ async function fetchLoans() {
       };
 
       const drawKpiGrid = (items) => {
-        const gap = 10;
+        const gap = 12;
         const cols = 3;
         const cardWidth = (pageWidth - marginX * 2 - gap * (cols - 1)) / cols;
-        const cardHeight = 54;
+        const cardHeight = 60;
 
         items.forEach((item, index) => {
           const col = index % cols;
@@ -829,25 +881,31 @@ async function fetchLoans() {
           const y = cursorY + row * (cardHeight + gap);
 
           pdf.setFillColor(248, 250, 252);
-          pdf.setDrawColor(...lineColor);
-          pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4, 'FD');
+          pdf.setDrawColor(170, 170, 170);
+          pdf.setLineWidth(1);
+          pdf.roundedRect(x, y, cardWidth, cardHeight, 5, 5, 'FD');
 
-          pdf.setFont('helvetica', 'normal');
+          // Inner white liquid-glass highlight stroke
+          pdf.setDrawColor(255, 255, 255);
+          pdf.setLineWidth(0.8);
+          pdf.roundedRect(x + 1, y + 1, cardWidth - 2, cardHeight - 2, 4, 4, 'S');
+          pdf.setLineWidth(1.0);
+          pdf.setFont(fontName, 'normal');
           pdf.setFontSize(9);
           pdf.setTextColor(...labelColor);
-          pdf.text(item.label, x + 10, y + 16);
+          pdf.text(item.label, x + 12, y + 22);
 
-          pdf.setFont('helvetica', 'bold');
+          pdf.setFont(fontName, 'bold');
           pdf.setFontSize(12);
           pdf.setTextColor(...titleColor);
-          pdf.text(item.value, x + 10, y + 37);
+          pdf.text(item.value, x + 12, y + 45);
         });
 
         cursorY += Math.ceil(items.length / cols) * (cardHeight + gap) + 4;
       };
 
       pdf.setTextColor(...titleColor);
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont(fontName, 'bold');
       pdf.setFontSize(16);
       pdf.text('Loan Summary', marginX, cursorY);
       cursorY += 20;
@@ -867,18 +925,18 @@ async function fetchLoans() {
       const rightX = marginX + (pageWidth - marginX * 2) / 2;
       pdf.setFontSize(10);
       introRows.forEach((row, rowIndex) => {
-        const y = cursorY + rowIndex * 22;
+        const y = cursorY + rowIndex * 24;
         row.forEach((pair, colIndex) => {
           const x = colIndex === 0 ? leftX : rightX;
-          pdf.setFont('helvetica', 'normal');
+          pdf.setFont(fontName, 'normal');
           pdf.setTextColor(...labelColor);
           pdf.text(`${pair[0]}:`, x, y);
-          pdf.setFont('helvetica', 'bold');
+          pdf.setFont(fontName, 'bold');
           pdf.setTextColor(...titleColor);
-          pdf.text(pair[1], x + 86, y);
+          pdf.text(pair[1], x + 96, y);
         });
       });
-      cursorY += introRows.length * 22 + 12;
+      cursorY += introRows.length * 24 + 14;
 
       ensurePageSpace(170);
       drawKpiGrid([
@@ -897,49 +955,55 @@ async function fetchLoans() {
 
       if (scheduleData.baselineSummary && scheduleData.comparison) {
         ensurePageSpace(90);
-        pdf.setFillColor(241, 245, 249);
-        pdf.setDrawColor(...lineColor);
-        pdf.roundedRect(marginX, cursorY, pageWidth - marginX * 2, 70, 4, 4, 'FD');
+        pdf.setFillColor(248, 250, 252);
+        pdf.setDrawColor(170, 170, 170);
+        pdf.setLineWidth(1);
+        pdf.roundedRect(marginX, cursorY, pageWidth - marginX * 2, 74, 5, 5, 'FD');
 
-        pdf.setFont('helvetica', 'bold');
+        // Inner white liquid-glass highlight stroke
+        pdf.setDrawColor(255, 255, 255);
+        pdf.setLineWidth(0.8);
+        pdf.roundedRect(marginX + 1, cursorY + 1, pageWidth - marginX * 2 - 2, 74 - 2, 4, 4, 'S');
+        pdf.setLineWidth(1.0);
+        pdf.setFont(fontName, 'bold');
         pdf.setFontSize(11);
         pdf.setTextColor(...titleColor);
-        pdf.text('Comparison vs Original Plan', marginX + 10, cursorY + 18);
+        pdf.text('Comparison vs Original Plan', marginX + 10, cursorY + 20);
 
-        pdf.setFont('helvetica', 'normal');
+        pdf.setFont(fontName, 'normal');
         pdf.setFontSize(10);
         pdf.setTextColor(...labelColor);
         pdf.text(
           `Original interest: ${formatPdfAmount(scheduleData.baselineSummary.totalInterest)}`,
           marginX + 10,
-          cursorY + 36
+          cursorY + 38
         );
         pdf.text(
           `New interest: ${formatPdfAmount(scheduleData.summary.totalInterest)}`,
           marginX + 280,
-          cursorY + 36
+          cursorY + 38
         );
 
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont(fontName, 'bold');
         pdf.setTextColor(...successColor);
         pdf.text(
           `Interest saved: ${formatPdfAmount(
             Math.max(0, scheduleData.comparison.interestSaved || 0)
           )}`,
           marginX + 10,
-          cursorY + 54
+          cursorY + 56
         );
         pdf.text(
           `EMIs saved: ${Math.max(0, scheduleData.comparison.monthsSaved || 0).toLocaleString()} months`,
           marginX + 280,
-          cursorY + 54
+          cursorY + 56
         );
 
-        cursorY += 84;
+        cursorY += 105;
       }
 
       ensurePageSpace(42);
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont(fontName, 'bold');
       pdf.setFontSize(13);
       pdf.setTextColor(...titleColor);
       pdf.text('Amortization Table', marginX, cursorY);
@@ -974,9 +1038,17 @@ async function fetchLoans() {
           `Closing (${currencyCode})`,
         ]],
         body: tableBody,
+        didParseCell: (data) => {
+          if (data.section === 'body') {
+            const originalRow = scheduleData.schedule[data.row.index];
+            if (originalRow && originalRow.extraPayment > 0) {
+              data.cell.styles.fillColor = [243, 244, 246]; // soft monochrome silver gray
+            }
+          }
+        },
         theme: 'grid',
         styles: {
-          font: 'helvetica',
+          font: fontName,
           fontSize: 8,
           cellPadding: { top: 3, right: 4, bottom: 3, left: 4 },
           textColor: [17, 24, 39],
